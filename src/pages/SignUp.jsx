@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import '../styles/cyber.css'
 import './Auth.css'
 import { useAuth } from '../context/AuthContext'
+import logoWhts from '../assets/media/logo-whts.jpg'
 
 const COUNTRIES = [
   'United States','United Kingdom','Nigeria','Canada','Australia',
@@ -67,7 +68,7 @@ export default function SignUp() {
         <div className="auth-panel-left-inner">
 
           <Link to="/" className="auth-panel-logo">
-            <img src="/src/assets/media/logo-whts.jpg" alt="WHTS" />
+            <img src={logoWhts} alt="WHTS" />
           </Link>
 
           <div className="auth-panel-headline">

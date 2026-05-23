@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
+import logoWhts from '../assets/media/logo-whts.jpg'
 
 export default function Footer() {
   const year = new Date().getFullYear()
@@ -18,7 +19,7 @@ export default function Footer() {
           <div className="col-12 col-lg-4">
             <div className="mb-3">
               <img
-                src="/src/assets/media/logo-whts.jpg"
+                src={logoWhts}
                 alt="The Watch Eyes - WHTS"
                 style={{ height: '80px', width: 'auto', borderRadius: '10px', mixBlendMode: 'lighten' }}
               />

@@ -3,6 +3,7 @@ import { NavLink, Link, useLocation } from 'react-router-dom'
 import './Navbar.css'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
+import logoWhts from '../assets/media/logo-whts.jpg'
 
 export default function Navbar() {
   const [navOpen, setNavOpen] = useState(false)
@@ -17,7 +18,7 @@ export default function Navbar() {
       <div className="container">
 
         <Link className="navbar-brand" to="/" aria-label="WHTS home">
-          <img src="/src/assets/media/logo-whts.jpg" alt="The Watch Eyes - WHTS" className="brand-logo" />
+          <img src={logoWhts} alt="The Watch Eyes - WHTS" className="brand-logo" />
         </Link>
 
         <button

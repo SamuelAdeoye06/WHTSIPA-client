@@ -3,6 +3,7 @@ import '../styles/cyber.css'
 import './Auth.css'
 import { useAuth } from '../context/AuthContext'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
+import logoWhts from '../assets/media/logo-whts.jpg'
 
 export default function SignIn() {
   const navigate = useNavigate()
@@ -44,7 +45,7 @@ export default function SignIn() {
 
           {/* Logo */}
           <Link to="/" className="auth-panel-logo">
-            <img src="/src/assets/media/logo-whts.jpg" alt="WHTS" />
+            <img src={logoWhts} alt="WHTS" />
           </Link>
 
           {/* Headline */}
