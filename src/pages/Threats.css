@@ -1,0 +1,253 @@
+/* ============================================
+   THREATS PAGE
+   src/pages/Threats.css
+   ============================================ */
+
+/* ── Hero ── */
+.threats-hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--cyber-bg);
+  border-bottom: 1px solid rgba(120, 214, 255, 0.1);
+}
+
+/* ── Quiz grid cards ── */
+.quiz-card-item {
+  background: linear-gradient(180deg, rgba(34,240,255,0.06), rgba(255,255,255,0.03));
+  border: 1px solid rgba(34, 240, 255, 0.2);
+  border-radius: 20px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+.quiz-card-item::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  background: radial-gradient(400px 140px at 10% 0%, rgba(34,240,255,0.12), transparent 55%);
+  pointer-events: none;
+}
+.quiz-card-item:hover {
+  transform: translateY(-3px);
+  border-color: rgba(34, 240, 255, 0.45);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(34,240,255,0.12);
+}
+
+/* ── Quiz Modal ── */
+.quiz-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(8px);
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.quiz-modal-box {
+  background: rgba(7, 17, 38, 0.97);
+  border: 1px solid rgba(120, 214, 255, 0.25);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(34,240,255,0.08);
+}
+
+.quiz-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.25rem 0.75rem;
+  border-bottom: 1px solid rgba(120, 214, 255, 0.12);
+}
+
+.quiz-close-btn {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(120,214,255,0.25);
+  background: rgba(255,255,255,0.05);
+  color: rgba(233,243,255,0.7);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.quiz-close-btn:hover {
+  background: rgba(255,59,85,0.15);
+  border-color: rgba(255,59,85,0.4);
+  color: var(--red);
+}
+
+/* Progress bar */
+.quiz-progress {
+  height: 3px;
+  background: rgba(255,255,255,0.06);
+  margin: 0;
+}
+.quiz-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--cyan), #2aabff);
+  transition: width 0.4s ease;
+  border-radius: 2px;
+}
+
+/* Phone mock */
+.quiz-phone-mock {
+  margin: 1.25rem;
+  border-radius: 20px;
+  border: 1px solid rgba(120,214,255,0.18);
+  background: rgba(255,255,255,0.03);
+  overflow: hidden;
+}
+.quiz-phone-notch {
+  height: 22px;
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid rgba(120,214,255,0.1);
+}
+.quiz-phone-screen {
+  padding: 1rem;
+}
+
+.quiz-question {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #f0f4ff;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+/* Answer options */
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.quiz-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid rgba(120,214,255,0.18);
+  background: rgba(255,255,255,0.04);
+  color: rgba(233,243,255,0.88);
+  text-align: left;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease;
+  width: 100%;
+}
+.quiz-option:hover:not(:disabled) {
+  border-color: rgba(34,240,255,0.45);
+  background: rgba(34,240,255,0.08);
+}
+.quiz-option.correct {
+  border-color: rgba(46,229,157,0.65);
+  background: rgba(46,229,157,0.12);
+  color: var(--green);
+}
+.quiz-option.wrong {
+  border-color: rgba(255,59,85,0.55);
+  background: rgba(255,59,85,0.10);
+  color: var(--red);
+}
+.quiz-option.dimmed {
+  opacity: 0.4;
+}
+.quiz-option-letter {
+  width: 22px; height: 22px; flex-shrink: 0;
+  border-radius: 8px;
+  background: rgba(120,214,255,0.1);
+  border: 1px solid rgba(120,214,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.72rem; font-weight: 700;
+  color: var(--cyan);
+}
+
+/* Feedback */
+.quiz-feedback {
+  margin-top: 0.75rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.quiz-feedback.correct {
+  background: rgba(46,229,157,0.12);
+  border: 1px solid rgba(46,229,157,0.35);
+  color: var(--green);
+}
+.quiz-feedback.wrong {
+  background: rgba(255,59,85,0.10);
+  border: 1px solid rgba(255,59,85,0.35);
+  color: var(--red);
+}
+
+/* Results screen */
+.quiz-results {
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.quiz-result-score {
+  font-size: 3.5rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+.quiz-result-label {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+/* ── Modal custom scrollbar ── */
+.quiz-modal-box {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(34, 240, 255, 0.25) transparent;
+}
+
+.quiz-modal-box::-webkit-scrollbar {
+  width: 4px;
+}
+
+.quiz-modal-box::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.quiz-modal-box::-webkit-scrollbar-thumb {
+  background: rgba(34, 240, 255, 0.25);
+  border-radius: 4px;
+}
+
+.quiz-modal-box::-webkit-scrollbar-thumb:hover {
+  background: rgba(34, 240, 255, 0.5);
+}
+
+/* ── Threats page responsive ── */
+@media (max-width: 991.98px) {
+  .threats-hero { padding: 36px 0; }
+
+  .quiz-modal-box { max-width: 96vw; margin: 0 auto; }
+
+  .quiz-phone-mock { margin: 1rem; }
+
+  .quiz-option { font-size: 0.82rem; padding: 0.55rem 0.75rem; }
+}
+
+@media (max-width: 575.98px) {
+  .quiz-modal-box { border-radius: 18px; }
+
+  .quiz-result-score { font-size: 2.8rem; }
+
+  .quiz-card-item { padding: 1rem; }
+}

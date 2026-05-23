@@ -1,0 +1,126 @@
+/* ============================================
+   404 NOT FOUND PAGE
+   src/pages/NotFound.css
+   ============================================ */
+
+.notfound-page {
+  position: relative;
+  min-height: calc(100vh - 72px);
+  background: var(--cyber-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  overflow: hidden;
+  text-align: center;
+}
+
+.notfound-container {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 520px;
+}
+
+/* ── Glitch 404 number ── */
+.notfound-code {
+  font-size: clamp(5rem, 18vw, 9rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.05em;
+}
+
+.notfound-4,
+.notfound-4b {
+  color: transparent;
+  -webkit-text-stroke: 2px rgba(34, 240, 255, 0.6);
+  text-shadow: 0 0 40px rgba(34, 240, 255, 0.25);
+  animation: glitch-4 3.5s ease-in-out infinite;
+}
+
+.notfound-0 {
+  color: transparent;
+  -webkit-text-stroke: 2px rgba(255, 59, 85, 0.7);
+  text-shadow: 0 0 40px rgba(255, 59, 85, 0.25);
+  animation: glitch-0 3.5s ease-in-out infinite 0.3s;
+}
+
+.notfound-4b {
+  animation-delay: 0.15s;
+}
+
+@keyframes glitch-4 {
+  0%, 90%, 100% { transform: translate(0); opacity: 1; }
+  91%  { transform: translate(-3px, 1px); opacity: 0.85; }
+  93%  { transform: translate(3px, -1px); opacity: 0.9; }
+  95%  { transform: translate(-2px, 2px); opacity: 0.85; }
+  97%  { transform: translate(0); opacity: 1; }
+}
+
+@keyframes glitch-0 {
+  0%, 88%, 100% { transform: translate(0); opacity: 1; }
+  89%  { transform: translate(2px, -2px); opacity: 0.8; }
+  91%  { transform: translate(-2px, 1px); opacity: 0.9; }
+  93%  { transform: translate(1px, 0); opacity: 1; }
+}
+
+/* ── Scan bar ── */
+.notfound-scan {
+  max-width: 240px;
+  margin: 0 auto 1.5rem;
+}
+
+/* ── Text ── */
+.notfound-title {
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  font-weight: 800;
+  color: #f0f4ff;
+  margin-bottom: 0.75rem;
+}
+
+.notfound-desc {
+  color: rgba(233, 243, 255, 0.58);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: 40ch;
+  margin: 0 auto 2rem;
+}
+
+/* ── Quick links ── */
+.notfound-links {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.notfound-link-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.88rem;
+  color: rgba(120, 214, 255, 0.7);
+}
+
+.notfound-link-item i {
+  font-size: 0.85rem;
+}
+
+.notfound-link-item a {
+  color: rgba(120, 214, 255, 0.7);
+  text-decoration: none;
+  transition: color 0.18s ease;
+}
+
+.notfound-link-item a:hover { color: var(--cyan); }
+
+/* ── Responsive ── */
+@media (max-width: 575.98px) {
+  .notfound-code { font-size: clamp(4rem, 22vw, 6rem); }
+  .notfound-links { gap: 1rem; }
+}

@@ -1,0 +1,246 @@
+/* ============================================
+   CYBER GLOBAL STYLES
+   src/styles/cyber.css
+   ============================================ */
+
+:root {
+  --cyan: #22f0ff;
+  --cyan-dim: rgba(120, 214, 255, 0.22);
+  --red: #ff3b55;
+  --green: #2ee59d;
+  --yellow: #ffd166;
+  --text: #f0f4ff;
+  --text-muted: rgba(233, 243, 255, 0.72);
+  --surface: rgba(255, 255, 255, 0.04);
+  --border: rgba(120, 214, 255, 0.18);
+  --radius: 18px;
+  --radius-lg: 24px;
+  --shadow2: 0 8px 40px rgba(0, 0, 0, 0.45);
+}
+
+/* ── Layout ── */
+.section-pad     { padding: 64px 0; }
+.section-pad-lg  { padding: 88px 0; }
+
+/* ── Typography ── */
+.glow-text { text-shadow: 0 0 22px rgba(34, 240, 255, 0.22); }
+.text-muted-cyber { color: var(--text-muted) !important; }
+.section-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cyan);
+}
+
+/* ── Cards ── */
+.card-glass {
+  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.card-hover { transition: transform 0.22s ease, box-shadow 0.22s ease; }
+.card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(34, 240, 255, 0.14);
+}
+
+/* ── Banner panels ── */
+.banner {
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(120, 214, 255, 0.24);
+  background: linear-gradient(180deg, rgba(34,240,255,0.08), rgba(255,255,255,0.03));
+  box-shadow: var(--shadow2);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  position: relative;
+  overflow: hidden;
+}
+.banner::before {
+  content: "";
+  position: absolute;
+  inset: -40px;
+  background: radial-gradient(600px 240px at 15% 20%, rgba(34,240,255,0.14), transparent 62%);
+  pointer-events: none;
+}
+.banner > * { position: relative; z-index: 1; }
+
+/* ── Stat boxes ── */
+.stat {
+  padding: 20px 18px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.stat .value {
+  font-weight: 900;
+  font-size: 2rem;
+  letter-spacing: -0.02em;
+  color: var(--cyan);
+}
+
+/* ── Pills / badges ── */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.42rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.05);
+  font-size: 0.78rem;
+}
+.pill .dot { width: 8px; height: 8px; border-radius: 99px; box-shadow: 0 0 14px currentColor; }
+.pill.high { border-color: rgba(255,59,85,0.38); }
+.pill.high .dot { background: var(--red); color: var(--red); }
+.pill.mid  { border-color: rgba(255,209,102,0.38); }
+.pill.mid  .dot { background: var(--yellow); color: var(--yellow); }
+.pill.low  { border-color: rgba(46,229,157,0.38); }
+.pill.low  .dot { background: var(--green); color: var(--green); }
+
+/* ── Icon boxes ── */
+.icon-box {
+  width: 48px; height: 48px;
+  border-radius: var(--radius);
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+  box-shadow: 0 0 22px rgba(34,240,255,0.08);
+  font-size: 1.35rem;
+  flex-shrink: 0;
+}
+
+/* ── Timeline ── */
+.timeline { display: flex; flex-direction: column; gap: 12px; }
+.t-item {
+  display: flex; gap: 14px; padding: 16px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(120,214,255,0.18);
+  background: var(--surface);
+  transition: border-color 0.2s ease;
+}
+.t-item.active { border-color: rgba(34,240,255,0.42); box-shadow: 0 0 28px rgba(34,240,255,0.08); }
+.t-marker {
+  width: 30px; height: 30px; flex-shrink: 0;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(34,240,255,0.38);
+  background: rgba(34,240,255,0.10);
+  font-size: 0.8rem; font-weight: 700;
+  color: var(--cyan);
+}
+
+/* ── Buttons ── */
+.btn-cyber {
+  padding: 0.72rem 1.2rem;
+  border-radius: 14px;
+  border: 1px solid rgba(34,240,255,0.34);
+  background: linear-gradient(180deg, rgba(34,240,255,0.16), rgba(42,168,255,0.08));
+  color: var(--text);
+  font-weight: 600;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.btn-cyber:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 28px rgba(34,240,255,0.22);
+  color: #fff;
+}
+.btn-alert {
+  padding: 0.72rem 1.2rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255,59,85,0.45);
+  background: linear-gradient(180deg, rgba(255,59,85,0.20), rgba(255,59,85,0.08));
+  color: var(--text);
+  font-weight: 600;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.btn-alert:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 28px rgba(255,59,85,0.25);
+  color: #fff;
+}
+.btn-outline-cyber {
+  padding: 0.72rem 1.2rem;
+  border-radius: 14px;
+  border: 1px solid rgba(120,214,255,0.35);
+  background: transparent;
+  color: rgba(233,243,255,0.88);
+  font-weight: 600;
+  transition: border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+.btn-outline-cyber:hover {
+  border-color: rgba(34,240,255,0.7);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* ── Scan bar animation ── */
+.scan-bar {
+  height: 4px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.08);
+  overflow: hidden;
+  position: relative;
+}
+.scan-bar span {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+  animation: scanMove 2.2s ease-in-out infinite;
+}
+@keyframes scanMove {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* ── Cyber grid overlay ── */
+.cyber-grid {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(34,240,255,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34,240,255,0.035) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* ============================================
+   GLOBAL RESPONSIVE — all breakpoints
+   ============================================ */
+
+/* ── Tablet (max 991px) ── */
+@media (max-width: 991.98px) {
+  .section-pad    { padding: 48px 0; }
+  .section-pad-lg { padding: 64px 0; }
+
+  .banner { padding: 1.5rem !important; }
+
+  .stat .value { font-size: 1.6rem; }
+
+  /* Stack timeline vertically with less gap */
+  .timeline { gap: 8px; }
+  .t-item { padding: 12px; }
+}
+
+/* ── Mobile (max 575px) ── */
+@media (max-width: 575.98px) {
+  .section-pad    { padding: 36px 0; }
+  .section-pad-lg { padding: 48px 0; }
+
+  .banner { padding: 1.25rem !important; }
+
+  .glow-text { text-shadow: none; }
+
+  .stat { padding: 14px 12px; }
+  .stat .value { font-size: 1.4rem; }
+
+  .icon-box { width: 40px; height: 40px; font-size: 1.1rem; border-radius: 12px; }
+
+  .pill { font-size: 0.7rem; padding: 0.32rem 0.6rem; }
+
+  /* Buttons full width on very small screens */
+  .btn-cyber,
+  .btn-alert,
+  .btn-outline-cyber { font-size: 0.85rem; padding: 0.6rem 0.9rem; }
+}

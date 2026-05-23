@@ -1,0 +1,220 @@
+/* ============================================
+   HOME PAGE
+   src/pages/Home.css
+   ============================================ */
+
+/* ── Hero ── */
+.hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--cyber-bg);
+  padding: 80px 0;
+}
+
+/* Min height so hero always looks full without being vh-locked */
+.min-vh-hero {
+  min-height: calc(100vh - 72px);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+.hero h1 {
+  font-weight: 820;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  font-size: clamp(1.7rem, 3vw, 3.2rem);
+}
+
+/* ── Hero video — right column ── */
+.hero-video-wrap {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(120, 214, 255, 0.22);
+  box-shadow:
+    0 0 0 1px rgba(34, 240, 255, 0.06),
+    0 24px 64px rgba(0, 0, 0, 0.55);
+  /* Portrait video — 9:16 ratio, full column width, capped height */
+  aspect-ratio: 9 / 16;
+  width: 100%;           /* fills the entire right column */
+  max-height: 95vh;      /* never overflows the screen */
+}
+
+.hero-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;  /* show top of video first since logo is up there */
+  display: block;
+}
+
+/* Subtle neon glow border overlay on the video */
+.hero-video-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    rgba(34, 240, 255, 0.06) 0%,
+    transparent 50%,
+    rgba(42, 168, 255, 0.04) 100%
+  );
+}
+
+/* On mobile — stack nicely, video goes below text */
+@media (max-width: 991.98px) {
+  .hero {
+    padding: 60px 0;
+  }
+  .min-vh-hero {
+    min-height: unset;
+  }
+  .hero-video-wrap {
+    width: 80%;
+    margin: 0 auto;
+    max-height: 60vh;
+  }
+}
+/* ── Unmute button overlay ── */
+.hero-video-unmute {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(120, 214, 255, 0.35);
+  background: rgba(7, 17, 38, 0.75);
+  color: rgba(233, 243, 255, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: background 0.2s ease, border-color 0.2s ease;
+  z-index: 5;
+}
+
+.hero-video-unmute:hover {
+  background: rgba(34, 240, 255, 0.15);
+  border-color: rgba(34, 240, 255, 0.6);
+  color: #fff;
+}
+
+/* ── Agency marquee carousel ── */
+.agency-marquee-wrap {
+  overflow: hidden;
+  width: 100%;
+  padding: 1.25rem 0;
+  border-radius: 20px;
+  border: 1px solid rgba(120, 214, 255, 0.12);
+  background: rgba(255, 255, 255, 0.02);
+  /* Fade edges */
+  mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+}
+
+.agency-marquee-track {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  width: max-content;
+  animation: marqueeScroll 28s linear infinite;
+}
+
+.agency-marquee-track:hover {
+  animation-play-state: paused;
+}
+
+.agency-marquee-item {
+  flex-shrink: 0;
+  width: 110px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Full color — no grayscale */
+  transition: transform 0.22s ease;
+}
+
+.agency-marquee-item:hover {
+  transform: scale(1.08);
+}
+
+.agency-marquee-item img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+@keyframes marqueeScroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ── Agency description image cards ── */
+.agency-card {
+  border-radius: 18px;
+  border: 1px solid rgba(120, 214, 255, 0.14);
+  background: rgba(255, 255, 255, 0.02);
+  overflow: hidden;
+  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+.agency-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(120, 214, 255, 0.35);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+.agency-desc-img {
+  width: 100%;
+  height: auto;
+  min-height: 260px;
+  max-height: 340px;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+  border-radius: 18px;
+}
+
+/* ── Home page responsive ── */
+@media (max-width: 991.98px) {
+  .hero { padding: 48px 0; }
+  .min-vh-hero { min-height: unset; }
+
+  .hero h1 { font-size: clamp(1.5rem, 4vw, 2.4rem); }
+
+  .hero-video-wrap {
+    width: 85%;
+    margin: 0 auto;
+    max-height: 55vh;
+  }
+
+  /* Agency cards — 2 per row on tablet */
+  .agency-desc-img { min-height: 240px; max-height: 320px; }
+}
+
+@media (max-width: 575.98px) {
+  .hero { padding: 36px 0; }
+  .hero h1 { font-size: clamp(1.4rem, 5vw, 2rem); }
+
+  .hero-video-wrap {
+    width: 100%;
+    max-height: 50vh;
+  }
+
+  /* Agency cards full width on mobile */
+  .agency-desc-img { min-height: 200px; max-height: 280px; }
+
+  /* Marquee items slightly smaller */
+  .agency-marquee-item { width: 80px; height: 48px; }
+
+  /* CTA banner padding */
+  .banner.p-5 { padding: 1.5rem !important; }
+}

@@ -1,0 +1,92 @@
+/* ============================================
+   THREAT DETAIL PAGE
+   src/pages/ThreatDetail.css
+   ============================================ */
+
+/* ── Hero ── */
+.threat-detail-hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--cyber-bg);
+  border-bottom: 1px solid rgba(120, 214, 255, 0.1);
+}
+
+/* ── Breadcrumb ── */
+.cyber-breadcrumb {
+  --bs-breadcrumb-divider-color: rgba(120, 214, 255, 0.4);
+  --bs-breadcrumb-item-active-color: rgba(233, 243, 255, 0.5);
+  font-size: 0.82rem;
+}
+.cyber-breadcrumb a {
+  color: rgba(120, 214, 255, 0.8);
+  text-decoration: none;
+}
+.cyber-breadcrumb a:hover { color: var(--cyan); }
+
+/* ── Indicators ── */
+.indicator-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 59, 85, 0.18);
+  background: rgba(255, 59, 85, 0.04);
+  color: rgba(233, 243, 255, 0.85);
+  transition: border-color 0.2s ease;
+}
+.indicator-item:hover {
+  border-color: rgba(255, 59, 85, 0.38);
+}
+
+/* ── Prevention cards ── */
+.prevention-card {
+  padding: 1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(120, 214, 255, 0.18);
+  background: rgba(255, 255, 255, 0.03);
+  position: relative;
+  transition: border-color 0.22s ease, transform 0.22s ease;
+}
+.prevention-card:hover {
+  border-color: rgba(34, 240, 255, 0.38);
+  transform: translateY(-2px);
+}
+.prevention-num {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--cyan);
+  opacity: 0.65;
+  margin-bottom: 0.4rem;
+}
+
+/* ── Tools highlight ── */
+.tools-link {
+  color: var(--cyan);
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 1px dashed rgba(34, 240, 255, 0.4);
+  transition: color 0.15s ease, border-color 0.15s ease;
+  text-transform: lowercase;
+}
+.tools-link:hover {
+  color: #fff;
+  border-color: rgba(34, 240, 255, 0.8);
+}
+
+/* ── ThreatDetail responsive ── */
+@media (max-width: 991.98px) {
+  .threat-detail-hero { padding: 36px 0 48px; }
+
+  /* Sidebar stacks below main content on tablet */
+  .prevention-card { padding: 0.85rem; }
+}
+
+@media (max-width: 575.98px) {
+  .indicator-item { padding: 0.5rem 0.7rem; font-size: 0.82rem; }
+
+  .prevention-num { font-size: 0.65rem; }
+
+  .cyber-breadcrumb { font-size: 0.75rem; }
+}

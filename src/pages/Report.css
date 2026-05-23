@@ -1,0 +1,170 @@
+/* ============================================
+   REPORT & RECOVER PAGE
+   src/pages/Report.css
+   ============================================ */
+
+/* ── Hero ── */
+.report-hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--cyber-bg);
+  border-bottom: 1px solid rgba(120, 214, 255, 0.1);
+}
+
+/* ── Cyber form inputs ── */
+.cyber-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(233, 243, 255, 0.82);
+  letter-spacing: 0.02em;
+  margin-bottom: 0.4rem;
+}
+
+.cyber-input,
+.cyber-select {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(120, 214, 255, 0.22) !important;
+  border-radius: 12px !important;
+  color: #f0f4ff !important;
+  padding: 0.65rem 0.9rem !important;
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cyber-input::placeholder { color: rgba(233, 243, 255, 0.35) !important; }
+.cyber-input:focus,
+.cyber-select:focus {
+  background: rgba(34, 240, 255, 0.04) !important;
+  border-color: rgba(34, 240, 255, 0.5) !important;
+  box-shadow: 0 0 0 3px rgba(34, 240, 255, 0.08) !important;
+  color: #fff !important;
+  outline: none;
+}
+
+.cyber-select option {
+  background: #0a1628;
+  color: #f0f4ff;
+}
+
+textarea.cyber-input { resize: vertical; min-height: 120px; }
+
+/* ── Report type tabs ── */
+.report-type-tabs {
+  display: flex;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(120, 214, 255, 0.15);
+  border-radius: 16px;
+  padding: 0.4rem;
+  width: fit-content;
+}
+
+.report-tab {
+  padding: 0.55rem 1.2rem;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  color: rgba(233, 243, 255, 0.65);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.report-tab.active {
+  background: rgba(34, 240, 255, 0.12);
+  border: 1px solid rgba(34, 240, 255, 0.3);
+  color: #fff;
+}
+
+.report-tab:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(233, 243, 255, 0.9);
+}
+
+/* ── File drop zone ── */
+.file-drop-zone {
+  border: 2px dashed rgba(120, 214, 255, 0.28);
+  border-radius: 16px;
+  background: rgba(34, 240, 255, 0.03);
+  padding: 2rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.file-drop-zone:hover {
+  border-color: rgba(34, 240, 255, 0.55);
+  background: rgba(34, 240, 255, 0.06);
+}
+
+.file-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.6rem;
+  border-radius: 8px;
+  background: rgba(34, 240, 255, 0.1);
+  border: 1px solid rgba(34, 240, 255, 0.25);
+  font-size: 0.75rem;
+  color: rgba(233, 243, 255, 0.85);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Recovery tabs ── */
+.recovery-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.recovery-tab {
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(120, 214, 255, 0.2);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(233, 243, 255, 0.75);
+  font-size: 0.84rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.recovery-tab:hover {
+  border-color: rgba(34, 240, 255, 0.4);
+  background: rgba(34, 240, 255, 0.06);
+  color: #fff;
+}
+
+.recovery-tab.active {
+  border-color: rgba(34, 240, 255, 0.55);
+  background: rgba(34, 240, 255, 0.12);
+  color: #fff;
+  box-shadow: 0 0 18px rgba(34, 240, 255, 0.1);
+}
+
+/* ── Report page responsive ── */
+@media (max-width: 991.98px) {
+  .report-type-tabs { width: 100%; }
+  .report-tab { flex: 1; text-align: center; }
+
+  .recovery-tabs { gap: 0.4rem; }
+  .recovery-tab { font-size: 0.8rem; padding: 0.4rem 0.75rem; }
+}
+
+@media (max-width: 575.98px) {
+  .report-type-tabs {
+    flex-direction: column;
+    width: 100%;
+    border-radius: 14px;
+  }
+
+  .report-tab { border-radius: 10px; padding: 0.65rem 1rem; }
+
+  .file-drop-zone { padding: 1.25rem 0.75rem; }
+
+  .cyber-input,
+  .cyber-select { font-size: 0.85rem; }
+}
