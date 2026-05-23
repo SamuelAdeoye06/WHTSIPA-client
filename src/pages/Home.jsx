@@ -19,7 +19,7 @@ import agencyDescDhs from '../assets/media/agency-desc-dhs.jpeg'
 import agencyDescFbi from '../assets/media/agency-desc-fbi.jpeg'
 import agencyDescSecretService from '../assets/media/agency-desc-secret-service.jpeg'
 import agencyDescIrs from '../assets/media/agency-desc-irs.jpeg'
-import heroVideo from '../../public/hero-video.mp4'
+const heroVideo = 'https://res.cloudinary.com/dqch0tjrm/video/upload/v1779575838/hero-video-compressed_rdbyn5.mp4'
 
 /* ── Animated counter hook ── */
 function useCounter(target, duration = 1400, trigger) {
