@@ -1,3 +1,19 @@
+// ══════════════════════════════════════════════════════
+// BACKEND INTEGRATION — AuthContext.jsx
+// ══════════════════════════════════════════════════════
+// Replace the localStorage simulation with real API calls:
+//
+// login(userData)    → POST /api/auth/login
+// register(userData) → POST /api/auth/register
+// logout()           → POST /api/auth/logout (optional, clear server session)
+//
+// On app mount (useEffect), replace localStorage.getItem with:
+//   GET /api/auth/me  — returns current user from JWT/session
+//
+// Expected user object shape:
+// { id, name, email, country, createdAt }
+// ══════════════════════════════════════════════════════
+
 import { createContext, useContext, useState, useEffect } from 'react'
 
 const AuthContext = createContext(null)

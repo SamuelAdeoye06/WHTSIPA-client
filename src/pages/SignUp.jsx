@@ -51,7 +51,20 @@ export default function SignUp() {
         if (form.password !== form.confirmPassword) { setError('Passwords do not match.'); return }
         if (strength.score < 2) { setError('Please use a stronger password.'); return }
         setLoading(true)
-        // ── Replace setTimeout with actual API call later ──
+        // ── BACKEND: Replace this entire setTimeout block with: ──
+        // try {
+        //   setLoading(true)
+        //   const { data } = await api.post('/auth/register', {
+        //     firstName: form.firstName, lastName: form.lastName,
+        //     email: form.email, country: form.country, password: form.password
+        //   })
+        //   register(data.user)
+        //   navigate('/')
+        // } catch (err) {
+        //   setError(err.response?.data?.message || 'Registration failed. Please try again.')
+        // } finally {
+        //   setLoading(false)
+        // }
         setTimeout(() => {
             register({ email: form.email, name: `${form.firstName} ${form.lastName}`, country: form.country })
             setLoading(false)

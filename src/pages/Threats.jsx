@@ -18,9 +18,13 @@ const THREAT_CATS = [
 ]
 
 const RISK_LABEL = { high: 'HIGH RISK', mid: 'MED RISK', low: 'SECURE PATH' }
+// Tracks which quiz slugs the user has failed — persists across quiz sessions
+const [failedScenarios, setFailedScenarios] = useState([])
+const [showRepPrompt, setShowRepPrompt] = useState(false)
+
 
 /* ── Quiz Modal Component ── */
-function QuizModal({ slug, onClose }) {
+function QuizModal({ slug, onClose, onFail }) {
   const quiz = QUIZ_DATA[slug]
   const [step, setStep]       = useState(0)   // current question index
   const [selected, setSelected] = useState(null)
@@ -44,6 +48,11 @@ function QuizModal({ slug, onClose }) {
   const handleNext = () => {
     if (step + 1 >= total) {
       setDone(true)
+      // If score is 3 or below out of 5, register this as a failed scenario
+      const finalScore = score + (selected === q.correct ? 1 : 0)
+      if (finalScore <= Math.floor(total * 0.6)) {
+        onFail(slug)
+      }
     } else {
       setStep(s => s + 1)
       setSelected(null)
@@ -52,9 +61,9 @@ function QuizModal({ slug, onClose }) {
   }
 
   const getResult = () => {
-    if (score === total)        return { label: '🛡️ Secured!',       msg: 'Perfect score — you are fully threat-aware.',           color: 'var(--green)' }
-    if (score === total - 1)    return { label: '🧠 Smart One!',      msg: 'Almost perfect — review the one you missed.',           color: 'var(--cyan)'  }
-    return                             { label: '⚠️ Try Again',       msg: 'You need to improve — revisit this scenario.',          color: 'var(--red)'   }
+    if (score === total)     return { label: '🛡️ Secured!',      msg: 'Perfect score — you are fully threat-aware.',                      color: 'var(--green)' }
+    if (score === total - 1) return { label: '🧠 Smart One!',     msg: 'Almost perfect — review the one you missed.',                      color: 'var(--cyan)'  }
+    return                          { label: '⚠️ You Failed',     msg: 'You need to improve your awareness. Try this scenario again.',     color: 'var(--red)'   }
   }
 
 
@@ -170,7 +179,57 @@ export default function Threats() {
   return (
     <>
       {/* ── Quiz Modal ── */}
-      {activeQuiz && <QuizModal slug={activeQuiz} onClose={() => setActiveQuiz(null)} />}
+      {activeQuiz && (
+        <QuizModal
+          slug={activeQuiz}
+          onClose={() => setActiveQuiz(null)}
+          onFail={(slug) => {
+            setFailedScenarios(prev => {
+              const updated = prev.includes(slug) ? prev : [...prev, slug]
+              // PDF rule: 3 or more failed scenarios triggers the prompt
+              if (updated.length >= 3) setShowRepPrompt(true)
+              return updated
+            })
+          }}
+        />
+      )}
+
+      {/* PDF requirement: show rep contact prompt after 3+ failed scenarios */}
+      {showRepPrompt && (
+        <div className="quiz-modal-backdrop" onClick={() => setShowRepPrompt(false)}>
+          <div className="quiz-modal-box" style={{ maxWidth: 400 }} onClick={e => e.stopPropagation()}>
+            <div className="quiz-modal-header">
+              <div className="d-flex align-items-center gap-2">
+                <span style={{ fontSize: '1.4rem' }}>⚠️</span>
+                <div className="fw-bold text-white">You Need Help</div>
+              </div>
+              <button className="quiz-close-btn" onClick={() => setShowRepPrompt(false)}>
+                <i className="bi bi-x-lg"></i>
+              </button>
+            </div>
+            <div className="p-4 text-center">
+              <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>🛡️</div>
+              <div className="fw-bold text-white mb-2">You have failed {failedScenarios.length} different scenarios.</div>
+              <p className="text-muted-cyber small mb-4">
+                You need to protect yourself. Contact an Active Representative now
+                — they will guide you through staying safe online.
+              </p>
+              {/* ── BACKEND NOTE: Replace the href below with the actual Telegram link from the client ── */}
+              <a
+                href="https://t.me/WHTS_support"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-alert w-100 mb-2"
+              >
+                <i className="bi bi-telegram me-2"></i>Contact Active Representative
+              </a>
+              <button className="btn btn-outline-cyber w-100" onClick={() => setShowRepPrompt(false)}>
+                Keep Practicing
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ════════════════════════════
           HERO

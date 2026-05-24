@@ -24,7 +24,17 @@ export default function SignIn() {
             return
         }
         setLoading(true)
-        // ── Replace setTimeout with actual API call later ──
+        // ── BACKEND: Replace this entire setTimeout block with: ──
+        // try {
+        //   setLoading(true)
+        //   const { data } = await api.post('/auth/login', { email: form.email, password: form.password })
+        //   login(data.user)          // data.user = { id, name, email, country }
+        //   navigate(from, scrollTo ? { state: { scrollTo } } : {})
+        // } catch (err) {
+        //   setError(err.response?.data?.message || 'Invalid email or password.')
+        // } finally {
+        //   setLoading(false)
+        // }
         setTimeout(() => {
             login({ email: form.email, name: 'User' })
             setLoading(false)

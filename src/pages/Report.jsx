@@ -238,7 +238,39 @@ export default function Report() {
       navigate('/signin', { state: { from: '/report', scrollTo: 'report' } })
       return
     }
-    // Wire backend API later
+    // ── BACKEND: Replace setSubmitted(true) with: ──
+    // try {
+    //   const formData = new FormData()
+    //   formData.append('reportType', reportType)
+    //   formData.append('fullName', form.fullName)
+    //   formData.append('email', form.email)
+    //   formData.append('phone', form.phone)
+    //   formData.append('country', form.country)
+    //   formData.append('incidentType', form.incidentType)
+    //   formData.append('detail', form.detail)
+    //   if (reportType === 'public') {
+    //     formData.append('organization', form.organization)
+    //     formData.append('targetedName', form.targetedName)
+    //     formData.append('socialHandles', form.socialHandles)
+    //   }
+    //   files.forEach(f => formData.append('evidence', f))
+    //   await api.post('/reports/submit', formData, {
+    //     headers: { 'Content-Type': 'multipart/form-data' }
+    //   })
+    //   setSubmitted(true)
+    // } catch (err) {
+    //   setError('Submission failed. Please try again.')
+    // }
+    //
+    // Also create: src/services/api.js
+    // import axios from 'axios'
+    // const api = axios.create({ baseURL: import.meta.env.VITE_API_URL })
+    // api.interceptors.request.use(config => {
+    //   const user = JSON.parse(localStorage.getItem('whts_user') || '{}')
+    //   if (user.token) config.headers.Authorization = `Bearer ${user.token}`
+    //   return config
+    // })
+    // export default api
     setSubmitted(true)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
