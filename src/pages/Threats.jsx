@@ -35,7 +35,7 @@ function QuizModal({ slug, onClose, onFail }) {
   const total = quiz.questions.length
 
   const handleAnswer = (idx) => {
-    if (selected !== null) return  // already answered
+    if (selected !== null) return
     setSelected(idx)
     const isCorrect = idx === q.correct
     setFeedback(isCorrect ? 'correct' : 'wrong')
@@ -44,10 +44,16 @@ function QuizModal({ slug, onClose, onFail }) {
 
   const handleNext = () => {
     if (step + 1 >= total) {
+      // Calculate true final score — include this last answer since score state
+      // hasn't updated yet (React state is async)
+      const lastAnswerCorrect = selected === q.correct
+      const trueScore = score + (lastAnswerCorrect ? 1 : 0)
+
       setDone(true)
-      // If score is 3 or below out of 5, register this as a failed scenario
-      const finalScore = score + (selected === q.correct ? 1 : 0)
-      if (finalScore <= Math.floor(total * 0.6)) {
+
+      // Passing threshold is 4 out of 5 (80%) — below that = failed
+      // Math.floor(total * 0.8) = 4 for a 5-question quiz
+      if (trueScore < Math.ceil(total * 0.8)) {
         onFail(slug)
       }
     } else {
@@ -58,9 +64,9 @@ function QuizModal({ slug, onClose, onFail }) {
   }
 
   const getResult = () => {
-    if (score === total)     return { label: '🛡️ Secured!',      msg: 'Perfect score — you are fully threat-aware.',                      color: 'var(--green)' }
-    if (score === total - 1) return { label: '🧠 Smart One!',     msg: 'Almost perfect — review the one you missed.',                      color: 'var(--cyan)'  }
-    return                          { label: '⚠️ You Failed',     msg: 'You need to improve your awareness. Try this scenario again.',     color: 'var(--red)'   }
+    if (score === total)        return { label: '🛡️ Secured!',   msg: 'Perfect score — you are fully threat-aware.',              color: 'var(--green)' }
+    if (score === total - 1)    return { label: '🧠 Smart One!',  msg: 'Almost perfect — review the one you missed.',              color: 'var(--cyan)'  }
+    return                             { label: '⚠️ You Failed',  msg: 'You need to improve. Try this scenario again.',            color: 'var(--red)'   }
   }
 
 
@@ -176,6 +182,17 @@ export default function Threats() {
   // Tracks which quiz slugs the user has failed — persists across quiz sessions
   const [failedScenarios, setFailedScenarios] = useState([])
   const [showRepPrompt, setShowRepPrompt] = useState(false)
+
+  const handleFail = (slug) => {
+    setFailedScenarios(prev => {
+      // Only count each unique scenario once
+      if (prev.includes(slug)) return prev
+      const updated = [...prev, slug]
+      // PDF rule: 3 or more unique failed scenarios triggers the modal
+      if (updated.length >= 3) setShowRepPrompt(true)
+      return updated
+    })
+  }
   return (
     <>
       {/* ── Quiz Modal ── */}
@@ -183,14 +200,7 @@ export default function Threats() {
         <QuizModal
           slug={activeQuiz}
           onClose={() => setActiveQuiz(null)}
-          onFail={(slug) => {
-            setFailedScenarios(prev => {
-              const updated = prev.includes(slug) ? prev : [...prev, slug]
-              // PDF rule: 3 or more failed scenarios triggers the prompt
-              if (updated.length >= 3) setShowRepPrompt(true)
-              return updated
-            })
-          }}
+          onFail={handleFail}
         />
       )}
 
