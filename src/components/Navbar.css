@@ -302,3 +302,34 @@
   font-weight: 600;
   white-space: nowrap;
 }
+/* ── Dropdown toggle underline via real span element ──
+   Using a span instead of ::before/::after because Bootstrap
+   owns both pseudo-elements on .dropdown-toggle ── */
+.cyber-navbar .nav-underline {
+  display: block;
+  position: absolute;
+  left: 8px;
+  right: 22px; /* account for Bootstrap caret width */
+  bottom: -2px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(34, 240, 255, 0.9), transparent);
+  border-radius: 2px;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.25s ease;
+  pointer-events: none;
+}
+
+.cyber-navbar .nav-dropdown-toggle:hover .nav-underline,
+.cyber-navbar .nav-dropdown-toggle.active-link .nav-underline {
+  transform: scaleX(1);
+}
+
+.cyber-navbar .nav-dropdown-toggle:hover {
+  color: #fff !important;
+}
+
+/* Hide underline spans on mobile where we already hide ::after underlines */
+@media (max-width: 991.98px) {
+  .cyber-navbar .nav-underline { display: none; }
+}

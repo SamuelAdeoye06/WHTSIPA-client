@@ -1,0 +1,15 @@
+/* ============================================
+   FOR VICTIMS & GOVERNMENT PAGE
+   src/pages/ForVictimsGovernment.css
+   ============================================ */
+
+.fvg-hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--cyber-bg);
+  border-bottom: 1px solid rgba(120, 214, 255, 0.1);
+}
+
+.fvg-gov-section {
+  background: rgba(5, 9, 19, 0.55);
+}

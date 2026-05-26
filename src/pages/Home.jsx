@@ -11,14 +11,7 @@ import agencyInterpol from '../assets/media/agency-interpol.jpeg'
 import agencyIrs from '../assets/media/agency-irs.jpeg'
 import agencySecretService from '../assets/media/agency-secret-service.jpeg'
 import agencyUsps from '../assets/media/agency-usps.jpeg'
-import agencyDescFtc from '../assets/media/agency-desc-ftc.jpeg'
-import agencyDescUsps from '../assets/media/agency-desc-usps.jpeg'
-import agencyDescInterpol from '../assets/media/agency-desc-interpol.jpeg'
-import agencyDescCisa from '../assets/media/agency-desc-cisa.jpeg'
-import agencyDescDhs from '../assets/media/agency-desc-dhs.jpeg'
-import agencyDescFbi from '../assets/media/agency-desc-fbi.jpeg'
-import agencyDescSecretService from '../assets/media/agency-desc-secret-service.jpeg'
-import agencyDescIrs from '../assets/media/agency-desc-irs.jpeg'
+import heroImage from '../assets/media/hero-image.png'
 const heroVideo = 'https://res.cloudinary.com/dqch0tjrm/video/upload/v1779575838/hero-video-compressed_rdbyn5.mp4'
 
 /* ── Animated counter hook ── */
@@ -63,14 +56,14 @@ const PROCESS = [
 ]
 
 const AGENCIES = [
-  { name: 'Federal Trade Commission',                       abbr: 'FTC',     img: agencyFtc,           descImg: agencyDescFtc },
-  { name: 'US Postal Inspection Service',                   abbr: 'USPS',    img: agencyUsps,          descImg: agencyDescUsps },
-  { name: 'INTERPOL',                                       abbr: 'INTERPOL', img: agencyInterpol,     descImg: agencyDescInterpol },
-  { name: 'Cybersecurity & Infrastructure Security Agency', abbr: 'CISA',    img: agencyCisa,          descImg: agencyDescCisa },
-  { name: 'Dept. of Homeland Security',                     abbr: 'DHS',     img: agencyDhs,           descImg: agencyDescDhs },
-  { name: 'FBI / Dept. of Justice',                         abbr: 'FBI',     img: agencyFbi,           descImg: agencyDescFbi },
-  { name: 'US Secret Service',                              abbr: 'USSS',    img: agencySecretService, descImg: agencyDescSecretService },
-  { name: 'Internal Revenue Service',                       abbr: 'IRS',     img: agencyIrs,           descImg: agencyDescIrs },
+  { name: 'Federal Trade Commission',                       abbr: 'FTC',      img: agencyFtc },
+  { name: 'US Postal Inspection Service',                   abbr: 'USPS',     img: agencyUsps },
+  { name: 'INTERPOL',                                       abbr: 'INTERPOL', img: agencyInterpol },
+  { name: 'Cybersecurity & Infrastructure Security Agency', abbr: 'CISA',     img: agencyCisa },
+  { name: 'Dept. of Homeland Security',                     abbr: 'DHS',      img: agencyDhs },
+  { name: 'FBI / Dept. of Justice',                         abbr: 'FBI',      img: agencyFbi },
+  { name: 'US Secret Service',                              abbr: 'USSS',     img: agencySecretService },
+  { name: 'Internal Revenue Service',                       abbr: 'IRS',      img: agencyIrs },
 ]
 
 export default function Home() {
@@ -107,6 +100,7 @@ export default function Home() {
             loop
             playsInline
             preload="auto"
+            poster = {heroImage}
           />
           {/* Dark overlay so text stays readable */}
           <div className="hero-media-overlay" />
@@ -347,19 +341,11 @@ export default function Home() {
             </div>
           </div>
 
-          {/* ── Agency description image cards ── */}
-          <div className="row g-3">
-            {AGENCIES.map(agency => (
-              <div key={agency.abbr} className="col-12 col-md-6 col-lg-4">
-                <div className="agency-card h-100">
-                  <img
-                    src={agency.descImg}
-                    alt={`${agency.name} description`}
-                    className="agency-desc-img"
-                  />
-                </div>
-              </div>
-            ))}
+          {/* Link to full officials page */}
+          <div className="text-center">
+            <Link className="btn btn-outline-cyber" to="/about-officials">
+              <i className="bi bi-people me-2"></i>View All Affiliated Agencies
+            </Link>
           </div>
 
         </div>

@@ -66,29 +66,40 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Threat education links */}
+          {/* About column */}
           <div className="col-6 col-lg-2">
-            <div className="footer-col-title">Threat Education</div>
+            <div className="footer-col-title">About</div>
             <ul className="list-unstyled mb-0">
               <li className="mb-2">
-                <button className="footer-link-btn" onClick={() => goTo('/threats', 'quizzes')}>
-                  Spot a Scam Quiz
-                </button>
+                <button className="footer-link-btn" onClick={() => navigate('/about')}>About WHTS</button>
               </li>
               <li className="mb-2">
-                <button className="footer-link-btn" onClick={() => goTo('/threats', 'categories')}>
-                  Threat Library
-                </button>
+                <button className="footer-link-btn" onClick={() => navigate('/about-officials')}>The Officials</button>
               </li>
               <li className="mb-2">
-                <button className="footer-link-btn" onClick={() => goTo('/threats', 'categories')}>
-                  Prevention Tips
-                </button>
+                <button className="footer-link-btn" onClick={() => navigate('/for-victims-government')}>For Victims</button>
               </li>
               <li className="mb-2">
-                <button className="footer-link-btn" onClick={() => goTo('/report', 'contact')}>
-                  Live Guidance
-                </button>
+                <button className="footer-link-btn" onClick={() => navigate('/contact')}>Contact Us</button>
+              </li>
+            </ul>
+          </div>
+
+          {/* Resources column */}
+          <div className="col-6 col-lg-2">
+            <div className="footer-col-title">Resources</div>
+            <ul className="list-unstyled mb-0">
+              <li className="mb-2">
+                <button className="footer-link-btn" onClick={() => navigate('/essential-eight')}>Essential Eight</button>
+              </li>
+              <li className="mb-2">
+                <button className="footer-link-btn" onClick={() => navigate('/blog')}>Knowledge Base</button>
+              </li>
+              <li className="mb-2">
+                <button className="footer-link-btn" onClick={() => goTo('/threats', 'quizzes')}>Spot a Scam Quiz</button>
+              </li>
+              <li className="mb-2">
+                <button className="footer-link-btn" onClick={() => goTo('/threats', 'categories')}>Threat Library</button>
               </li>
             </ul>
           </div>
@@ -124,7 +135,7 @@ export default function Footer() {
             © {year} WHTS · America Cyber Security World. All rights reserved.
           </div>
           <div className="d-flex gap-3">
-            <button className="footer-link-btn small" onClick={() => goTo('/report', 'contact')}>Contact</button>
+          <button className="footer-link-btn small" onClick={() => navigate('/contact')}>Contact</button>
             <span className="text-muted-cyber small">Privacy Policy</span>
             <span className="text-muted-cyber small">Terms of Use</span>
           </div>

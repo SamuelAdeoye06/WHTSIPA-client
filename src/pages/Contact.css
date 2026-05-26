@@ -1,0 +1,30 @@
+/* ============================================
+   CONTACT PAGE
+   src/pages/Contact.css
+   ============================================ */
+
+.contact-hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--cyber-bg);
+  border-bottom: 1px solid rgba(120, 214, 255, 0.1);
+}
+
+.contact-input-wrap {
+  position: relative;
+}
+
+.contact-icon {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(120, 214, 255, 0.5);
+  font-size: 0.9rem;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.ps-contact {
+  padding-left: 2.4rem !important;
+}

@@ -7,6 +7,12 @@ const PAGE_TITLES = {
   '/report':  'Report & Recover — WHTS',
   '/signin':  'Sign In — WHTS',
   '/signup':  'Create Account — WHTS',
+  '/essential-eight':        'Essential Eight — WHTS',
+  '/for-victims-government': 'For Victims & Government — WHTS',
+  '/blog':                   'Knowledge Base — WHTS',
+  '/about':                  'About WHTSIPA — WHTS',
+  '/about-officials':        'The Officials — WHTS',
+  '/contact':                'Contact — WHTS',
 }
 
 export default function ScrollManager() {
