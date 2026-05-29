@@ -67,10 +67,25 @@ export default function Navbar() {
               </NavLink>
             </li>
 
-            <li className="nav-item">
-              <NavLink className={({ isActive }) => `nav-link ${isActive ? 'active-link' : ''}`} to="/threats">
+            {/* Threats dropdown */}
+            <li className="nav-item dropdown">
+              <a className={`nav-link dropdown-toggle nav-dropdown-toggle ${location.pathname.startsWith('/threats') ? 'active-link' : ''}`}
+                href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Threats
-              </NavLink>
+                <span className="nav-underline" aria-hidden="true"></span>
+              </a>
+              <ul className="dropdown-menu cyber-dropdown p-3">
+                <li>
+                  <Link className="dropdown-item cyber-dropdown-item" to="/threats">
+                    <i className="bi bi-grid me-2" style={{ color: '#1d4ed8' }}></i>Threat Library
+                  </Link>
+                </li>
+                <li>
+                  <Link className="dropdown-item cyber-dropdown-item" to="/threats-tools">
+                    <i className="bi bi-tools me-2" style={{ color: '#dc2626' }}></i>Threats &amp; Tools
+                  </Link>
+                </li>
+              </ul>
             </li>
 
             {/* About dropdown */}
@@ -137,12 +152,6 @@ export default function Navbar() {
                   <Link className="dropdown-item cyber-dropdown-item" to="/report" state={{ scrollTo: 'recover' }}>
                     <i className="bi bi-shield-check me-2 text-success"></i>Recover Now
                   </Link>
-                </li>
-                <li><hr className="dropdown-divider border-cyber" /></li>
-                <li>
-                  <span className="dropdown-item-text text-muted-cyber small">
-                    Guided steps and emergency support.
-                  </span>
                 </li>
               </ul>
             </li>

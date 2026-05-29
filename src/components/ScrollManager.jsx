@@ -13,6 +13,7 @@ const PAGE_TITLES = {
   '/about':                  'About WHTSIPA — WHTS',
   '/about-officials':        'The Officials — WHTS',
   '/contact':                'Contact — WHTS',
+  '/threats-tools': 'Threats & Tools — WHTS',
 }
 
 export default function ScrollManager() {

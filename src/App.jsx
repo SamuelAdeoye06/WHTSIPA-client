@@ -5,6 +5,7 @@ import Footer from './components/Footer'
 import ScrollManager from './components/ScrollManager'
 import Home from './pages/Home'
 import Threats from './pages/Threats'
+import ThreatsTools from './pages/ThreatsTools'
 import Report from './pages/Report'
 import ThreatDetail from './pages/ThreatDetail'
 import SignIn from './pages/SignIn'
@@ -22,7 +23,7 @@ const KNOWN_ROUTES = [
   '/', '/threats', '/threats/:slug', '/report',
   '/signin', '/signup',
   '/about', '/about-officials', '/contact',
-  '/essential-eight', '/for-victims-government', '/blog',
+  '/essential-eight', '/for-victims-government', '/blog', '/threats-tools'
 ]
 const BARE_ROUTES = ['/signin', '/signup']
 
@@ -53,6 +54,7 @@ function Layout() {
           <Route path="/essential-eight"        element={<EssentialEight />} />
           <Route path="/for-victims-government" element={<ForVictimsGovernment />} />
           <Route path="/blog"                   element={<Blog />} />
+          <Route path="/threats-tools"          element={<ThreatsTools />} />
           <Route path="*"                       element={<NotFound />} />
         </Routes>
       </main>
