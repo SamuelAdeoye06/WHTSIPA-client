@@ -118,13 +118,11 @@
   color: var(--cyan);
   font-weight: 600;
   cursor: pointer;
-  border-bottom: 1px dashed rgba(34, 240, 255, 0.4);
-  transition: color 0.15s ease, border-color 0.15s ease;
+  transition: color 0.15s ease;
   text-transform: lowercase;
 }
 .tools-link:hover {
   color: #fff;
-  border-color: rgba(34, 240, 255, 0.8);
 }
 
 /* ── ThreatDetail responsive ── */

@@ -14,14 +14,14 @@ export default function ThreatsFooter() {
             className="threats-footer-logo"
           />
           <h2 className="threats-footer-title">
-            Acknowledgement of Country &amp; Cyber Guardians Threats
+            Acknowledgement of Country
           </h2>
           <p className="threats-footer-text">
             We acknowledge the Traditional Private Owners and Custodians of Country throughout and
             their continuing connections to land, sea and communities.
-            We pay our respects to them, their past, present and emerging. We also recognise the
-            enduring contribution of the First Peoples and all frontline defenders to our national
-            security and the global fight against cyber threats.
+          </p>
+          <p className="threats-footer-text">
+          We pay our respects to them, their cultures and their Elders; past, present and emerging. We also recognise Australia's First Peoples' enduring contribution to Australia's national security.
           </p>
         </div>
 

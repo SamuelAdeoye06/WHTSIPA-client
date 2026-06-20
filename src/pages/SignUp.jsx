@@ -36,11 +36,11 @@ const ALLOWED_COUNTRIES = [
   { code: 'IE', name: 'Ireland',                dial: '+353' },
   { code: 'GR', name: 'Greece',                 dial: '+30'  },
   { code: 'CZ', name: 'Czechia',               dial: '+420' },
+  // DEV ONLY — remove before final delivery to client
   { code: 'NG', name: 'Nigeria (Dev)',          dial: '+234' },
 ]
 
 /* ── Blocked country codes ── */
-// NOTE: 'NG' (Nigeria) excluded during development — re-add for production
 const BLOCKED_CODES = new Set([
   'CM','CI','TZ','UG','DZ','SN','MA','ZM','RW','GH','ZA','KE'
 ])

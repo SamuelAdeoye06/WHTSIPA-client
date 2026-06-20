@@ -407,7 +407,7 @@ export const THREAT_DATA = {
       { title: 'Always use the official portal', desc: 'Access your tax account directly through the official government website — never through links in messages.' },
       { title: 'Know how agencies contact you', desc: 'Most tax authorities initiate contact via official mail with reference numbers — not SMS, email, or WhatsApp.' },
       { title: 'Never pay via gift cards or crypto', desc: 'No government tax agency accepts payment via gift cards, wire transfer to personal accounts, or cryptocurrency.' },
-      { title: 'Protect your NIN', desc: 'Your National Identification Number is the master key to your tax identity — never share it in response to unsolicited contact.' },
+      { title: 'Protect your government ID', desc: 'Your national identification number is the master key to your tax identity — never share it in response to unsolicited contact.' },
       { title: 'File taxes early', desc: 'Filing your tax return early reduces the window for fraudsters to file a fake return in your name and claim your refund.' },
       { title: 'Report to authorities', desc: 'Report tax scam attempts to the IRS, HMRC, or your national tax authority and to WHTS immediately.' },
     ],
@@ -470,7 +470,7 @@ export const THREAT_DATA = {
     prevention: [
       { title: 'Verify the company independently', desc: 'Search the company name plus "scam" or "reviews", check their official website, and verify the recruiter on LinkedIn.' },
       { title: 'Never pay to get a job', desc: 'Legitimate employers never charge application fees, training fees, equipment deposits, or background check fees.' },
-      { title: 'Protect your documents', desc: 'Never send your NIN, passport, or bank details before receiving a verified, signed offer letter from a verifiable company.' },
+      { title: 'Protect your documents', desc: 'Never send your government ID, passport, or bank details before receiving a verified, signed offer letter from a verifiable company.' },
       { title: 'Be skeptical of unrealistic offers', desc: '"Earn $5,000/week from home, no experience needed" is always a scam. Research realistic salaries for the role and industry.' },
       { title: 'Use official job platforms', desc: 'Apply through verified platforms like LinkedIn, Indeed, or company career pages — not via WhatsApp, Telegram, or Instagram DMs.' },
       { title: 'Report fake listings', desc: 'Report fraudulent job postings to the platform, to WHTS, and to your national consumer protection agency.' },
