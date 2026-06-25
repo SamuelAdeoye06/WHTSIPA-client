@@ -74,7 +74,52 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Layout />
+        {/* Comment the line below to disable the app while client payment is pending */}
+        {/* <Layout /> */}
+
+        {/* Uncomment the block below to show the payment/maintenance screen */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100vh',
+          backgroundColor: '#0f172a',
+          color: '#ffffff',
+          fontFamily: 'system-ui, -apple-system, sans-serif',
+          padding: '20px',
+          textAlign: 'center'
+        }}>
+          <div style={{
+            fontSize: '3.5rem',
+            marginBottom: '20px'
+          }}>⏳</div>
+          <h1 style={{
+            fontSize: '2rem',
+            fontWeight: '700',
+            marginBottom: '10px',
+            color: '#38bdf8'
+          }}>System Temporary Lock</h1>
+          {/* <p style={{
+            fontSize: '1rem',
+            color: '#94a3b8',
+            maxWidth: '480px',
+            lineHeight: '1.6',
+            marginBottom: '30px'
+          }}>
+            This demonstration environment is temporarily locked pending deployment confirmation. Please check back shortly or contact the administrator.
+          </p> */}
+          <div style={{
+            fontSize: '0.8rem',
+            color: '#64748b',
+            borderTop: '1px solid #1e293b',
+            paddingTop: '20px',
+            width: '100%',
+            maxWidth: '300px'
+          }}>
+            Status Code: 402 - Payment Required
+          </div>
+        </div>
       </AuthProvider>
     </BrowserRouter>
   )
