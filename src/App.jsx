@@ -109,7 +109,7 @@ function App() {
           }}>
             This demonstration environment is temporarily locked pending deployment confirmation. Please check back shortly or contact the administrator.
           </p> */}
-          <div style={{
+          {/* <div style={{
             fontSize: '0.8rem',
             color: '#64748b',
             borderTop: '1px solid #1e293b',
@@ -118,7 +118,7 @@ function App() {
             maxWidth: '300px'
           }}>
             Status Code: 402 - Payment Required
-          </div>
+          </div> */}
         </div>
       </AuthProvider>
     </BrowserRouter>
