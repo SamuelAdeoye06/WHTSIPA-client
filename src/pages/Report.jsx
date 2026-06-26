@@ -727,12 +727,14 @@ export default function Report() {
         socialHandles: reportType === 'public' ? values.socialHandles : undefined,
         linksImposterDetails: reportType === 'public' ? values.linksImposterDetails : undefined,
         effectsOfIncident: reportType === 'public' ? values.effectsOfIncident : undefined,
+        evidenceFiles: files.map(f => f.name),
       }
 
       await api.post('/reports/submit', payload)
 
       // Clear draft on successful submit
       localStorage.removeItem(reportType === 'personal' ? 'whts_personal_draft' : 'whts_public_draft')
+      setFiles([])
       setSubmitted(true)
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (err) {

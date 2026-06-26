@@ -94,3 +94,134 @@
   font-weight: 800;
   color: #1d4ed8;
 }
+
+/* ── Clickable channel rows (fully clickable like Report.jsx cards) ── */
+.contact-channel-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 12px;
+  border: 1.5px solid #e5e7eb;
+  background: #ffffff;
+  color: inherit;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, transform 0.15s ease;
+  text-align: left;
+  width: 100%;
+  /* Critical: allow inner flex children to shrink/wrap properly */
+  min-width: 0;
+}
+
+/* Inner text block — must shrink so arrow stays visible */
+.contact-channel-row .flex-1 {
+  flex: 1 1 0;
+  min-width: 0;         /* allow text to shrink below natural width */
+}
+
+/* Truncate/wrap long text inside the card */
+.contact-channel-row .flex-1 div {
+  overflow-wrap: anywhere;
+  word-break: break-all;
+  white-space: normal;
+}
+
+/* Title line (bold label) — never truncate */
+.contact-channel-row .flex-1 .fw-bold {
+  white-space: normal;
+  word-break: normal;
+}
+
+.contact-channel-btn {
+  /* reset default button styles */
+  appearance: none;
+  -webkit-appearance: none;
+  font: inherit;
+  outline: none;
+}
+
+.contact-channel-row:hover {
+  border-color: #3b82f6;
+  background: #f0f7ff;
+  box-shadow: 0 3px 12px rgba(59,130,246,0.12);
+  transform: translateY(-1px);
+  color: inherit;
+}
+
+.contact-channel-row:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.contact-channel-arrow {
+  flex-shrink: 0;        /* arrow never shrinks — always visible */
+  color: #9ca3af;
+  font-size: 0.85rem;
+  transition: transform 0.2s ease, color 0.2s ease;
+  margin-left: 0.25rem;
+  align-self: center;
+}
+
+.contact-channel-row:hover .contact-channel-arrow {
+  transform: translateX(3px);
+  color: #3b82f6;
+}
+
+/* ── Mobile breakpoints ── */
+@media (max-width: 575.98px) {
+  /* Tighten card padding on small screens */
+  .contact-channel-row {
+    padding: 0.65rem 0.75rem;
+    gap: 0.6rem;
+    border-radius: 10px;
+  }
+
+  /* Smaller icon box on mobile */
+  .contact-icon-box {
+    width: 38px !important;
+    height: 38px !important;
+    font-size: 1rem !important;
+    border-radius: 10px !important;
+  }
+
+  /* Sub-label text slightly smaller */
+  .contact-channel-row .flex-1 > div:last-child {
+    font-size: 0.78rem !important;
+  }
+
+  /* Contact form card — remove horizontal padding overflow */
+  .contact-form-card {
+    border-radius: 14px;
+  }
+
+  /* Stack response-time stats more compactly */
+  .contact-stat-value {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 400px) {
+  /* Very small screens — tighten further */
+  .contact-channel-row {
+    gap: 0.5rem;
+    padding: 0.6rem 0.65rem;
+  }
+
+  .contact-channel-arrow {
+    font-size: 0.75rem;
+  }
+}
+
+/* ── Live Chat Modal — mobile sizing ── */
+@media (max-width: 575.98px) {
+  .livechat-modal {
+    bottom: 0 !important;
+    right: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    border-radius: 20px 20px 0 0 !important;
+    height: 82vh !important;
+    max-height: 82vh !important;
+  }
+}

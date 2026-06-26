@@ -9,6 +9,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import api from '../services/api'
 import './WhatsipModal.css'
 
 /* ── Contact details ── */
@@ -166,7 +167,7 @@ const TOOLS_FLOW = {
 /* ══════════════════════════════════════════
    TOOLS LIVE CHAT COMPONENT
    ══════════════════════════════════════════ */
-function ToolsLiveChat({ ticketId, threatTitle, onClose, onBack, userName, waLink }) {
+function ToolsLiveChat({ ticketId, threatTitle, onClose, onBack, user, userName, waLink }) {
   const [currentNode, setCurrentNode] = useState('main')
   const [messages, setMessages] = useState([
     {
@@ -177,6 +178,26 @@ function ToolsLiveChat({ ticketId, threatTitle, onClose, onBack, userName, waLin
   ])
   const [isTyping, setIsTyping] = useState(false)
   const chatEndRef = useRef(null)
+
+  useEffect(() => {
+    const recordSession = async () => {
+      try {
+        await api.post('/tickets/create', {
+          ticketId,
+          type: 'livechat',
+          threatTitle: threatTitle || 'General Threat Tools Inquiry',
+          summary: `AI Live Chat Session - ${threatTitle || 'General'}`,
+          goals: `User initiated live chatbot conversation. Ref: ${threatTitle || 'General'}`,
+          name: user?.firstName || user?.name || userName || 'Anonymous Client',
+          email: user?.email || 'chat-client@whtsipa.com',
+          contactMethod: 'Live Chat'
+        })
+      } catch (err) {
+        console.error('Error pre-registering ticket session:', err)
+      }
+    }
+    recordSession()
+  }, [ticketId, threatTitle, user, userName])
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -306,6 +327,8 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
   const navigate = useNavigate()
   const [ticketId] = useState(genTicketId)
   const [step, setStep] = useState('main')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
   const [form, setForm] = useState({
     summary: '', services: [], duration: 'One-Time Assistance',
     goals: '', name: '', email: '', phone: '', contactMethod: 'WhatsApp',
@@ -519,6 +542,7 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
             threatTitle={threatTitle}
             onClose={onClose}
             onBack={() => setStep('main')}
+            user={user}
             userName={user?.firstName || user?.name || ''}
             waLink={waLink}
           />
@@ -544,9 +568,32 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
          'Law Enforcement / Insurance Documentation', 'Ongoing Protection & Monitoring', 'Other (please specify)']
       : []
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
       e.preventDefault()
-      setStep('success')
+      setLoading(true)
+      setError('')
+      try {
+        const fileNames = form.evidence ? Array.from(form.evidence).map(f => f.name) : []
+        await api.post('/tickets/create', {
+          ticketId,
+          type: isReport ? 'report' : isHire ? 'hire' : 'request',
+          threatTitle: threatTitle || undefined,
+          summary: form.summary,
+          goals: form.goals,
+          services: isHire ? form.services : [],
+          duration: isHire ? form.duration : undefined,
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          contactMethod: form.contactMethod,
+          evidenceFiles: fileNames
+        })
+        setStep('success')
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to submit request. Please try again.')
+      } finally {
+        setLoading(false)
+      }
     }
 
     if (step === 'success') {
@@ -586,6 +633,12 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
           <div className="wm-ticket-ref"><i className="bi bi-ticket-perforated me-2"></i>Ticket: <strong>{ticketId}</strong> — Save this reference.</div>
 
           <form className="wm-form" onSubmit={handleSubmit}>
+            {error && (
+              <div className="alert alert-danger d-flex align-items-center gap-2 mb-3" style={{ borderRadius: 10, fontSize: '0.85rem', padding: '0.5rem 0.75rem' }}>
+                <i className="bi bi-exclamation-circle-fill"></i>
+                <span>{error}</span>
+              </div>
+            )}
             <div className="wm-field">
               <label>Incident / Case Summary <span className="wm-required">*</span></label>
               <textarea rows={3} placeholder="Briefly describe the issue or threat you're experiencing..."
@@ -654,8 +707,12 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
               <small className="wm-hint">Screenshots, transaction records, emails, etc. Secure &amp; encrypted.</small>
             </div>
 
-            <button type="submit" className="btn btn-alert w-100 mt-2">
-              <i className="bi bi-send me-2"></i>{submit}
+            <button type="submit" className="btn btn-alert w-100 mt-2" disabled={loading}>
+              {loading ? (
+                <><span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Submitting...</>
+              ) : (
+                <><i className="bi bi-send me-2"></i>{submit}</>
+              )}
             </button>
           </form>
         </div>
