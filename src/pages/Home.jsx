@@ -68,6 +68,9 @@ export default function Home() {
   const [duration,     setDuration]     = useState(0)
   const [skipHint,     setSkipHint]     = useState(null) // 'forward' | 'backward' | null
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [playbackSpeed,setPlaybackSpeed]= useState(1)
+  const [showSpeedMenu,setShowSpeedMenu]= useState(false)
+  const [ccOn,         setCcOn]         = useState(false)
 
   const formatTime = (secs) => {
     if (!secs || isNaN(secs)) return '0:00'
@@ -121,6 +124,22 @@ export default function Home() {
         }
       }, 360)
     }
+  }
+
+  /* Restart — back to 0:00 */
+  const handleRestart = () => {
+    const vid = heroVideoRef.current
+    if (!vid) return
+    vid.currentTime = 0
+    if (vid.paused) { vid.play(); setIsPlaying(true) }
+  }
+
+  /* Playback speed */
+  const handleSpeedChange = (rate) => {
+    const vid = heroVideoRef.current
+    if (vid) vid.playbackRate = rate
+    setPlaybackSpeed(rate)
+    setShowSpeedMenu(false)
   }
 
   /* Fullscreen toggle */
@@ -317,34 +336,80 @@ export default function Home() {
             </div>
 
             <div className="cinematic-controls">
-              <div className="cinematic-controls-left">
-                <button className="cinematic-ctrl" onClick={handleVideoClick} aria-label={isPlaying ? 'Pause' : 'Play'}>
-                  <i className={`bi ${isPlaying ? 'bi-pause-fill' : 'bi-play-fill'}`}></i>
-                </button>
-
-                {/* Volume control */}
-                <div className="cinematic-vol-wrap"
-                  onMouseEnter={() => setShowVolSlider(true)}
-                  onMouseLeave={() => setShowVolSlider(false)}
-                >
-                  <button className="cinematic-ctrl" onClick={() => setMuted(p => !p)} aria-label="Toggle mute">
-                    <i className={`bi ${muted || volume === 0 ? 'bi-volume-mute-fill' : volume < 0.5 ? 'bi-volume-down-fill' : 'bi-volume-up-fill'}`}></i>
+              <div className="cinematic-controls-row1">
+                <div className="cinematic-controls-left">
+                  <button className="cinematic-ctrl" onClick={handleRestart} aria-label="Restart">
+                    <i className="bi bi-arrow-counterclockwise"></i>
                   </button>
-                  {showVolSlider && (
-                    <div className="cinematic-vol-slider-wrap">
-                      <input
-                        type="range"
-                        className="cinematic-vol-slider"
-                        min="0" max="1" step="0.05"
-                        value={muted ? 0 : volume}
-                        onChange={handleVolumeChange}
-                        aria-label="Volume"
-                      />
-                    </div>
-                  )}
+                  <button className="cinematic-ctrl" onClick={handleVideoClick} aria-label={isPlaying ? 'Pause' : 'Play'}>
+                    <i className={`bi ${isPlaying ? 'bi-pause-fill' : 'bi-play-fill'}`}></i>
+                  </button>
+
+                  {/* Volume control */}
+                  <div className="cinematic-vol-wrap"
+                    onMouseEnter={() => setShowVolSlider(true)}
+                    onMouseLeave={() => setShowVolSlider(false)}
+                  >
+                    <button className="cinematic-ctrl" onClick={() => setMuted(p => !p)} aria-label="Toggle mute">
+                      <i className={`bi ${muted || volume === 0 ? 'bi-volume-mute-fill' : volume < 0.5 ? 'bi-volume-down-fill' : 'bi-volume-up-fill'}`}></i>
+                    </button>
+                    {showVolSlider && (
+                      <div className="cinematic-vol-slider-wrap">
+                        <input
+                          type="range"
+                          className="cinematic-vol-slider"
+                          min="0" max="1" step="0.05"
+                          value={muted ? 0 : volume}
+                          onChange={handleVolumeChange}
+                          aria-label="Volume"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  <span className="cinematic-time">{formatTime(currentTime)} / {formatTime(duration)}</span>
                 </div>
 
-                <span className="cinematic-time">{formatTime(currentTime)} / {formatTime(duration)}</span>
+                <div className="cinematic-controls-right">
+                  <button
+                    className={`cinematic-ctrl ${ccOn ? 'cinematic-ctrl-active' : ''}`}
+                    onClick={() => setCcOn(p => !p)}
+                    aria-label="Toggle captions"
+                    aria-pressed={ccOn}
+                  >
+                    <i className="bi bi-cc-square"></i>
+                  </button>
+
+                  {/* Speed / settings */}
+                  <div className="cinematic-speed-wrap">
+                    <button
+                      className="cinematic-ctrl"
+                      onClick={() => setShowSpeedMenu(p => !p)}
+                      aria-label="Playback speed settings"
+                    >
+                      <i className="bi bi-gear-fill"></i>
+                    </button>
+                    {showSpeedMenu && (
+                      <div className="cinematic-speed-menu">
+                        {[0.5, 1, 1.5, 2].map(rate => (
+                          <button
+                            key={rate}
+                            className={`cinematic-speed-option ${playbackSpeed === rate ? 'cinematic-speed-option-active' : ''}`}
+                            onClick={() => handleSpeedChange(rate)}
+                          >
+                            {rate}x{rate === 1 ? ' (Normal)' : ''}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <button className="cinematic-ctrl cinematic-fullscreen-btn" onClick={handleFullscreen} aria-label="Toggle fullscreen">
+                    <i className={`bi ${isFullscreen ? 'bi-fullscreen-exit' : 'bi-fullscreen'}`}></i>
+                  </button>
+
+                  <span className="cinematic-badge"><i className="bi bi-shield-fill-check me-1"></i>WHTS</span>
+                </div>
               </div>
 
               <div className="cinematic-progress" onClick={handleSeek}>
@@ -352,13 +417,6 @@ export default function Home() {
                   <div className="cinematic-progress-fill" style={{ width: `${progress}%` }} />
                   <div className="cinematic-progress-thumb" style={{ left: `${progress}%` }} />
                 </div>
-              </div>
-
-              <div className="cinematic-controls-right">
-                <span className="cinematic-badge"><i className="bi bi-shield-fill-check me-1"></i>WHTS</span>
-                <button className="cinematic-ctrl cinematic-fullscreen-btn" onClick={handleFullscreen} aria-label="Toggle fullscreen">
-                  <i className={`bi ${isFullscreen ? 'bi-fullscreen-exit' : 'bi-fullscreen'}`}></i>
-                </button>
               </div>
             </div>
 

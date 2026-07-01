@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { QUIZ_LIST, QUIZ_DATA } from '../data/quizData'
 import WhatsipModal from '../components/WhatsipModal'
 import ThreatsFooter from '../components/ThreatsFooter'
@@ -318,12 +318,23 @@ function QuizModal({ slug, onClose, onFail }) {
    ════════════════════════════════════════════ */
 export default function Threats() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [activeQuiz,      setActiveQuiz]      = useState(null)
   const [failedScenarios, setFailedScenarios] = useState([])
   const [showRepPrompt,   setShowRepPrompt]   = useState(false)
   const [highlightedCard, setHighlightedCard] = useState(null)
   const [activeModal,     setActiveModal]     = useState(null)
   const [modalThreat,     setModalThreat]     = useState('')
+
+  // After a redirected sign-in/sign-up, reopen the modal the user was using
+  // (Request Tool, Hire, Report, Contact) with the same threat context.
+  useEffect(() => {
+    if (location.state?.reopenModal) {
+      setActiveModal(location.state.reopenModal)
+      setModalThreat(location.state.reopenThreatTitle || '')
+      navigate(location.pathname, { replace: true, state: {} })
+    }
+  }, [location.state, location.pathname, navigate])
 
   const handleFail = (slug) => {
     setFailedScenarios(prev => {

@@ -1,6 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
 import logoWhts from '../assets/media/logo-whts.jpg'
-import logoWhtsDark from '../assets/media/logo-whts-dark.png'
 
 export default function Footer() {
   const year = new Date().getFullYear()
@@ -20,7 +19,7 @@ export default function Footer() {
           <div className="col-12 col-lg-3">
             <div className="mb-3">
               <img
-                src={logoWhtsDark}
+                src={logoWhts}
                 alt="The Watch Eyes - WHTS"
                 style={{ height: '80px', width: 'auto', borderRadius: '10px', mixBlendMode: 'lighten' }}
               />
@@ -50,7 +49,7 @@ export default function Footer() {
                 </button>
               </li>
               <li className="mb-2">
-                <button className="footer-link-btn" onClick={() => goTo('/threats', 'categories')}>
+                <button className="footer-link-btn" onClick={() => { navigate('/threats'); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>
                   Threats
                 </button>
               </li>
@@ -72,7 +71,7 @@ export default function Footer() {
             <div className="footer-col-title">About</div>
             <ul className="list-unstyled mb-0">
               <li className="mb-2">
-                <button className="footer-link-btn" onClick={() => navigate('/about')}>About WHTSIPA</button>
+                <button className="footer-link-btn" onClick={() => navigate('/about')}>About WHTS</button>
               </li>
               <li className="mb-2">
                 <button className="footer-link-btn" onClick={() => navigate('/about-officials')}>The Officials</button>
@@ -97,10 +96,10 @@ export default function Footer() {
                 <button className="footer-link-btn" onClick={() => navigate('/blog')}>Knowledge Base</button>
               </li>
               <li className="mb-2">
-                <button className="footer-link-btn" onClick={() => goTo('/threats', 'quizzes')}>Spot a Scam Quiz</button>
+                <button className="footer-link-btn" onClick={() => goTo('/threats', 'spot-a-threat')}>Spot a Scam Quiz</button>
               </li>
               <li className="mb-2">
-                <button className="footer-link-btn" onClick={() => goTo('/threats', 'categories')}>Threat Library</button>
+                <button className="footer-link-btn" onClick={() => goTo('/threats', 'types-of-threats')}>Threat Library</button>
               </li>
             </ul>
           </div>

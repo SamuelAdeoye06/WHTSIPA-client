@@ -188,3 +188,397 @@
   background: linear-gradient(90deg, transparent, #3b82f6, transparent);
   animation: scanMove 2.2s ease-in-out infinite;
 }
+
+/* ============================================
+   BOOK A CALL MODAL
+   ============================================ */
+
+.bc-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 11, 32, 0.75);
+  backdrop-filter: blur(6px);
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.bc-box {
+  background: #ffffff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.3);
+}
+
+.bc-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #f1f5f9;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #475569;
+  font-size: 0.85rem;
+  z-index: 10;
+  transition: background 0.15s ease;
+}
+.bc-close:hover { background: #e2e8f0; }
+
+/* ── Header ── */
+.bc-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.75rem 1.75rem 0;
+}
+
+.bc-header-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  color: #1d4ed8;
+  flex-shrink: 0;
+}
+
+.bc-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 0.3rem;
+}
+
+.bc-subtitle {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* ── Body ── */
+.bc-body {
+  padding: 1.25rem 1.75rem 1.75rem;
+}
+
+.bc-field {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.bc-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.bc-input {
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.9rem;
+  color: #0f172a;
+  background: #f8fafc;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  font-family: inherit;
+}
+.bc-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+  background: #fff;
+}
+.bc-input-err { border-color: #ef4444 !important; }
+.bc-textarea { resize: vertical; min-height: 80px; }
+
+.bc-error {
+  font-size: 0.78rem;
+  color: #ef4444;
+}
+
+.bc-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+/* ── Primary button ── */
+.bc-btn-primary {
+  background: #1d4ed8;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 0.8rem 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.bc-btn-primary:hover:not(:disabled) { background: #1e40af; transform: translateY(-1px); }
+.bc-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.bc-btn-outline {
+  background: transparent;
+  color: #1d4ed8;
+  border: 1.5px solid #bfdbfe;
+  border-radius: 12px;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: background 0.15s ease;
+}
+.bc-btn-outline:hover { background: #eff6ff; }
+
+.bc-disclaimer {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  text-align: center;
+  margin: 0.75rem 0 0;
+}
+
+/* ── Spinner ── */
+.bc-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: bcSpin 0.7s linear infinite;
+  display: inline-block;
+}
+@keyframes bcSpin { to { transform: rotate(360deg); } }
+
+/* ── Auth prompt ── */
+.bc-auth-prompt {
+  padding: 2.5rem 1.75rem;
+  text-align: center;
+}
+.bc-auth-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #fef3c7;
+  border: 2px solid #fcd34d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  color: #b45309;
+  margin: 0 auto 1.25rem;
+}
+.bc-auth-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 0.5rem;
+}
+.bc-auth-text {
+  font-size: 0.88rem;
+  color: #64748b;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+/* ── Success screen ── */
+.bc-success {
+  padding: 2rem 1.75rem;
+  text-align: center;
+}
+.bc-success-icon {
+  font-size: 3rem;
+  color: #16a34a;
+  margin-bottom: 1rem;
+}
+.bc-success-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 0.5rem;
+}
+.bc-success-text {
+  font-size: 0.88rem;
+  color: #64748b;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+/* ── Number reveal card ── */
+.bc-number-card {
+  background: #0f172a;
+  border-radius: 14px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+.bc-number-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(120,214,255,0.7);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.bc-number-value {
+  font-size: 1.55rem;
+  font-weight: 900;
+  color: #22f0ff;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.5rem;
+  font-family: 'Courier New', monospace;
+}
+.bc-number-note {
+  font-size: 0.78rem;
+  color: rgba(233,243,255,0.6);
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* ── Info note box ── */
+.bc-note-box {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  font-size: 0.8rem;
+  color: #1e40af;
+  text-align: left;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  line-height: 1.55;
+}
+
+/* ── Mobile ── */
+@media (max-width: 575.98px) {
+  .bc-box { border-radius: 16px; }
+  .bc-header { padding: 1.25rem 1.25rem 0; }
+  .bc-body { padding: 1rem 1.25rem 1.25rem; }
+  .bc-success, .bc-auth-prompt { padding: 1.5rem 1.25rem; }
+  .bc-row { grid-template-columns: 1fr; }
+}
+
+.bc-submit-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  border-radius: 10px;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.82rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+}
+
+/* ============================================
+   PHONE COUNTRY CODE DROPDOWN
+   (matches the same pattern used in SignUp / Report)
+   ============================================ */
+
+.phone-country-field-wrap {
+  position: relative;
+}
+
+.phone-country-field-wrap .input-group {
+  display: flex;
+  align-items: stretch;
+}
+
+.phone-country-btn {
+  background: #f8fafc !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-right: none !important;
+  color: #0f172a !important;
+  border-radius: 10px 0 0 10px !important;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.65rem 0.85rem !important;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.phone-country-btn::after {
+  margin-left: 0.5em;
+  vertical-align: 0.25em;
+}
+
+.bc-input-phone {
+  border-radius: 0 10px 10px 0 !important;
+  flex: 1;
+  min-width: 0;
+}
+
+.phone-country-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1300;
+  display: block;
+  min-width: 240px;
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 0.5rem 0;
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
+}
+
+.phone-country-dropdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  font-weight: 400;
+  color: #212529;
+  text-align: inherit;
+  white-space: nowrap;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.phone-country-dropdown-item:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+.phone-country-dropdown-item .country-name {
+  font-weight: 500;
+}
+
+.phone-country-dropdown-item .country-dial {
+  font-size: 0.78rem;
+  color: #64748b;
+}

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import '../styles/cyber.css'
 import './Auth.css'
 import { useAuth } from '../context/AuthContext'
@@ -56,6 +56,7 @@ async function detectCountry() {
 
 export default function SignUp() {
   const navigate  = useNavigate()
+  const location  = useLocation()
   const { register } = useAuth()
 
   const [form, setForm] = useState({
@@ -224,7 +225,12 @@ export default function SignUp() {
           <p style={{ color: '#6b7280', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
             Didn't receive it? Check your spam folder. The link expires in 24 hours.
           </p>
-          <Link to="/signin" className="auth-submit-btn" style={{ textDecoration: 'none', display: 'inline-flex', width: 'auto', padding: '0.75rem 2rem' }}>
+          <Link
+            to="/signin"
+            state={location.state}
+            className="auth-submit-btn"
+            style={{ textDecoration: 'none', display: 'inline-flex', width: 'auto', padding: '0.75rem 2rem' }}
+          >
             Go to Sign In <i className="bi bi-arrow-right ms-2"></i>
           </Link>
         </div>

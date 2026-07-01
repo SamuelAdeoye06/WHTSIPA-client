@@ -597,6 +597,7 @@ export default function Report() {
       phoneCountryDial: '+1',
       country: '',
       communicationMethod: '',
+      communicationValue: '',
       incidentTypes: [],
       incidentTypesOther: '',
       detail: '',
@@ -606,11 +607,22 @@ export default function Report() {
       contactedAuthorities: '',
     },
     validationSchema: Yup.object({
-      fullName: Yup.string().required('Full Name is required'),
-      email: Yup.string().email('Invalid email address').required('Email Address is required'),
+      fullName: Yup.string(),
+      email: Yup.string().email('Invalid email address'),
       phone: Yup.string().required('Phone Number is required'),
       country: Yup.string().required('Country of Residence is required'),
       communicationMethod: Yup.string().required('Preferred Communication Method is required'),
+      communicationValue: Yup.string().test(
+        'comm-value-required',
+        'Please provide your contact details for the selected method',
+        function (value) {
+          const { communicationMethod } = this.parent
+          if (['Phone Call', 'SMS/Text', 'Secure Messaging App (e.g., Signal, WhatsApp)'].includes(communicationMethod)) {
+            return !!value && value.trim().length > 0
+          }
+          return true
+        }
+      ),
       incidentTypes: Yup.array().min(1, 'Please select at least one incident type').required('Type of Incident is required'),
       incidentTypesOther: Yup.string().test(
         'is-required-other',
@@ -641,6 +653,7 @@ export default function Report() {
       country: '',
       organization: '',
       communicationMethod: '',
+      communicationValue: '',
       incidentTypes: [],
       incidentTypesOther: '',
       incidentStatus: '',
@@ -658,6 +671,17 @@ export default function Report() {
       country: Yup.string().required('Country is required'),
       organization: Yup.string(),
       communicationMethod: Yup.string(),
+      communicationValue: Yup.string().test(
+        'pub-comm-value-required',
+        'Please provide your contact details for the selected method',
+        function (value) {
+          const { communicationMethod } = this.parent
+          if (['Email', 'SMS/Text'].includes(communicationMethod)) {
+            return !!value && value.trim().length > 0
+          }
+          return true
+        }
+      ),
       incidentTypes: Yup.array().min(1, 'Please select at least one incident type').required('Type of Incident is required'),
       incidentTypesOther: Yup.string().test(
         'is-required-other',
@@ -718,6 +742,7 @@ export default function Report() {
         detail: values.detail,
         // Optional & spec conditional fields mapped to custom schema keys
         communicationMethod: values.communicationMethod,
+        communicationValue: values.communicationValue,
         financialLoss: reportType === 'personal' && values.financialLoss ? `${values.financialLossCurrency} ${values.financialLoss}` : undefined,
         consentShareAnonymized: reportType === 'personal' ? values.consentShareAnonymized : undefined,
         contactedAuthorities: reportType === 'personal' ? values.contactedAuthorities : undefined,
@@ -992,48 +1017,40 @@ export default function Report() {
               <div className="card-glass p-4 p-md-5">
                 {/* Visual Progress indicator */}
                 <div className="form-progress-bar-wrap mb-4">
-                  <div className="d-flex justify-content-between align-items-center mb-1">
-                    <span className="small text-muted-cyber" style={{ fontSize: '0.8rem', fontWeight: 600 }}>Form Completion Progress</span>
-                    <span className="small text-cyber-glow">{activeProgress}%</span>
+                  <div className="d-flex justify-content-between align-items-baseline mb-2">
+                    <span className="progress-title">Form Completion Progress</span>
+                    <span className="progress-percentage">{activeProgress}%</span>
                   </div>
                   <div className="progress cyber-progress-bar">
                     <div className="progress-bar cyber-progress-bg" style={{ width: `${activeProgress}%`, transition: 'width 0.3s ease' }}></div>
                   </div>
                 </div>
 
-                <div className="d-flex align-items-start justify-content-between gap-3 mb-4">
-                  <div>
-                    <div className="text-muted-cyber small">{reportType === 'personal' ? 'Personal' : 'Public / Organisation'}</div>
-                    <h3 className="fw-bold mt-1">
-                      {reportType === 'personal' ? '👤 Personal Report Form' : '🏢 Public Report Form'}
-                    </h3>
-                    <p className="text-muted-cyber small mb-0">
-                      {reportType === 'personal'
-                        ? 'For incidents affecting your own accounts, devices, or data.'
-                        : 'For incidents impacting organisations, communities, or the general public.'}
-                    </p>
-                  </div>
-                  <div>
-                    <button
-                      type="button"
-                      className="btn btn-sm btn-outline-secondary"
-                      style={{ fontSize: '0.75rem', borderRadius: '8px' }}
-                      onClick={() => {
-                        if (window.confirm('Are you sure you want to clear your current draft?')) {
-                          if (reportType === 'personal') {
-                            localStorage.removeItem('whts_personal_draft')
-                            personalFormik.resetForm()
-                          } else {
-                            localStorage.removeItem('whts_public_draft')
-                            publicFormik.resetForm()
-                          }
+                <div className="report-form-header mb-2">
+                  <h3 className="report-form-title fw-bold">
+                    {reportType === 'personal' ? 'Personal Report Form' : 'Public Report Form'}
+                  </h3>
+                  <button
+                    type="button"
+                    className="btn-clear-draft"
+                    onClick={() => {
+                      if (window.confirm('Are you sure you want to clear your current draft?')) {
+                        if (reportType === 'personal') {
+                          localStorage.removeItem('whts_personal_draft')
+                          personalFormik.resetForm()
+                        } else {
+                          localStorage.removeItem('whts_public_draft')
+                          publicFormik.resetForm()
                         }
-                      }}
-                    >
-                      Clear Draft
-                    </button>
-                  </div>
+                      }
+                    }}
+                  >
+                    Clear Draft
+                  </button>
                 </div>
+                <p className="report-form-subtitle mb-4">
+                  Please complete the form below. Note that all fields marked with an astelish (*) are required.
+                </p>
 
                 {error && (
                   <div className="alert alert-danger d-flex align-items-center mb-4" role="alert" style={{ borderRadius: '12px', fontSize: '0.88rem' }}>
@@ -1050,25 +1067,26 @@ export default function Report() {
 
                       {/* Full Name */}
                       <div className="col-12 col-md-6">
-                        <label className="form-label cyber-label" htmlFor="personal-fullName">Full Name <span className="text-danger">* (Required)</span></label>
+                        <label className="form-label cyber-label" htmlFor="personal-fullName">
+                          Full Name <span className="text-muted-cyber fw-normal">(Optional – input nickname to remain anonymous)</span>
+                        </label>
                         <input
                           id="personal-fullName"
                           name="fullName"
                           type="text"
-                          placeholder="Your full name"
-                          className={`form-control cyber-input ${personalFormik.touched.fullName && personalFormik.errors.fullName ? 'is-invalid' : ''}`}
+                          placeholder="Your full name or nickname"
+                          className="form-control cyber-input"
                           value={personalFormik.values.fullName}
                           onChange={personalFormik.handleChange}
                           onBlur={personalFormik.handleBlur}
                         />
-                        {personalFormik.touched.fullName && personalFormik.errors.fullName && (
-                          <div className="cyber-error-msg"><i className="bi bi-exclamation-triangle-fill me-1"></i>{personalFormik.errors.fullName}</div>
-                        )}
                       </div>
 
                       {/* Email Address */}
                       <div className="col-12 col-md-6">
-                        <label className="form-label cyber-label" htmlFor="personal-email">Email Address <span className="text-danger">* (Required)</span></label>
+                        <label className="form-label cyber-label" htmlFor="personal-email">
+                          Email Address <span className="text-muted-cyber fw-normal">(Optional – for confirmation and updates only)</span>
+                        </label>
                         <input
                           id="personal-email"
                           name="email"
@@ -1145,6 +1163,70 @@ export default function Report() {
                         </div>
                         {personalFormik.touched.communicationMethod && personalFormik.errors.communicationMethod && (
                           <div className="cyber-error-msg"><i className="bi bi-exclamation-triangle-fill me-1"></i>{personalFormik.errors.communicationMethod}</div>
+                        )}
+
+                        {/* Dynamic contact input based on selected method */}
+                        {personalFormik.values.communicationMethod === 'Phone Call' && (
+                          <div className="comm-value-wrap mt-3">
+                            <label className="form-label cyber-label" htmlFor="personal-commVal-phone">
+                              Phone number to call you on <span className="text-danger">*</span>
+                            </label>
+                            <input
+                              id="personal-commVal-phone"
+                              name="communicationValue"
+                              type="tel"
+                              placeholder="+1 234 567 8900"
+                              className={`form-control cyber-input ${personalFormik.touched.communicationValue && personalFormik.errors.communicationValue ? 'is-invalid' : ''}`}
+                              value={personalFormik.values.communicationValue}
+                              onChange={personalFormik.handleChange}
+                              onBlur={personalFormik.handleBlur}
+                            />
+                            {personalFormik.touched.communicationValue && personalFormik.errors.communicationValue && (
+                              <div className="cyber-error-msg"><i className="bi bi-exclamation-triangle-fill me-1"></i>{personalFormik.errors.communicationValue}</div>
+                            )}
+                          </div>
+                        )}
+
+                        {personalFormik.values.communicationMethod === 'SMS/Text' && (
+                          <div className="comm-value-wrap mt-3">
+                            <label className="form-label cyber-label" htmlFor="personal-commVal-sms">
+                              Phone number to SMS you on <span className="text-danger">*</span>
+                            </label>
+                            <input
+                              id="personal-commVal-sms"
+                              name="communicationValue"
+                              type="tel"
+                              placeholder="+1 234 567 8900"
+                              className={`form-control cyber-input ${personalFormik.touched.communicationValue && personalFormik.errors.communicationValue ? 'is-invalid' : ''}`}
+                              value={personalFormik.values.communicationValue}
+                              onChange={personalFormik.handleChange}
+                              onBlur={personalFormik.handleBlur}
+                            />
+                            {personalFormik.touched.communicationValue && personalFormik.errors.communicationValue && (
+                              <div className="cyber-error-msg"><i className="bi bi-exclamation-triangle-fill me-1"></i>{personalFormik.errors.communicationValue}</div>
+                            )}
+                          </div>
+                        )}
+
+                        {personalFormik.values.communicationMethod === 'Secure Messaging App (e.g., Signal, WhatsApp)' && (
+                          <div className="comm-value-wrap mt-3">
+                            <label className="form-label cyber-label" htmlFor="personal-commVal-msg">
+                              Your username or phone number on Signal/WhatsApp <span className="text-danger">*</span>
+                            </label>
+                            <input
+                              id="personal-commVal-msg"
+                              name="communicationValue"
+                              type="text"
+                              placeholder="e.g. +1 234 567 8900 or @username"
+                              className={`form-control cyber-input ${personalFormik.touched.communicationValue && personalFormik.errors.communicationValue ? 'is-invalid' : ''}`}
+                              value={personalFormik.values.communicationValue}
+                              onChange={personalFormik.handleChange}
+                              onBlur={personalFormik.handleBlur}
+                            />
+                            {personalFormik.touched.communicationValue && personalFormik.errors.communicationValue && (
+                              <div className="cyber-error-msg"><i className="bi bi-exclamation-triangle-fill me-1"></i>{personalFormik.errors.communicationValue}</div>
+                            )}
+                          </div>
                         )}
                       </div>
 
@@ -1456,6 +1538,43 @@ export default function Report() {
                             </label>
                           ))}
                         </div>
+
+                        {/* Dynamic contact input based on selected method */}
+                        {publicFormik.values.communicationMethod === 'Email' && (
+                          <div className="comm-value-wrap mt-3">
+                            <label className="form-label cyber-label" htmlFor="public-commVal-email">
+                              Email address to contact you on <span className="text-muted-cyber fw-normal">(Optional)</span>
+                            </label>
+                            <input
+                              id="public-commVal-email"
+                              name="communicationValue"
+                              type="email"
+                              placeholder="you@example.com"
+                              className="form-control cyber-input"
+                              value={publicFormik.values.communicationValue}
+                              onChange={publicFormik.handleChange}
+                              onBlur={publicFormik.handleBlur}
+                            />
+                          </div>
+                        )}
+
+                        {publicFormik.values.communicationMethod === 'SMS/Text' && (
+                          <div className="comm-value-wrap mt-3">
+                            <label className="form-label cyber-label" htmlFor="public-commVal-sms">
+                              Phone number to SMS you on <span className="text-muted-cyber fw-normal">(Optional)</span>
+                            </label>
+                            <input
+                              id="public-commVal-sms"
+                              name="communicationValue"
+                              type="tel"
+                              placeholder="+1 234 567 8900"
+                              className="form-control cyber-input"
+                              value={publicFormik.values.communicationValue}
+                              onChange={publicFormik.handleChange}
+                              onBlur={publicFormik.handleBlur}
+                            />
+                          </div>
+                        )}
                       </div>
 
                       <div className="col-12 mt-2"><div className="section-label" style={{ fontSize: '0.68rem' }}>Incident Information</div></div>

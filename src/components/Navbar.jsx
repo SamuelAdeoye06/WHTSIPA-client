@@ -473,6 +473,35 @@ export default function Navbar() {
             </ul>
 
             <div className="nav-auth-actions">
+              {user ? (
+                <div className="nav-mobile-auth">
+                  <span className="nav-mobile-user">
+                    <i className="bi bi-person-circle me-2"></i>
+                    {user.firstName || user.email || 'Account'}
+                  </span>
+                  <button
+                    className="nav-mobile-signout"
+                    type="button"
+                    onClick={() => {
+                      logout()
+                      setNavOpen(false)
+                      setShowSignOutToast(true)
+                      setTimeout(() => { setShowSignOutToast(false); navigate('/') }, 2200)
+                    }}
+                  >
+                    <i className="bi bi-box-arrow-right me-2"></i>Sign Out
+                  </button>
+                </div>
+              ) : (
+                <div className="nav-mobile-auth">
+                  <Link className="nav-mobile-signin" to="/signin" onClick={() => setNavOpen(false)}>
+                    <i className="bi bi-box-arrow-in-right me-2"></i>Sign In
+                  </Link>
+                  <Link className="nav-mobile-signup" to="/signup" onClick={() => setNavOpen(false)}>
+                    <i className="bi bi-person-plus me-2"></i>Sign Up
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>

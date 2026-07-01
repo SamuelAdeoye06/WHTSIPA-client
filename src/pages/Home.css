@@ -139,17 +139,50 @@
 .cinematic-play-sub   { font-size: 0.78rem; color: rgba(255,255,255,0.55); letter-spacing: 0.04em; text-transform: uppercase; }
 
 /* Controls bar */
-.cinematic-controls { display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 1.25rem; background: #111827; border-top: 1px solid rgba(255,255,255,0.06); }
-.cinematic-controls-left { display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0; }
-.cinematic-ctrl { background: none; border: none; color: rgba(255,255,255,0.75); font-size: 1.1rem; cursor: pointer; padding: 0.3rem 0.45rem; border-radius: 6px; display: flex; align-items: center; transition: color 0.18s ease, background 0.18s ease; }
+.cinematic-controls { display: flex; flex-direction: column; gap: 0.4rem; padding: 0.55rem 1.1rem 0.7rem; background: #111827; border-top: 1px solid rgba(255,255,255,0.06); }
+.cinematic-controls-row1 { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.cinematic-controls-left { display: flex; align-items: center; gap: 0.3rem; flex-shrink: 0; min-width: 0; }
+.cinematic-controls-right { display: flex; align-items: center; gap: 0.25rem; flex-shrink: 0; }
+.cinematic-ctrl { background: none; border: none; color: rgba(255,255,255,0.75); font-size: 1.05rem; cursor: pointer; padding: 0.3rem 0.4rem; border-radius: 6px; display: flex; align-items: center; transition: color 0.18s ease, background 0.18s ease; flex-shrink: 0; }
 .cinematic-ctrl:hover { color: #fff; background: rgba(255,255,255,0.1); }
-.cinematic-time  { font-size: 0.72rem; color: rgba(255,255,255,0.5); white-space: nowrap; font-variant-numeric: tabular-nums; padding-left: 0.25rem; }
-.cinematic-progress { flex: 1; cursor: pointer; padding: 8px 0; }
+.cinematic-ctrl-active { color: var(--cyan, #67e8f9); }
+.cinematic-time  { font-size: 0.7rem; color: rgba(255,255,255,0.5); white-space: nowrap; font-variant-numeric: tabular-nums; padding-left: 0.25rem; overflow: hidden; text-overflow: ellipsis; }
+.cinematic-progress { cursor: pointer; padding: 6px 0; }
 .cinematic-progress-track { position: relative; height: 4px; background: rgba(255,255,255,0.15); border-radius: 4px; }
 .cinematic-progress-fill  { height: 100%; background: #3b82f6; border-radius: 4px; transition: width 0.1s linear; }
 .cinematic-progress-thumb { position: absolute; top: 50%; transform: translate(-50%,-50%); width: 12px; height: 12px; border-radius: 50%; background: #3b82f6; box-shadow: 0 0 8px rgba(59,130,246,0.6); transition: left 0.1s linear; }
-.cinematic-controls-right { flex-shrink: 0; }
-.cinematic-badge { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; color: rgba(255,255,255,0.45); display: flex; align-items: center; }
+.cinematic-badge { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.05em; color: rgba(255,255,255,0.45); display: flex; align-items: center; white-space: nowrap; }
+
+/* Speed / settings popover */
+.cinematic-speed-wrap { position: relative; }
+.cinematic-speed-menu {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  background: #1f2937;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 0.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 110px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  z-index: 20;
+}
+.cinematic-speed-option {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.75);
+  font-size: 0.78rem;
+  text-align: left;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.cinematic-speed-option:hover { background: rgba(255,255,255,0.08); color: #fff; }
+.cinematic-speed-option-active { color: var(--cyan, #67e8f9); font-weight: 700; }
 
 /* Tablet video — keep 16:9 but slightly smaller play button */
 @media (min-width: 768px) and (max-width: 991.98px) {
@@ -157,22 +190,27 @@
   .cinematic-play-btn { width: 72px; height: 72px; font-size: 1.8rem; }
 }
 
-/* Mobile video — 9:16 portrait */
+/* Mobile video — 9:16 portrait. Every control stays visible, just tighter. */
 @media (max-width: 767.98px) {
   .home-video-section { padding: 3rem 0 0; }
   .cinematic-frame    { aspect-ratio: 9 / 16; max-height: 92vh; }
   .cinematic-play-btn { width: 64px; height: 64px; font-size: 1.6rem; }
   .cinematic-play-title { font-size: 0.9rem; }
   .cinematic-topbar   { padding: 0.5rem 0.85rem; }
-  .cinematic-controls { padding: 0.45rem 0.85rem; gap: 0.5rem; }
-  .cinematic-controls-right { display: none; }
+  .cinematic-controls { padding: 0.45rem 0.7rem 0.6rem; gap: 0.35rem; }
+  .cinematic-ctrl     { font-size: 0.95rem; padding: 0.28rem 0.32rem; }
+  .cinematic-badge    { display: none; } /* badge text is decorative only — safe to drop first on tight screens */
 }
 
 @media (max-width: 575.98px) {
   .cinematic-play-btn { width: 52px; height: 52px; font-size: 1.3rem; }
-  .cinematic-time     { display: none; }
   .cinematic-play-sub { display: none; }
   .home-video-intro   { padding: 0 1rem 2rem; }
+  .cinematic-controls-left  { gap: 0.15rem; }
+  .cinematic-controls-right { gap: 0.1rem; }
+  .cinematic-time      { font-size: 0.62rem; max-width: 64px; }
+  .cinematic-ctrl      { font-size: 0.88rem; padding: 0.24rem 0.26rem; }
+  .cinematic-speed-menu{ min-width: 96px; }
 }
 
 

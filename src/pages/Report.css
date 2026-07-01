@@ -693,7 +693,114 @@ textarea.cyber-input { resize: vertical; min-height: 120px; }
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
-  padding: 0.75rem 1rem;
+  padding: 1.25rem 1.5rem;
 }
 
+.form-progress-bar-wrap .progress-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e293b;
+}
 
+.form-progress-bar-wrap .progress-percentage {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1;
+}
+
+.page-light .cyber-progress-bar {
+  background-color: #e2e8f0 !important;
+  height: 8px !important;
+  border-radius: 99px !important;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.06);
+}
+
+.page-light .cyber-progress-bg {
+  background: #0f172a !important;
+  box-shadow: none !important;
+}
+
+/* ============================================
+   REPORT FORM HEADER — title + Clear Draft
+   ============================================ */
+.report-form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.report-form-title {
+  font-size: 1.55rem;
+  color: #0f172a;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.report-form-subtitle {
+  font-size: 0.88rem;
+  color: #475569;
+  line-height: 1.5;
+}
+
+.btn-clear-draft {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  flex-shrink: 0;
+  background: #091024;
+  border: none;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 0.6rem 1.25rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: background 0.15s ease;
+}
+
+.btn-clear-draft:hover {
+  background: #1e293b;
+}
+
+/* Mobile: keep side-by-side, just tighter */
+@media (max-width: 575.98px) {
+  .report-form-header {
+    margin-top: 1rem;
+    margin-bottom: 0.25rem;
+  }
+  .btn-clear-draft {
+    font-size: 0.78rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+  }
+  .report-form-title {
+    font-size: 1.2rem;
+  }
+  .form-progress-bar-wrap {
+    padding: 1rem;
+  }
+  .form-progress-bar-wrap .progress-percentage {
+    font-size: 1.35rem;
+  }
+}
+
+/* ── DYNAMIC COMMUNICATION VALUE FIELD ── */
+.comm-value-wrap {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1rem 1rem 0.85rem;
+  animation: commFadeIn 0.2s ease;
+}
+
+@keyframes commFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

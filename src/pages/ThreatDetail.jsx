@@ -1,5 +1,5 @@
-import { useParams, Link, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import { THREAT_DATA } from '../data/threatData'
 import { QUIZ_LIST } from '../data/quizData'
 import WhatsipModal from '../components/WhatsipModal'
@@ -113,8 +113,17 @@ function ToolsText({ text }) {
 export default function ThreatDetail() {
   const { slug } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
   const threat = THREAT_DATA[slug]
   const [activeModal, setActiveModal] = useState(null) // 'hire' | 'report' | 'request' | 'contact' | 'recovery'
+
+  // After a redirected sign-in/sign-up, reopen the modal the user was using.
+  useEffect(() => {
+    if (location.state?.reopenModal) {
+      setActiveModal(location.state.reopenModal)
+      navigate(location.pathname, { replace: true, state: {} })
+    }
+  }, [location.state, location.pathname, navigate])
 
   // Find a related quiz for this slug
   const relatedQuiz = QUIZ_LIST.find(q =>

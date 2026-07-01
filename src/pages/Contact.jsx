@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import api from '../services/api'
+import { useAuth } from '../context/AuthContext'
 import '../styles/cyber.css'
 import './Contact.css'
 import './Report.css'   /* shared livechat modal styles */
@@ -402,7 +403,9 @@ function ContactLiveChat({ isOpen, onClose, userName, navigate }) {
    CONTACT PAGE
    ══════════════════════════════════════════════════════════ */
 export default function Contact() {
-  const navigate = useNavigate()
+  const navigate  = useNavigate()
+  const location  = useLocation()
+  const { user }  = useAuth()
   const [form,      setForm]      = useState({ name: '', email: '', subject: '', message: '' })
   const [submitted, setSubmitted] = useState(false)
   const [loading,   setLoading]   = useState(false)
@@ -410,12 +413,39 @@ export default function Contact() {
   const [showChat,  setShowChat]  = useState(false)
   const set = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }))
 
+  // Restore a saved draft (left behind by an auth redirect) and prefill from the signed-in user
+  useEffect(() => {
+    const saved = localStorage.getItem('whts_contact_draft')
+    if (saved) {
+      try { setForm(JSON.parse(saved)) } catch { /* ignore */ }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (user) {
+      setForm(f => ({
+        ...f,
+        name:  f.name  || (user.firstName || user.name || ''),
+        email: f.email || user.email || '',
+      }))
+    }
+  }, [user])
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+
+    if (!user) {
+      // Save what they've typed so far and send them to sign in
+      localStorage.setItem('whts_contact_draft', JSON.stringify(form))
+      navigate('/signin', { state: { from: '/contact', scrollTo: 'contact' } })
+      return
+    }
+
     setLoading(true)
     try {
       await api.post('/contact/submit', form)
+      localStorage.removeItem('whts_contact_draft')
       setSubmitted(true)
     } catch (err) {
       setError(err.response?.data?.message || 'Something went wrong. Please try again.')
@@ -485,7 +515,7 @@ export default function Contact() {
                   </button>
                 </div>
               ) : (
-                <div className="contact-form-card p-4 p-md-5">
+                <div className="contact-form-card p-4 p-md-5" id="contact">
                   <h3 className="fw-bold mb-4" style={{ color: '#0f172a' }}>Send us a Message</h3>
                   {error && (
                     <div className="alert alert-danger d-flex align-items-center gap-2 mb-3" style={{ borderRadius: 10 }}>
@@ -532,10 +562,13 @@ export default function Contact() {
                           style={{ padding: '0.85rem', borderRadius: 12, fontWeight: 600 }}
                           disabled={loading}
                         >
-                          {loading
-                            ? <><span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Sending…</>
-                            : <><i className="bi bi-send me-2"></i>Send Message</>
-                          }
+                          {loading ? (
+                            <><span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Sending…</>
+                          ) : user ? (
+                            <><i className="bi bi-send me-2"></i>Send Message</>
+                          ) : (
+                            <><i className="bi bi-lock me-2"></i>Sign In to Submit</>
+                          )}
                         </button>
                       </div>
                     </div>

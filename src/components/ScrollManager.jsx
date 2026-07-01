@@ -43,17 +43,26 @@ export default function ScrollManager() {
       return
     }
 
+    // Navbar height differs between mobile (~56px) and desktop (~80px).
+    // Read it dynamically from the DOM so the scroll lands exactly on the heading.
+    const getNavbarHeight = () => {
+      const nav = document.querySelector('.cyber-navbar') || document.querySelector('nav')
+      return nav ? nav.getBoundingClientRect().height + 8 : 72
+    }
+
     let attempts = 0
     const scroll = () => {
       const el = document.getElementById(target)
       if (el) {
-        const y = el.getBoundingClientRect().top + window.scrollY - 80
-        window.scrollTo({ top: y, behavior: 'smooth' })
-      } else if (attempts++ < 30) {
-        setTimeout(scroll, 100)
+        const offset = getNavbarHeight()
+        const y = el.getBoundingClientRect().top + window.scrollY - offset
+        window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' })
+      } else if (attempts++ < 50) {
+        // Retry longer — mobile renders slower after navigation
+        setTimeout(scroll, 120)
       }
     }
-    setTimeout(scroll, 50)
+    setTimeout(scroll, 80)
   }, [location])
 
   return null

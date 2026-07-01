@@ -111,6 +111,9 @@ function OfficialPlayer({ official }) {
   const [progress, setProgress] = useState(0)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
+  const [playbackSpeed, setPlaybackSpeed] = useState(1)
+  const [showSpeedMenu, setShowSpeedMenu] = useState(false)
+  const [ccOn, setCcOn] = useState(false)
 
   const fmt = (s) => {
     if (!s || isNaN(s)) return '0:00'
@@ -136,6 +139,51 @@ function OfficialPlayer({ official }) {
     if (!v) return
     const r = e.currentTarget.getBoundingClientRect()
     v.currentTime = ((e.clientX - r.left) / r.width) * v.duration
+  }
+
+  const restart = (e) => {
+    e.stopPropagation()
+    const v = videoRef.current
+    if (!v) return
+    v.currentTime = 0
+    if (v.paused) { v.play(); setIsPlaying(true) }
+  }
+
+  const handleSpeedChange = (rate, e) => {
+    e?.stopPropagation()
+    const v = videoRef.current
+    if (v) v.playbackRate = rate
+    setPlaybackSpeed(rate)
+    setShowSpeedMenu(false)
+  }
+
+  /* Double-tap sides of the frame to skip ±10s */
+  const lastTapRef = useRef({ side: null, time: 0 })
+  const [skipHint, setSkipHint] = useState(null)
+  const handleFrameTap = (e) => {
+    const v = videoRef.current
+    if (!v) return
+    const rect = e.currentTarget.getBoundingClientRect()
+    const tapX = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left
+    const side = tapX < rect.width / 2 ? 'backward' : 'forward'
+    const now  = Date.now()
+    const last = lastTapRef.current
+
+    if (last.side === side && now - last.time < 350) {
+      const skip = side === 'forward' ? 10 : -10
+      v.currentTime = Math.min(Math.max(v.currentTime + skip, 0), v.duration)
+      setSkipHint(side)
+      setTimeout(() => setSkipHint(null), 700)
+      lastTapRef.current = { side: null, time: 0 }
+    } else {
+      lastTapRef.current = { side, time: now }
+      setTimeout(() => {
+        if (lastTapRef.current.side === side) {
+          toggle()
+          lastTapRef.current = { side: null, time: 0 }
+        }
+      }, 360)
+    }
   }
 
   useEffect(() => {
@@ -172,7 +220,7 @@ function OfficialPlayer({ official }) {
 
   return (
     <div className="official-player-card">
-      <div className="official-player-frame" onClick={toggle} style={{ borderColor: official.color + '44' }}>
+      <div className="official-player-frame" onClick={handleFrameTap} onTouchEnd={handleFrameTap} style={{ borderColor: official.color + '44' }}>
         <video
           ref={videoRef}
           className="official-player-video"
@@ -185,6 +233,14 @@ function OfficialPlayer({ official }) {
         <div className="official-player-watermark" style={{ color: official.color + '55' }}>
           {official.codename}
         </div>
+
+        {skipHint === 'backward' && (
+          <div className="skip-hint skip-hint-left"><i className="bi bi-skip-backward-fill"></i><span>-10s</span></div>
+        )}
+        {skipHint === 'forward' && (
+          <div className="skip-hint skip-hint-right"><i className="bi bi-skip-forward-fill"></i><span>+10s</span></div>
+        )}
+
         {!isPlaying && (
           <div className="official-player-overlay">
             <button className="official-play-btn" style={{ borderColor: official.color, background: official.color + '22' }}>
@@ -195,18 +251,53 @@ function OfficialPlayer({ official }) {
       </div>
 
       <div className="official-player-controls">
-        <button className="official-ctrl" onClick={toggle}>
-          <i className={`bi ${isPlaying ? 'bi-pause-fill' : 'bi-play-fill'}`}></i>
-        </button>
+        <div className="official-ctrl-row1">
+          <div className="official-ctrl-left">
+            <button className="official-ctrl" onClick={restart} aria-label="Restart">
+              <i className="bi bi-arrow-counterclockwise"></i>
+            </button>
+            <button className="official-ctrl" onClick={toggle} aria-label={isPlaying ? 'Pause' : 'Play'}>
+              <i className={`bi ${isPlaying ? 'bi-pause-fill' : 'bi-play-fill'}`}></i>
+            </button>
+            <button className="official-ctrl" onClick={() => setMuted(p => !p)} aria-label="Toggle mute">
+              <i className={`bi ${muted ? 'bi-volume-mute-fill' : 'bi-volume-up-fill'}`}></i>
+            </button>
+            <span className="official-ctrl-time">{fmt(currentTime)} / {fmt(duration)}</span>
+          </div>
+          <div className="official-ctrl-right">
+            <button
+              className={`official-ctrl ${ccOn ? 'official-ctrl-active' : ''}`}
+              onClick={() => setCcOn(p => !p)}
+              aria-label="Toggle captions"
+              aria-pressed={ccOn}
+            >
+              <i className="bi bi-cc-square"></i>
+            </button>
+            <div className="official-speed-wrap">
+              <button className="official-ctrl" onClick={() => setShowSpeedMenu(p => !p)} aria-label="Playback speed settings">
+                <i className="bi bi-gear-fill"></i>
+              </button>
+              {showSpeedMenu && (
+                <div className="official-speed-menu">
+                  {[0.5, 1, 1.5, 2].map(rate => (
+                    <button
+                      key={rate}
+                      className={`official-speed-option ${playbackSpeed === rate ? 'official-speed-option-active' : ''}`}
+                      onClick={(e) => handleSpeedChange(rate, e)}
+                    >
+                      {rate}x{rate === 1 ? ' (Normal)' : ''}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
         <div className="official-ctrl-progress" onClick={seek}>
           <div className="official-progress-track">
             <div className="official-progress-fill" style={{ width: `${progress}%`, background: official.color }} />
           </div>
         </div>
-        <span className="official-ctrl-time">{fmt(currentTime)}</span>
-        <button className="official-ctrl" onClick={() => setMuted(p => !p)}>
-          <i className={`bi ${muted ? 'bi-volume-mute-fill' : 'bi-volume-up-fill'}`}></i>
-        </button>
       </div>
 
       <div className="official-caption">
@@ -250,6 +341,12 @@ function CombinedVideo() {
   const [progress,  setProgress]  = useState(0)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration,  setDuration]  = useState(0)
+  const [playbackSpeed, setPlaybackSpeed] = useState(1)
+  const [showSpeedMenu, setShowSpeedMenu] = useState(false)
+  const [ccOn, setCcOn] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [skipHint, setSkipHint] = useState(null)
+  const lastTapRef = useRef({ side: null, time: 0 })
 
   const fmt = (s) => {
     if (!s || isNaN(s)) return '0:00'
@@ -273,6 +370,60 @@ function CombinedVideo() {
     v.currentTime = ((e.clientX - r.left) / r.width) * v.duration
   }
 
+  const restart = (e) => {
+    e.stopPropagation()
+    const v = videoRef.current
+    if (!v) return
+    v.currentTime = 0
+    if (v.paused) { v.play(); setIsPlaying(true) }
+  }
+
+  const handleSpeedChange = (rate, e) => {
+    e?.stopPropagation()
+    const v = videoRef.current
+    if (v) v.playbackRate = rate
+    setPlaybackSpeed(rate)
+    setShowSpeedMenu(false)
+  }
+
+  const toggleFullscreen = (e) => {
+    e.stopPropagation()
+    const wrap = playerWrapRef.current
+    if (!wrap) return
+    if (!document.fullscreenElement) {
+      wrap.requestFullscreen?.() || wrap.webkitRequestFullscreen?.()
+    } else {
+      document.exitFullscreen?.() || document.webkitExitFullscreen?.()
+    }
+  }
+
+  /* Double-tap sides of the frame to skip ±10s */
+  const handleFrameTap = (e) => {
+    const v = videoRef.current
+    if (!v) return
+    const rect = e.currentTarget.getBoundingClientRect()
+    const tapX = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left
+    const side = tapX < rect.width / 2 ? 'backward' : 'forward'
+    const now  = Date.now()
+    const last = lastTapRef.current
+
+    if (last.side === side && now - last.time < 350) {
+      const skip = side === 'forward' ? 10 : -10
+      v.currentTime = Math.min(Math.max(v.currentTime + skip, 0), v.duration)
+      setSkipHint(side)
+      setTimeout(() => setSkipHint(null), 700)
+      lastTapRef.current = { side: null, time: 0 }
+    } else {
+      lastTapRef.current = { side, time: now }
+      setTimeout(() => {
+        if (lastTapRef.current.side === side) {
+          toggle()
+          lastTapRef.current = { side: null, time: 0 }
+        }
+      }, 360)
+    }
+  }
+
   const playFullscreen = (e) => {
     e.preventDefault()
     e.stopPropagation()
@@ -288,6 +439,16 @@ function CombinedVideo() {
       }
     }).catch(e => console.log('Play error:', e))
   }
+
+  useEffect(() => {
+    const onFs = () => setIsFullscreen(!!document.fullscreenElement)
+    document.addEventListener('fullscreenchange', onFs)
+    document.addEventListener('webkitfullscreenchange', onFs)
+    return () => {
+      document.removeEventListener('fullscreenchange', onFs)
+      document.removeEventListener('webkitfullscreenchange', onFs)
+    }
+  }, [])
 
   useEffect(() => {
     const v = videoRef.current
@@ -348,7 +509,7 @@ function CombinedVideo() {
           </div>
 
           {/* Video frame */}
-          <div className="combined-video-frame" onClick={toggle}>
+          <div className="combined-video-frame" onClick={handleFrameTap} onTouchEnd={handleFrameTap}>
             <video
               ref={videoRef}
               className="combined-video-el"
@@ -359,6 +520,13 @@ function CombinedVideo() {
             />
             <div className="combined-video-gradient" />
             <div className="combined-video-watermark">whts-client.vercel.app</div>
+
+            {skipHint === 'backward' && (
+              <div className="skip-hint skip-hint-left"><i className="bi bi-skip-backward-fill"></i><span>-10s</span></div>
+            )}
+            {skipHint === 'forward' && (
+              <div className="skip-hint skip-hint-right"><i className="bi bi-skip-forward-fill"></i><span>+10s</span></div>
+            )}
 
             {!isPlaying && (
               <div className="combined-video-overlay">
@@ -374,14 +542,54 @@ function CombinedVideo() {
 
           {/* Controls */}
           <div className="combined-video-controls">
-            <div className="combined-ctrl-left">
-              <button className="combined-ctrl-btn" onClick={toggle} aria-label={isPlaying ? 'Pause' : 'Play'}>
-                <i className={`bi ${isPlaying ? 'bi-pause-fill' : 'bi-play-fill'}`}></i>
-              </button>
-              <button className="combined-ctrl-btn" onClick={() => setMuted(p => !p)} aria-label="Toggle mute">
-                <i className={`bi ${muted ? 'bi-volume-mute-fill' : 'bi-volume-up-fill'}`}></i>
-              </button>
-              <span className="combined-ctrl-time">{fmt(currentTime)} / {fmt(duration)}</span>
+            <div className="combined-ctrl-row1">
+              <div className="combined-ctrl-left">
+                <button className="combined-ctrl-btn" onClick={restart} aria-label="Restart">
+                  <i className="bi bi-arrow-counterclockwise"></i>
+                </button>
+                <button className="combined-ctrl-btn" onClick={toggle} aria-label={isPlaying ? 'Pause' : 'Play'}>
+                  <i className={`bi ${isPlaying ? 'bi-pause-fill' : 'bi-play-fill'}`}></i>
+                </button>
+                <button className="combined-ctrl-btn" onClick={() => setMuted(p => !p)} aria-label="Toggle mute">
+                  <i className={`bi ${muted ? 'bi-volume-mute-fill' : 'bi-volume-up-fill'}`}></i>
+                </button>
+                <span className="combined-ctrl-time">{fmt(currentTime)} / {fmt(duration)}</span>
+              </div>
+
+              <div className="combined-ctrl-right">
+                <button
+                  className={`combined-ctrl-btn ${ccOn ? 'combined-ctrl-active' : ''}`}
+                  onClick={() => setCcOn(p => !p)}
+                  aria-label="Toggle captions"
+                  aria-pressed={ccOn}
+                >
+                  <i className="bi bi-cc-square"></i>
+                </button>
+                <div className="combined-speed-wrap">
+                  <button className="combined-ctrl-btn" onClick={() => setShowSpeedMenu(p => !p)} aria-label="Playback speed settings">
+                    <i className="bi bi-gear-fill"></i>
+                  </button>
+                  {showSpeedMenu && (
+                    <div className="combined-speed-menu">
+                      {[0.5, 1, 1.5, 2].map(rate => (
+                        <button
+                          key={rate}
+                          className={`combined-speed-option ${playbackSpeed === rate ? 'combined-speed-option-active' : ''}`}
+                          onClick={(e) => handleSpeedChange(rate, e)}
+                        >
+                          {rate}x{rate === 1 ? ' (Normal)' : ''}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <button className="combined-ctrl-btn" onClick={toggleFullscreen} aria-label="Toggle fullscreen">
+                  <i className={`bi ${isFullscreen ? 'bi-fullscreen-exit' : 'bi-fullscreen'}`}></i>
+                </button>
+                <span className="combined-ctrl-badge">
+                  <i className="bi bi-shield-fill-check me-1"></i>WHTSIPA
+                </span>
+              </div>
             </div>
 
             <div className="combined-ctrl-progress" onClick={seek}>
@@ -390,21 +598,21 @@ function CombinedVideo() {
                 <div className="combined-progress-thumb" style={{ left: `${progress}%` }} />
               </div>
             </div>
-
-            <div className="combined-ctrl-right">
-              <span className="combined-ctrl-badge">
-                <i className="bi bi-shield-fill-check me-1"></i>WHTSIPA
-              </span>
-            </div>
           </div>
-
         </div>
 
         <div className="combined-video-find-us-wrap">
           <button className="combined-ctrl-find-us" onClick={playFullscreen} type="button">
-            FIND US
+            <span className="find-us-inner">
+              <span className="find-us-bracket find-us-bracket-tl"></span>
+              <span className="find-us-bracket find-us-bracket-tr"></span>
+              FIND US
+              <span className="find-us-bracket find-us-bracket-bl"></span>
+              <span className="find-us-bracket find-us-bracket-br"></span>
+            </span>
           </button>
         </div>
+
       </div>
     </section>
   )

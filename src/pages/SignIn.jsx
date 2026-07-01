@@ -28,9 +28,8 @@ export default function SignIn() {
     try {
         const { data } = await api.post('/auth/login', { email: form.email, password: form.password })
         login({ ...data.user, token: data.token })
-        const from     = location.state?.from || '/'
-        const scrollTo = location.state?.scrollTo
-        navigate(from, scrollTo ? { state: { scrollTo } } : {})
+        const { from = '/', ...rest } = location.state || {}
+        navigate(from, Object.keys(rest).length ? { state: rest } : {})
     } catch (err) {
          setError(err.response?.data?.message || 'Invalid email or password.')
     } finally {

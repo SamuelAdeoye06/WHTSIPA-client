@@ -370,10 +370,16 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
               <br/><small>Save this — it will be yours after sign up.</small>
             </div>
             <div className="d-flex gap-2 flex-wrap justify-content-center mt-3">
-              <button className="btn btn-cyber" onClick={() => { onClose(); navigate('/signup') }}>
+              <button className="btn btn-cyber" onClick={() => {
+                onClose()
+                navigate('/signup', { state: { from: window.location.pathname, reopenModal: mode, reopenThreatTitle: threatTitle } })
+              }}>
                 <i className="bi bi-person-plus me-2"></i>Create Free Account
               </button>
-              <button className="btn btn-outline-cyber" onClick={() => { onClose(); navigate('/signin') }}>
+              <button className="btn btn-outline-cyber" onClick={() => {
+                onClose()
+                navigate('/signin', { state: { from: window.location.pathname, reopenModal: mode, reopenThreatTitle: threatTitle } })
+              }}>
                 Sign In
               </button>
             </div>
