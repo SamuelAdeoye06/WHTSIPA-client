@@ -155,11 +155,20 @@ const TOOLS_FLOW = {
     ]
   },
   live_rep: {
-    text: "Our live representatives are available to assist you immediately. We respond fastest on Telegram at @WHTSIPA_DigitalTools. Choose your preferred channel:",
+    text: "Would you like to connect with a live representative? Please choose your preferred channel:",
     options: [
-      { text: "📲 Telegram — WHTSIPA Tools (Immediate)", action: "open_tg" },
-      { text: "💬 WhatsApp — 24/7 Support", action: "open_wa" },
-      { text: "⬅️ Back to main menu", next: "main" },
+      { text: "💬 Connect via WhatsApp",                    action: "open_wa" },
+      { text: "📲 Connect via Telegram",                    action: "open_tg" },
+      { text: "🧑‍💼 Chat with an Active Representative",      next: "live_rep_confirm" },
+      { text: "⬅️ Back to main menu",                      next: "main" },
+    ]
+  },
+  live_rep_confirm: {
+    text: "Would you like to chat with an Active Representative?\n\n⏱️ Estimated wait time: 15–20 minutes.\n\nAn available specialist will be assigned to your ticket and will reach out to you via your preferred contact channel (Telegram or WhatsApp).",
+    options: [
+      { text: "✅ Yes — Connect me now",      action: "open_tg" },
+      { text: "💬 Connect via WhatsApp instead", action: "open_wa" },
+      { text: "⬅️ Back",                       next: "live_rep" },
     ]
   },
 }
@@ -167,8 +176,9 @@ const TOOLS_FLOW = {
 /* ══════════════════════════════════════════
    TOOLS LIVE CHAT COMPONENT
    ══════════════════════════════════════════ */
-function ToolsLiveChat({ ticketId, threatTitle, onClose, onBack, user, userName, waLink }) {
+function ToolsLiveChat({ ticketId, threatTitle, onClose, onBack, user, userName, waLink, isHumanAgent = false }) {
   const [currentNode, setCurrentNode] = useState('main')
+  const [isHuman, setIsHuman] = useState(isHumanAgent)
   const [messages, setMessages] = useState([
     {
       sender: 'agent',
@@ -229,6 +239,13 @@ function ToolsLiveChat({ ticketId, threatTitle, onClose, onBack, user, userName,
             text: `Opening WhatsApp now. Your Ticket ID is: ${ticketId} — our team will respond shortly.`,
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           }])
+        } else if (opt.action === 'connect_human') {
+          setIsHuman(true)
+          setMessages(prev => [...prev, {
+            sender: 'agent',
+            text: "Connecting to an Active Representative...\n\n⏱️ Estimated wait time: 15–20 minutes.\n\nYou have been placed in the queue. A representative will respond to your messages here or contact you via your registered details shortly.",
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          }])
         }
       }, 900)
       return
@@ -260,24 +277,18 @@ function ToolsLiveChat({ ticketId, threatTitle, onClose, onBack, user, userName,
           <i className="bi bi-arrow-left"></i>
         </button>
         <div className="wm-tools-chat-avatar">
-          <i className="bi bi-robot text-white"></i>
+          <i className={`bi ${isHuman ? 'bi-person-fill' : 'bi-robot'} text-white`}></i>
         </div>
         <div className="wm-tools-chat-info">
-          <div className="wm-tools-chat-title">WHTSIPA Tools Assistant</div>
+          <div className="wm-tools-chat-title">WHTSIPA Live Support</div>
           <div className="wm-tools-chat-status">
             <span className="wm-tools-status-dot"></span>
-            AI Chatbot · Powered by WHTSIPA
+            {isHuman ? 'Active Representative Online' : 'AI Representative Online'}
           </div>
         </div>
         <button className="wm-close wm-tools-close-btn" onClick={onClose} aria-label="Close">
           <i className="bi bi-x-lg text-white"></i>
         </button>
-      </div>
-
-      {/* Ticket bar */}
-      <div className="wm-tools-ticket-bar">
-        <i className="bi bi-ticket-perforated me-1"></i>
-        Ticket: <strong>{ticketId}</strong>
       </div>
 
       {/* Messages */}
@@ -444,7 +455,6 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
               <p className="wm-subtitle">Choose how you'd like to connect.</p>
             </div>
           </div>
-          <div className="wm-ticket-ref"><i className="bi bi-ticket-perforated me-2"></i>Ticket Reference: <strong>{ticketId}</strong></div>
           <div className="wm-channels">
             <a href={waLink} target="_blank" rel="noreferrer" className="wm-channel-btn wm-wa">
               <i className="bi bi-whatsapp"></i><span><strong>WhatsApp</strong><small>24/7 support — fastest response</small></span><i className="bi bi-arrow-right ms-auto"></i>
@@ -488,9 +498,6 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
             </div>
           </div>
 
-          <div className="wm-ticket-ref"><i className="bi bi-ticket-perforated me-2"></i>Ticket: <strong>{ticketId}</strong></div>
-
-          {/* Two main options */}
           <div className="wm-request-options">
             <button className="wm-request-option-card wm-roc-chat" onClick={() => setStep('livechat')}>
               <div className="wm-roc-icon"><i className="bi bi-robot"></i></div>
@@ -636,7 +643,6 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
               <h3 className="wm-title">{title}</h3>
             </div>
           </div>
-          <div className="wm-ticket-ref"><i className="bi bi-ticket-perforated me-2"></i>Ticket: <strong>{ticketId}</strong> — Save this reference.</div>
 
           <form className="wm-form" onSubmit={handleSubmit}>
             {error && (

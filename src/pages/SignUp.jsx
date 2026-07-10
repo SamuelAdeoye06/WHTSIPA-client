@@ -45,6 +45,18 @@ const BLOCKED_CODES = new Set([
   'CM','CI','TZ','UG','DZ','SN','MA','ZM','RW','GH','ZA','KE'
 ])
 
+const getFriendlyCode = (code) => {
+  const mapping = {
+    US: 'USA', CA: 'CAN', GB: 'UK', AU: 'AUS', NZ: 'NZL',
+    DE: 'GER', FR: 'FRA', NL: 'NLD', SE: 'SWE', NO: 'NOR',
+    DK: 'DNK', FI: 'FIN', CH: 'CHE', SG: 'SGP', JP: 'JPN',
+    KR: 'KOR', AE: 'UAE', QA: 'QAT', IL: 'ISR', AT: 'AUT',
+    BE: 'BEL', IT: 'ITA', ES: 'ESP', PL: 'POL', PT: 'PRT',
+    IE: 'IRL', GR: 'GRC', CZ: 'CZE', NG: 'NGA'
+  }
+  return mapping[code] || code.toUpperCase()
+}
+
 /* ── IP → country detection ── */
 async function detectCountry() {
   try {
@@ -384,7 +396,7 @@ export default function SignUp() {
                                 }}
                               >
                                 <span className="auth-country-name">{c.name}</span>
-                                <span className="auth-country-dial">{c.dial}</span>
+                                <span className="auth-country-dial">{getFriendlyCode(c.code)} ({c.dial})</span>
                               </button>
                             </li>
                           ))}
@@ -403,7 +415,7 @@ export default function SignUp() {
                   <div className="auth-input-wrap">
                     <i className="bi bi-telephone auth-input-icon"></i>
                     <input id="phone" type="tel" className={`auth-input${errors.phone ? ' auth-input-error' : ''}`}
-                      placeholder={selectedCountry ? `${selectedCountry.dial} ...` : '+1 ...'}
+                      placeholder={selectedCountry ? `${getFriendlyCode(selectedCountry.code)} (${selectedCountry.dial}) ...` : 'USA (+1) ...'}
                       value={form.phone}
                       onChange={set('phone')} onBlur={handleBlur('phone')} />
                   </div>

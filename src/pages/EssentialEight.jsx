@@ -195,64 +195,56 @@ const ALLOWED_COUNTRIES = [
 /* ── Phone field with country-code dropdown — same UX as SignUp/Report,
    built for plain useState instead of Formik, and kept at module scope
    so React never remounts it (which would break input focus). ── */
-function BookingPhoneField({ dialCode, setDialCode, digits, setDigits, error }) {
-  const [showDropdown, setShowDropdown] = useState(false)
-  const dropdownRef = useRef(null)
+const getFriendlyCode = (code) => {
+  const mapping = {
+    US: 'USA', CA: 'CAN', GB: 'UK', AU: 'AUS', NZ: 'NZL',
+    DE: 'GER', FR: 'FRA', NL: 'NLD', SE: 'SWE', NO: 'NOR',
+    DK: 'DNK', FI: 'FIN', CH: 'CHE', SG: 'SGP', JP: 'JPN',
+    KR: 'KOR', AE: 'UAE', QA: 'QAT', IL: 'ISR', AT: 'AUT',
+    BE: 'BEL', IT: 'ITA', ES: 'ESP', PL: 'POL', PT: 'PRT',
+    IE: 'IRL', GR: 'GRC', CZ: 'CZE', NG: 'NGA'
+  }
+  return mapping[code] || code.toUpperCase()
+}
 
-  useEffect(() => {
-    const handler = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setShowDropdown(false)
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [])
-
-  const selectedCountry = ALLOWED_COUNTRIES.find(c => c.dial === dialCode) || ALLOWED_COUNTRIES[0]
-
+function BookingPhoneField({ countryCode, setCountryCode, dialCode, setDialCode, digits, setDigits, error }) {
   return (
     <div className="bc-field">
       <label className="bc-label" htmlFor="bc-phone">Phone Number *</label>
-      <div className="phone-country-field-wrap">
-        <div className="input-group" ref={dropdownRef}>
-          <button
-            type="button"
-            className="btn phone-country-btn dropdown-toggle"
-            onClick={() => setShowDropdown(p => !p)}
-          >
-            {selectedCountry.code} ({selectedCountry.dial})
-          </button>
-          <input
-            id="bc-phone"
-            type="tel"
-            className={`form-control bc-input bc-input-phone ${error ? 'bc-input-err' : ''}`}
-            placeholder="Phone number digits"
-            value={digits}
-            onChange={e => setDigits(e.target.value)}
-          />
-          {showDropdown && (
-            <div className="phone-country-dropdown-menu">
-              <ul className="list-unstyled mb-0">
-                {ALLOWED_COUNTRIES.map(c => (
-                  <li key={c.code}>
-                    <button
-                      type="button"
-                      className="phone-country-dropdown-item"
-                      onClick={() => { setDialCode(c.dial); setShowDropdown(false) }}
-                    >
-                      <span className="country-name">{c.name}</span>
-                      <span className="country-dial">{c.dial}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
+      <div className="bc-phone-wrap">
+        {/* Native select — works reliably inside overflow-y:auto modals */}
+        <select
+          className="bc-phone-select"
+          value={countryCode}
+          onChange={e => {
+            const chosen = ALLOWED_COUNTRIES.find(c => c.code === e.target.value)
+            if (chosen) {
+              setCountryCode(chosen.code)
+              setDialCode(chosen.dial)
+            }
+          }}
+          aria-label="Country code"
+        >
+          {ALLOWED_COUNTRIES.map(c => (
+            <option key={c.code} value={c.code}>
+              {getFriendlyCode(c.code)} ({c.dial})
+            </option>
+          ))}
+        </select>
+        <input
+          id="bc-phone"
+          type="tel"
+          className={`bc-input bc-input-phone ${error ? 'bc-input-err' : ''}`}
+          placeholder="Phone number digits"
+          value={digits}
+          onChange={e => setDigits(e.target.value)}
+        />
       </div>
       {error && <span className="bc-error"><i className="bi bi-exclamation-circle me-1"></i>{error}</span>}
     </div>
   )
 }
+
 
 /* ── Field wrapper — at module scope so React never remounts it on re-render ── */
 function F({ id, label, error, children }) {
@@ -274,7 +266,8 @@ function BookCallModal({ onClose }) {
   const [loading,        setLoading]        = useState(false)
   const [callbackNumber, setCallbackNumber] = useState(CALLBACK_NUMBER_FALLBACK)
   const [form,           setForm]           = useState({
-    name: '', email: '', dialCode: '+1', phoneDigits: '', preferredDate: '', preferredTime: '', notes: '',
+    name: '', email: '', countryCode: 'US', dialCode: '+1', phoneDigits: '', preferredDate: '',
+    preferredTime: '', preferredTimeCustom: '', notes: '', consentPrivacy: false,
   })
   const [errors, setErrors] = useState({})
 
@@ -316,10 +309,21 @@ function BookCallModal({ onClose }) {
     if (!form.name.trim())          e.name          = 'Full name is required'
     if (!form.email.trim())         e.email         = 'Email is required'
     else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = 'Enter a valid email'
-    if (!form.phoneDigits.trim())         e.phoneDigits  = 'Phone number is required'
-    else if (!/^[\d\s\-().]{4,15}$/.test(form.phoneDigits)) e.phoneDigits = 'Enter a valid phone number'
+    
+    // Validate allowed countries
+    const isCountryAllowed = ALLOWED_COUNTRIES.some(c => c.code === form.countryCode)
+    if (!isCountryAllowed) {
+      e.phoneDigits = 'Selected country is not allowed'
+    } else if (!form.phoneDigits.trim()) {
+      e.phoneDigits  = 'Phone number is required'
+    } else if (!/^[\d\s\-().]{4,15}$/.test(form.phoneDigits)) {
+      e.phoneDigits = 'Enter a valid phone number'
+    }
+
     if (!form.preferredDate)        e.preferredDate = 'Please select a preferred date'
-    if (!form.preferredTime)        e.preferredTime = 'Please select a preferred time'
+    if (!form.preferredTime && !form.preferredTimeCustom)
+                              e.preferredTime = 'Please select or enter a preferred time'
+    if (!form.consentPrivacy)   e.consentPrivacy = 'You must agree to the Privacy Policy and Terms'
     return e
   }
 
@@ -333,7 +337,7 @@ function BookCallModal({ onClose }) {
         email: form.email,
         phone: `${form.dialCode} ${form.phoneDigits}`.trim(),
         preferredDate: form.preferredDate,
-        preferredTime: form.preferredTime,
+        preferredTime: form.preferredTime === 'other' ? form.preferredTimeCustom : form.preferredTime,
         notes: form.notes,
       }
       const { data } = await api.post('/booking/submit', payload)
@@ -366,7 +370,8 @@ function BookCallModal({ onClose }) {
               </div>
               <div className="bc-number-value">{callbackNumber}</div>
               <p className="bc-number-note">
-                Please save this number. Expect a call from our specialists within 24 to 72 hours.
+                Please save this number. Expect a call from our specialists on your scheduled date:<br />
+                <strong>{form.preferredDate}{form.preferredTime ? ' at ' + form.preferredTime : ''}</strong>
               </p>
             </div>
             <div className="bc-note-box">
@@ -414,6 +419,8 @@ function BookCallModal({ onClose }) {
           </F>
 
           <BookingPhoneField
+            countryCode={form.countryCode}
+            setCountryCode={cc => setForm(p => ({ ...p, countryCode: cc }))}
             dialCode={form.dialCode}
             setDialCode={dc => setForm(p => ({ ...p, dialCode: dc }))}
             digits={form.phoneDigits}
@@ -432,10 +439,19 @@ function BookCallModal({ onClose }) {
                 value={form.preferredTime} onChange={set('preferredTime')}>
                 <option value="">Select time</option>
                 {['09:00 AM','10:00 AM','11:00 AM','12:00 PM',
-                  '01:00 PM','02:00 PM','03:00 PM','04:00 PM','05:00 PM'].map(t => (
-                  <option key={t} value={t}>{t}</option>
+                  '01:00 PM','02:00 PM','03:00 PM','04:00 PM','05:00 PM',
+                  'other'].map(t => (
+                  <option key={t} value={t}>{t === 'other' ? 'Other (type below)' : t}</option>
                 ))}
               </select>
+              {form.preferredTime === 'other' && (
+                <input
+                  className={`bc-input mt-2 ${errors.preferredTime ? 'bc-input-err' : ''}`}
+                  placeholder="e.g. 6:30 PM, early morning, flexible…"
+                  value={form.preferredTimeCustom}
+                  onChange={e => setForm(p => ({ ...p, preferredTimeCustom: e.target.value }))}
+                />
+              )}
             </F>
           </div>
 
@@ -458,6 +474,26 @@ function BookCallModal({ onClose }) {
             }
           </button>
 
+          <div className="bc-consent-wrap">
+            <label className="bc-consent-label">
+              <input
+                type="checkbox"
+                className="bc-consent-check"
+                checked={form.consentPrivacy || false}
+                onChange={e => setForm(p => ({ ...p, consentPrivacy: e.target.checked }))}
+              />
+              <span>
+                I agree to the{' '}
+                <a href="/privacy" target="_blank" rel="noopener noreferrer" className="bc-consent-link">Privacy Policy</a>
+                {' '}and{' '}
+                <a href="/terms" target="_blank" rel="noopener noreferrer" className="bc-consent-link">Terms</a>.
+              </span>
+            </label>
+            {errors.consentPrivacy && (
+              <span className="bc-error"><i className="bi bi-exclamation-circle me-1"></i>{errors.consentPrivacy}</span>
+            )}
+          </div>
+
           <p className="bc-disclaimer">
             <i className="bi bi-shield-lock me-1"></i>
             Your information is kept strictly confidential and used only for scheduling purposes.
@@ -475,15 +511,16 @@ export default function EssentialEight() {
   const location = useLocation()
   const navigate  = useNavigate()
 
-  // After a redirected sign-in, reopen the Book a Call modal automatically
+  // After a redirected sign-in or direct link from search, reopen the Book a Call modal automatically
   // so the user lands right back where they intended to act, not just the page.
   useEffect(() => {
-    if (location.state?.reopenModal === 'bookCall') {
+    const params = new URLSearchParams(location.search)
+    if (location.state?.reopenModal === 'bookCall' || params.get('bookCall') === 'true') {
       setShowBookModal(true)
       // Clear the flag so refreshing or navigating away doesn't reopen it again
       navigate(location.pathname, { replace: true, state: {} })
     }
-  }, [location.state, location.pathname, navigate])
+  }, [location.state, location.search, location.pathname, navigate])
 
   return (
     <div className="page-light">

@@ -215,12 +215,20 @@ const SITE_CHAT_FLOW = {
 
   /* ── LIVE AGENT ── */
   live_agent: {
-    text: "Our live representatives are available around the clock for urgent cases. Choose how you'd like to connect:",
+    text: "Would you like to connect with a live representative? Please choose your preferred channel:",
     options: [
-      { text: '🟢 WhatsApp — Fastest (24/7)',  action: 'open_wa' },
-      { text: '🔵 Telegram Support',            action: 'open_tg' },
-      { text: '📧 Send an Email',               action: 'open_email' },
-      { text: '⬅️ Back to main menu',           next: 'main' },
+      { text: "💬 Connect via WhatsApp",                    action: "open_wa" },
+      { text: "📲 Connect via Telegram",                    action: "open_tg" },
+      { text: "🧑‍💼 Chat with an Active Representative",      next: "live_agent_confirm" },
+      { text: "⬅️ Back to main menu",                      next: "main" },
+    ]
+  },
+  live_agent_confirm: {
+    text: "Would you like to chat with an Active Representative?\n\n⏱️ Estimated wait time: 15–20 minutes.\n\nAn available representative will be assigned to you and will respond shortly.",
+    options: [
+      { text: "✅ Yes — Connect me now",      action: "connect_human" },
+      { text: "💬 Connect via WhatsApp instead", action: "open_wa" },
+      { text: "⬅️ Back",                       next: "live_agent" },
     ]
   },
 }
@@ -228,8 +236,9 @@ const SITE_CHAT_FLOW = {
 /* ══════════════════════════════════════════════════════════
    SITE-WIDE LIVE CHAT MODAL COMPONENT
    ══════════════════════════════════════════════════════════ */
-function ContactLiveChat({ isOpen, onClose, userName, navigate }) {
+function ContactLiveChat({ isOpen, onClose, userName, navigate, isHumanAgent = false }) {
   const [currentNode, setCurrentNode] = useState('main')
+  const [isHuman, setIsHuman] = useState(isHumanAgent)
   const [messages, setMessages]       = useState([{
     sender: 'agent',
     text:   `Hello ${userName || 'there'}! Welcome to WHTSIPA Central Support. I can help with anything on our platform — reports, threats, tools, accounts, hiring, and more. What do you need today?`,
@@ -268,6 +277,14 @@ function ContactLiveChat({ isOpen, onClose, userName, navigate }) {
           open_wa:            () => window.open(`https://wa.me/${WA_NUMBER}`, '_blank'),
           open_tg:            () => window.open(`https://t.me/${TG_HANDLE}`, '_blank'),
           open_email:         () => window.open(`mailto:${SUPPORT_EMAIL}`, '_blank'),
+          connect_human:      () => {
+            setIsHuman(true)
+            setMessages(prev => [...prev, {
+              sender: 'agent',
+              text: "Connecting to an Active Representative...\n\n⏱️ Estimated wait time: 15–20 minutes.\n\nYou have been placed in the queue. A representative will respond here shortly.",
+              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            }])
+          }
         }
         actionMap[opt.action]?.()
       }, 900)
@@ -318,13 +335,13 @@ function ContactLiveChat({ isOpen, onClose, userName, navigate }) {
         <div className="livechat-header">
           <div className="d-flex align-items-center gap-2">
             <div className="livechat-avatar">
-              <i className="bi bi-shield-fill-check text-white"></i>
+              <i className={`bi ${isHuman ? 'bi-person-fill' : 'bi-shield-fill-check'} text-white`}></i>
             </div>
             <div>
-              <div className="livechat-title text-white">WHTSIPA Central Support</div>
+              <div className="livechat-title text-white">WHTSIPA Live Support</div>
               <div className="livechat-status">
                 <span className="livechat-status-dot"></span>
-                Active Representative Online
+                {isHuman ? 'Active Representative Online' : 'AI Representative Online'}
               </div>
             </div>
           </div>
@@ -420,6 +437,16 @@ export default function Contact() {
       try { setForm(JSON.parse(saved)) } catch { /* ignore */ }
     }
   }, [])
+
+  // Auto-open live chat modal if ?chat=true is in the query params
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    if (params.get('chat') === 'true') {
+      setShowChat(true)
+      // Clear search param so refreshing doesn't force-reopen
+      navigate(location.pathname, { replace: true })
+    }
+  }, [location.search, location.pathname, navigate])
 
   useEffect(() => {
     if (user) {

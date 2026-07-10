@@ -1,11 +1,345 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { QUIZ_LIST, QUIZ_DATA } from '../data/quizData'
 import WhatsipModal from '../components/WhatsipModal'
 import ThreatsFooter from '../components/ThreatsFooter'
 import '../styles/cyber.css'
 import './Threats.css'
+import './Report.css'   /* shared livechat modal styles */
 import { THREATS_AND_TOOLS } from '../data/threatsToolsData'
+
+/* ─────────────────────────────────────────────────────────
+   ADMIN-CONFIGURABLE CONTACT DETAILS — Threats page only
+   These will be managed via the admin panel once built.
+   To update temporarily: edit the values below.
+───────────────────────────────────────────────────────── */
+const THREATS_CONTACTS = {
+  whatsapp:  { number: '+1 (650) 281-4251', url: 'https://wa.me/16502814251' },
+  telegram:  { handle: '@WHTSIPA_DigitalTools', url: 'https://t.me/WHTSIPA_DigitalTools' },
+  email:     { address: 'wehelptrackscammersipaddress@mail.com', url: 'mailto:wehelptrackscammersipaddress@mail.com' },
+  website:   { label: 'wehelptrackscammersipaddress.com', url: 'https://wehelptrackscammersipaddress.com' },
+}
+
+/* ══════════════════════════════════════════════════════════
+   THREATS-SPECIFIC LIVE CHAT FLOW
+   Focused on: threat education, scam recovery, reporting,
+   and connecting to live representatives
+   ══════════════════════════════════════════════════════════ */
+const THREATS_CHAT_FLOW = {
+  main: {
+    text: "Welcome to WHTSIPA Threat Support! I'm here to help with threat education, recovery steps, reporting cyber incidents, and connecting you to our team. What can I help you with?",
+    options: [
+      { text: '🦠 I think I have malware / ransomware',      next: 'threat_malware' },
+      { text: '💰 I was scammed (romance / investment)',      next: 'threat_scam' },
+      { text: '🔐 My account was hacked / compromised',      next: 'threat_account' },
+      { text: '🕵️ I received a phishing / smishing attack',  next: 'threat_phishing' },
+      { text: '🌐 I need to report a cybercrime',            next: 'reporting' },
+      { text: '📚 Learn about types of threats',             next: 'threat_library' },
+      { text: '🚨 Connect me to a live agent NOW',           next: 'live_agent' },
+    ]
+  },
+  threat_malware: {
+    text: "Malware and ransomware infections require immediate action:\n\n1. ❌ Disconnect from the internet NOW — stops data exfiltration\n2. 🚫 Do NOT pay the ransom — rarely results in file recovery\n3. 📸 Preserve the ransom note and error messages as screenshots\n4. 🔒 Do not restart — may trigger encryption of remaining files\n5. 📞 Contact WHTSIPA for professional malware analysis and decryption support\n\nOur team can assist with Ransomware Decryption, RAT Neutralisation, and Spyware Removal.",
+    options: [
+      { text: '🛠️ What tools can remove it?',     next: 'malware_tools' },
+      { text: '📝 Report this malware incident',  action: 'go_report' },
+      { text: '🚨 Connect to a live agent',       next: 'live_agent' },
+      { text: '⬅️ Back to main menu',             next: 'main' },
+    ]
+  },
+  malware_tools: {
+    text: "WHTSIPA provides the following tools for malware and ransomware:\n\n• 🛡️ Advanced Antivirus EDR (Endpoint Detection & Response)\n• 🔑 Ransomware Decryption Assistance\n• 🕵️ Spyware & Keylogger Detector\n• 🤖 RAT (Remote Access Trojan) Neutralizer\n• 🧹 Full System Deep Clean & Audit\n\nAll tools come with expert guidance from our certified team.",
+    options: [
+      { text: '🛒 Request malware removal tools',  action: 'go_tools' },
+      { text: '🚨 Connect to a live agent',        next: 'live_agent' },
+      { text: '⬅️ Back',                           next: 'threat_malware' },
+    ]
+  },
+  threat_scam: {
+    text: "Romance, investment, and crypto scams are devastating. Key warning signs:\n\n🚩 Being pushed to move to private apps (Telegram, Signal)\n🚩 Promises of guaranteed investment returns\n🚩 Urgent requests for crypto, gift cards, or wire transfers\n🚩 Emotional pressure to act fast or keep it secret\n\nIf you've lost money — act immediately. Time is critical for fund tracing.",
+    options: [
+      { text: '💸 I lost money — what do I do first?',  next: 'scam_lost_money' },
+      { text: '📝 Report this scam now',               action: 'go_report' },
+      { text: '🛠️ Recovery and tracing tools',          action: 'go_tools' },
+      { text: '🚨 Connect to a live agent',            next: 'live_agent' },
+      { text: '⬅️ Back to main menu',                  next: 'main' },
+    ]
+  },
+  scam_lost_money: {
+    text: "If you've lost money to a scam, take these steps immediately:\n\n1. 🏦 Contact your bank — request a chargeback (usually within 120 days)\n2. 🔐 Change all passwords on affected accounts from a clean device\n3. 📸 Screenshot ALL communication — do not delete anything\n4. 📋 Note all transaction IDs, wallet addresses, and amounts\n5. 📞 Report to WHTSIPA — our team assists with fund tracing and legal evidence packages\n\nFor crypto losses, blockchain tracing is still possible after transfers.",
+    options: [
+      { text: '📝 File a full incident report',  action: 'go_report' },
+      { text: '🔍 Crypto & fund tracing tools',  action: 'go_tools' },
+      { text: '🚨 Speak to a specialist now',    next: 'live_agent' },
+      { text: '⬅️ Back',                         next: 'threat_scam' },
+    ]
+  },
+  threat_account: {
+    text: "Account compromises require urgent action:\n\n1. 🔑 Change password immediately from a DIFFERENT, unaffected device\n2. ✅ Enable Two-Factor Authentication (2FA) everywhere, right now\n3. 🚪 Revoke all active sessions and connected third-party apps\n4. 📢 Alert your contacts — attacker may impersonate you\n5. 🏦 If banking is involved — freeze the account and call your bank\n\nAct fast — every minute matters.",
+    options: [
+      { text: '📝 Report this account compromise',  action: 'go_report' },
+      { text: '🔐 Account protection tools',        action: 'go_tools' },
+      { text: '🚨 Connect to a live agent',         next: 'live_agent' },
+      { text: '⬅️ Back to main menu',              next: 'main' },
+    ]
+  },
+  threat_phishing: {
+    text: "Phishing, smishing (SMS), and vishing (phone calls) are the most common threats:\n\n📧 Phishing Email: Do NOT click links or download attachments. Report to your email provider. If you clicked — change your passwords immediately.\n\n📱 Smishing (SMS): Do not click the link. If you tapped — check for new apps and revoke permissions.\n\n📞 Vishing (Fake calls): Hang up — real banks will NEVER ask for OTP or passwords over the phone.",
+    options: [
+      { text: '📝 Report this phishing attack',  action: 'go_report' },
+      { text: '📚 Explore threat library',       next: 'threat_library' },
+      { text: '🚨 Connect to a live agent',      next: 'live_agent' },
+      { text: '⬅️ Back to main menu',            next: 'main' },
+    ]
+  },
+  reporting: {
+    text: "WHTSIPA accepts two types of cybercrime reports:\n\n👤 Personal Report — For incidents that directly affected you (phishing, scams, account hacks, identity theft, financial fraud)\n\n🏢 Public / Org Report — For incidents affecting organisations, communities, or third parties\n\nAll reports are handled confidentially and assigned to our specialist team.",
+    options: [
+      { text: '👤 File a Personal Report',         action: 'go_report' },
+      { text: '🏢 File a Public / Org Report',     action: 'go_report' },
+      { text: '📋 What information do I need?',    next: 'reporting_info' },
+      { text: '⬅️ Back to main menu',              next: 'main' },
+    ]
+  },
+  reporting_info: {
+    text: "For a strong report, please prepare:\n\n• Your name, email, and phone number\n• Incident date and description of what happened\n• Communication screenshots (emails, messages, profiles)\n• Financial transaction records if money was lost\n• Crypto wallet addresses or transaction IDs if applicable\n• Suspect social media handles, links, or phone numbers\n\nThe more detail you provide, the faster our team can act.",
+    options: [
+      { text: '📝 Go to Report page now',  action: 'go_report' },
+      { text: '⬅️ Back to reporting',      next: 'reporting' },
+    ]
+  },
+  threat_library: {
+    text: "Our Threats Library covers the most dangerous cybersecurity threats. Which category would you like to explore?",
+    options: [
+      { text: '🦠 Malware, Ransomware & Spyware',       next: 'threat_malware' },
+      { text: '💰 Scams: Romance, Investment & Crypto',  next: 'threat_scam' },
+      { text: '🔐 Account Hacking & Credential Theft',   next: 'threat_account' },
+      { text: '🕵️ Phishing, Smishing & Vishing',         next: 'threat_phishing' },
+      { text: '📡 Deepfakes & Impersonation',            next: 'threat_deepfake' },
+      { text: '🌐 DDoS & Network Attacks',               next: 'threat_ddos' },
+      { text: '⬅️ Back to main menu',                    next: 'main' },
+    ]
+  },
+  threat_deepfake: {
+    text: "Deepfake and impersonation attacks use AI-generated video, voice, or images:\n\n🚩 Fake CEO video/voice calls requesting urgent transfers\n🚩 AI-generated romance profiles with stolen images\n🚩 Fake government officials demanding payment\n🚩 Cloned voice calls from 'family members' in fake emergencies\n\nAlways verify through a separate, known channel before taking any action.",
+    options: [
+      { text: '📝 Report a deepfake incident',  action: 'go_report' },
+      { text: '🚨 Connect to a live agent',     next: 'live_agent' },
+      { text: '⬅️ Back to threat library',      next: 'threat_library' },
+    ]
+  },
+  threat_ddos: {
+    text: "DDoS (Distributed Denial of Service) attacks overwhelm servers, making services unavailable:\n\n• Sudden service outages or extreme slowdowns for all users\n• Abnormal traffic spikes from no legitimate source\n• Exhausted bandwidth with no internal explanation\n\nWHTSIPA assists businesses with DDoS Mitigation, Traffic Scrubbing, and Network Hardening.",
+    options: [
+      { text: '🛠️ DDoS protection tools',       action: 'go_tools' },
+      { text: '📝 Report a network attack',     action: 'go_report' },
+      { text: '🚨 Connect to a specialist',     next: 'live_agent' },
+      { text: '⬅️ Back to threat library',      next: 'threat_library' },
+    ]
+  },
+  live_agent: {
+    text: "Would you like to connect with a live representative? Please choose your preferred channel:",
+    options: [
+      { text: "💬 Connect via WhatsApp",                    action: "open_wa" },
+      { text: "📲 Connect via Telegram",                    action: "open_tg" },
+      { text: "🧑‍💼 Chat with an Active Representative",      next: "live_agent_confirm" },
+      { text: "⬅️ Back to main menu",                      next: "main" },
+    ]
+  },
+  live_agent_confirm: {
+    text: "Would you like to chat with an Active Representative?\n\n⏱️ Estimated wait time: 15–20 minutes.\n\nAn available specialist will be assigned to your ticket and will reach out to you via your preferred contact channel (Telegram or WhatsApp).",
+    options: [
+      { text: "✅ Yes — Connect me now",      action: "connect_human" },
+      { text: "💬 Connect via WhatsApp instead", action: "open_wa" },
+      { text: "⬅️ Back",                       next: "live_agent" },
+    ]
+  },
+}
+
+/* ══════════════════════════════════════════════════════════
+   THREATS PAGE LIVE CHAT MODAL
+   ══════════════════════════════════════════════════════════ */
+function ThreatsChatModal({ isOpen, onClose, navigate, isHumanAgent = false }) {
+  const [currentNode, setCurrentNode] = useState('main')
+  const [isHuman, setIsHuman] = useState(isHumanAgent)
+  const [messages, setMessages]       = useState([{
+    sender: 'agent',
+    text:   "Welcome to WHTSIPA Threat Support! I can help with threat education, scam recovery, reporting cybercrime, or connecting you to our live team. What do you need help with today?",
+    time:   new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+  }])
+  const [isTyping,   setIsTyping]   = useState(false)
+  const [inputText,  setInputText]  = useState('')
+  const chatEndRef = useRef(null)
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages, isTyping])
+
+  if (!isOpen) return null
+
+  const WA_LINK    = 'https://wa.me/16502814251'
+  const TG_LINK    = 'https://t.me/WHTSIPA_DigitalTools'
+  const EMAIL_LINK = 'mailto:wehelptrackscammersipaddress@mail.com'
+
+  const selectOption = (opt) => {
+    setMessages(prev => [...prev, {
+      sender: 'user',
+      text:   opt.text,
+      time:   new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    }])
+    setIsTyping(true)
+
+    if (opt.action) {
+      setTimeout(() => {
+        setIsTyping(false)
+        const actions = {
+          go_report:          () => { onClose(); navigate('/report') },
+          go_tools:           () => { onClose(); navigate('/tools') },
+          go_threats_library: () => {
+            onClose()
+            setTimeout(() => document.getElementById('types-of-threats')?.scrollIntoView({ behavior: 'smooth' }), 100)
+          },
+          open_wa:            () => window.open(WA_LINK, '_blank'),
+          open_tg:            () => window.open(TG_LINK, '_blank'),
+          open_email:         () => window.open(EMAIL_LINK, '_blank'),
+          connect_human:      () => {
+            setIsHuman(true)
+            setMessages(prev => [...prev, {
+              sender: 'agent',
+              text: "Connecting to an Active Representative...\n\n⏱️ Estimated wait time: 15–20 minutes.\n\nYou have been placed in the queue. A representative will respond here shortly.",
+              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            }])
+          }
+        }
+        actions[opt.action]?.()
+      }, 900)
+      return
+    }
+
+    if (opt.next) {
+      setTimeout(() => {
+        setIsTyping(false)
+        const nextNode = THREATS_CHAT_FLOW[opt.next]
+        setCurrentNode(opt.next)
+        setMessages(prev => [...prev, {
+          sender: 'agent',
+          text:   nextNode.text,
+          time:   new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        }])
+      }, 1200)
+    }
+  }
+
+  const handleSend = (e) => {
+    e.preventDefault()
+    if (!inputText.trim()) return
+    setMessages(prev => [...prev, {
+      sender: 'user',
+      text:   inputText,
+      time:   new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    }])
+    setInputText('')
+    setIsTyping(true)
+    setTimeout(() => {
+      setIsTyping(false)
+      setMessages(prev => [...prev, {
+        sender: 'agent',
+        text:   "Please use the quick options below to navigate, or connect directly with our live team via WhatsApp or Telegram for real-time assistance.",
+        time:   new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      }])
+    }, 1400)
+  }
+
+  const currentNodeData = THREATS_CHAT_FLOW[currentNode]
+
+  return (
+    <div className="wm-overlay" style={{ zIndex: 9999 }} onClick={onClose}>
+      <div className="livechat-modal" onClick={e => e.stopPropagation()}>
+
+        {/* Header */}
+        <div className="livechat-header threats-livechat-header">
+          <div className="d-flex align-items-center gap-2">
+            <div className="livechat-avatar">
+              <i className={`bi ${isHuman ? 'bi-person-fill' : 'bi-shield-fill-check'} text-white`}></i>
+            </div>
+            <div>
+              <div className="livechat-title text-white">WHTSIPA Live Support</div>
+              <div className="livechat-status">
+                <span className="livechat-status-dot"></span>
+                {isHuman ? 'Active Representative Online' : 'AI Representative Online'}
+              </div>
+            </div>
+          </div>
+          <button className="livechat-close" onClick={onClose} aria-label="Close Chat">
+            <i className="bi bi-x-lg text-white"></i>
+          </button>
+        </div>
+
+        {/* Messages */}
+        <div className="livechat-body">
+          {messages.map((m, idx) => (
+            <div key={idx} className={`livechat-msg-row ${m.sender === 'user' ? 'user-row' : 'agent-row'}`}>
+              <div className="livechat-bubble">
+                <div className="msg-text" style={{ whiteSpace: 'pre-line' }}>{m.text}</div>
+                <div className="msg-time">{m.time}</div>
+              </div>
+            </div>
+          ))}
+          {isTyping && (
+            <div className="livechat-msg-row agent-row">
+              <div className="livechat-bubble typing-bubble">
+                <span className="typing-dot"></span>
+                <span className="typing-dot"></span>
+                <span className="typing-dot"></span>
+              </div>
+            </div>
+          )}
+          <div ref={chatEndRef} />
+        </div>
+
+        {/* Quick options */}
+        {!isTyping && currentNodeData?.options && (
+          <div className="livechat-options-panel p-2">
+            <div className="d-flex flex-column gap-1">
+              {currentNodeData.options.map((opt, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  className="btn btn-sm livechat-opt-btn"
+                  onClick={() => selectOption(opt)}
+                >
+                  {opt.text}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Input footer */}
+        <form className="livechat-footer" onSubmit={handleSend}>
+          <input
+            type="text"
+            className="form-control livechat-input"
+            placeholder="Type a message…"
+            value={inputText}
+            onChange={e => setInputText(e.target.value)}
+          />
+          <button
+            type="submit"
+            className="btn btn-primary livechat-send-btn"
+            style={{ color: '#ffffff', backgroundColor: '#1d4ed8' }}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffffff" viewBox="0 0 16 16"
+              style={{ fill: '#ffffff', display: 'block' }}>
+              <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/>
+            </svg>
+          </button>
+        </form>
+
+      </div>
+    </div>
+  )
+}
 
 import iconDeepfake from '../assets/media/icons/icon-deepfake.png'
 import iconCredentialStuffing from '../assets/media/icons/icon-credential-stuffing.png'
@@ -325,6 +659,7 @@ export default function Threats() {
   const [highlightedCard, setHighlightedCard] = useState(null)
   const [activeModal,     setActiveModal]     = useState(null)
   const [modalThreat,     setModalThreat]     = useState('')
+  const [showThreatChat,  setShowThreatChat]  = useState(false)
 
   // After a redirected sign-in/sign-up, reopen the modal the user was using
   // (Request Tool, Hire, Report, Contact) with the same threat context.
@@ -432,9 +767,13 @@ export default function Threats() {
                 <a className="btn btn-outline-cyber" href="#threats-tools" onClick={e => { e.preventDefault(); document.getElementById('threats-tools')?.scrollIntoView({ behavior: 'smooth' }) }}>
                   <i className="bi bi-grid me-2"></i>Threats &amp; Tools
                 </a>
-                <Link className="btn btn-alert" to="/report">
+                <a
+                  className="btn btn-alert"
+                  href="#threats-contact-section"
+                  onClick={e => { e.preventDefault(); document.getElementById('threats-contact-section')?.scrollIntoView({ behavior: 'smooth' }) }}
+                >
                   <i className="bi bi-exclamation-triangle me-2"></i>Need Urgent Help?
-                </Link>
+                </a>
               </div>
             </div>
             <div className="col-12 col-lg-5">
@@ -881,6 +1220,100 @@ export default function Threats() {
         </div>
       </section>
 
+      {/* ════════════════════════════
+          OTHER WAYS TO REACH US
+          Threats page only — distinct design
+          ════════════════════════════ */}
+      <section className="threats-contact-section" id="threats-contact-section">
+        <div className="container">
+          <h3 className="threats-contact-title">Other Ways to Reach Us</h3>
+          <div className="threats-contact-grid">
+
+            {/* WhatsApp */}
+            <a
+              href={THREATS_CONTACTS.whatsapp.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="threats-contact-card"
+            >
+              <div className="tcc-icon tcc-icon-whatsapp">
+                <i className="bi bi-whatsapp"></i>
+              </div>
+              <div className="tcc-body">
+                <div className="tcc-name">WhatsApp</div>
+                <div className="tcc-detail">{THREATS_CONTACTS.whatsapp.number} · 24/7 fastest response</div>
+              </div>
+              <i className="bi bi-arrow-right tcc-arrow"></i>
+            </a>
+
+            {/* Telegram */}
+            <a
+              href={THREATS_CONTACTS.telegram.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="threats-contact-card"
+            >
+              <div className="tcc-icon tcc-icon-telegram">
+                <i className="bi bi-telegram"></i>
+              </div>
+              <div className="tcc-body">
+                <div className="tcc-name">Telegram</div>
+                <div className="tcc-detail">{THREATS_CONTACTS.telegram.handle}</div>
+              </div>
+              <i className="bi bi-arrow-right tcc-arrow"></i>
+            </a>
+
+            {/* Email */}
+            <a
+              href={THREATS_CONTACTS.email.url}
+              className="threats-contact-card"
+            >
+              <div className="tcc-icon tcc-icon-email">
+                <i className="bi bi-envelope-fill"></i>
+              </div>
+              <div className="tcc-body">
+                <div className="tcc-name">Email Us</div>
+                <div className="tcc-detail">{THREATS_CONTACTS.email.address}</div>
+              </div>
+              <i className="bi bi-arrow-right tcc-arrow"></i>
+            </a>
+
+            {/* Official Website */}
+            <a
+              href={THREATS_CONTACTS.website.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="threats-contact-card"
+            >
+              <div className="tcc-icon tcc-icon-web">
+                <i className="bi bi-globe2"></i>
+              </div>
+              <div className="tcc-body">
+                <div className="tcc-name">Official Website</div>
+                <div className="tcc-detail">{THREATS_CONTACTS.website.label}</div>
+              </div>
+              <i className="bi bi-arrow-right tcc-arrow"></i>
+            </a>
+
+            {/* Live Chat — threats-focused chatbot */}
+            <button
+              className="threats-contact-card threats-contact-card-btn"
+              onClick={() => setShowThreatChat(true)}
+            >
+              <div className="tcc-icon tcc-icon-chat">
+                <i className="bi bi-chat-dots-fill"></i>
+              </div>
+              <div className="tcc-body">
+                <div className="tcc-name">Live Chat</div>
+                <div className="tcc-detail">Threats · Recovery · Reporting · and more</div>
+              </div>
+              <i className="bi bi-arrow-right tcc-arrow"></i>
+            </button>
+
+          </div>
+        </div>
+      </section>
+
       <ThreatsFooter />
 
       {/* ── Modals ── */}
@@ -891,6 +1324,13 @@ export default function Threats() {
           onClose={() => { setActiveModal(null); setModalThreat('') }}
         />
       )}
+
+      {/* ── Threats Live Chat ── */}
+      <ThreatsChatModal
+        isOpen={showThreatChat}
+        onClose={() => setShowThreatChat(false)}
+        navigate={navigate}
+      />
 
     </div>
   )

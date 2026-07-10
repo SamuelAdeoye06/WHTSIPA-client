@@ -2,18 +2,22 @@ import { useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 
 const PAGE_TITLES = {
-  '/':        'WHTS — Cybersecurity Intelligence Platform',
-  '/threats': 'Threat Library — WHTS',
-  '/report':  'Report & Recover — WHTS',
-  '/signin':  'Sign In — WHTS',
-  '/signup':  'Create Account — WHTS',
-  '/essential-eight':        'Essential Eight — WHTS',
-  '/for-victims-government': 'For Victims & Government — WHTS',
-  '/blog':                   'Knowledge Base — WHTS',
-  '/about':                  'About WHTSIPA — WHTS',
-  '/about-officials':        'The Officials — WHTS',
-  '/contact':                'Contact — WHTS',
-  '/threats-tools': 'Threats & Tools — WHTS',
+  '/':                       'WHTSIPA — Cybersecurity Intelligence & Scam Protection Platform',
+  '/threats':                'Cyber Threat Library — Browse All Threats | WHTSIPA',
+  '/report':                 'Report a Cybercrime & Recover — WHTSIPA',
+  '/recover':                'Incident Recovery Guide — WHTSIPA',
+  '/signin':                 'Sign In to Your Account — WHTSIPA',
+  '/signup':                 'Create a Free Account — WHTSIPA',
+  '/verify-email':           'Verify Your Email Address — WHTSIPA',
+  '/forgot-password':        'Forgot Password — Reset Your Account | WHTSIPA',
+  '/reset-password':         'Reset Your Password — WHTSIPA',
+  '/essential-eight':        'Essential Eight Cybersecurity Strategies — WHTSIPA',
+  '/for-victims-government': 'Support for Victims & Government Agencies — WHTSIPA',
+  '/blog':                   'Knowledge Base — Security Tips & Awareness | WHTSIPA',
+  '/about':                  'About WHTSIPA — Our Mission & Government Alignment',
+  '/about-officials':        'Meet the Officials — WHTSIPA Team & Partners',
+  '/contact':                'Contact WHTSIPA — Get Support & Report an Incident',
+  '/threats-tools':          'Security Tools & Threat Resources — WHTSIPA',
 }
 
 export default function ScrollManager() {
@@ -26,9 +30,9 @@ export default function ScrollManager() {
     if (isThreatsDetail) {
       const slug = location.pathname.split('/threats/')[1]
       const formatted = slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
-      document.title = `${formatted} — WHTS`
+      document.title = `${formatted} — Cyber Threat | WHTSIPA`
     } else {
-      document.title = PAGE_TITLES[location.pathname] || 'WHTS — Cybersecurity Intelligence'
+      document.title = PAGE_TITLES[location.pathname] || 'WHTSIPA — Cybersecurity Intelligence Platform'
     }
 
     // Scroll logic

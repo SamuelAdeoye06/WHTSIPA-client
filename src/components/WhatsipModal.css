@@ -662,10 +662,21 @@
 }
 
 @media (max-width: 575.98px) {
-  .wm-modal.wm-livechat-modal {
-    width: 96vw;
-    max-height: 88vh;
+  .wm-overlay {
+    padding: 0 !important;
   }
-  .wm-tools-chat { height: 88vh; }
+  .wm-modal.wm-livechat-modal {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+    border: none !important;
+    margin: 0 !important;
+  }
+  .wm-tools-chat {
+    height: 100vh !important;
+    max-height: 100vh !important;
+  }
   .wm-request-option-card { padding: 0.85rem; }
 }

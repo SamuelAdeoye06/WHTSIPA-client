@@ -308,17 +308,29 @@
   .nav-mobile-auth {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    padding: 0.75rem 0 0.5rem;
-    border-top: 1px solid rgba(255,255,255,0.08);
+    gap: 0.6rem;
+    padding: 1rem 0 0.5rem;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    margin-top: 0.5rem;
   }
 
   .nav-mobile-user {
     font-size: 0.82rem;
-    color: rgba(233,243,255,0.55);
-    padding: 0 0.25rem 0.25rem;
+    color: rgba(233,243,255,0.65);
+    padding: 0 0.25rem 0.35rem;
     display: flex;
     align-items: center;
+    font-weight: 500;
+  }
+
+  /* Username on light navbar — needs dark text */
+  .navbar-white .nav-mobile-user {
+    color: #0f172a;
+  }
+
+  /* Border separator also needs contrast adjustment on light bg */
+  .navbar-white .nav-mobile-auth {
+    border-top-color: rgba(0, 0, 0, 0.1);
   }
 
   .nav-mobile-signin,
@@ -326,35 +338,83 @@
   .nav-mobile-signout {
     display: flex;
     align-items: center;
+    justify-content: center;
     width: 100%;
-    padding: 0.65rem 1rem;
-    border-radius: 10px;
-    font-size: 0.9rem;
-    font-weight: 600;
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 700;
     text-decoration: none;
     cursor: pointer;
-    border: none;
-    transition: background 0.15s ease;
+    border: 1.5px solid transparent;
+    letter-spacing: 0.01em;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
   }
 
-  .nav-mobile-signin {
-    background: rgba(59,130,246,0.12);
-    color: #93c5fd;
-  }
-  .nav-mobile-signin:hover { background: rgba(59,130,246,0.22); color: #bfdbfe; }
-
-  .nav-mobile-signup {
-    background: rgba(16,185,129,0.12);
-    color: #6ee7b7;
-  }
-  .nav-mobile-signup:hover { background: rgba(16,185,129,0.22); color: #a7f3d0; }
-
+  .nav-mobile-signin,
+  .nav-mobile-signup,
   .nav-mobile-signout {
-    background: rgba(239,68,68,0.1);
-    color: #fca5a5;
-    text-align: left;
+    transform: none;
   }
-  .nav-mobile-signout:hover { background: rgba(239,68,68,0.2); color: #fecaca; }
+
+  .nav-mobile-signin:hover,
+  .nav-mobile-signup:hover,
+  .nav-mobile-signout:hover {
+    transform: translateY(-1px);
+    text-decoration: none;
+  }
+
+  /* ── Dark Navbar (cyber-navbar) Theme Buttons ── */
+  .cyber-navbar:not(.navbar-white) .nav-mobile-signin {
+    background: rgba(255, 255, 255, 0.05);
+    color: #22f0ff !important;
+    border-color: rgba(34, 240, 255, 0.35);
+    box-shadow: none;
+  }
+  .cyber-navbar:not(.navbar-white) .nav-mobile-signin:hover {
+    background: rgba(34, 240, 255, 0.1);
+    border-color: #22f0ff;
+    color: #ffffff !important;
+  }
+
+  .cyber-navbar:not(.navbar-white) .nav-mobile-signup {
+    background: linear-gradient(135deg, #1d4ed8, #2563eb);
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(29, 78, 216, 0.4);
+  }
+  .cyber-navbar:not(.navbar-white) .nav-mobile-signup:hover {
+    background: linear-gradient(135deg, #1e40af, #1d4ed8);
+  }
+
+  /* ── Light Navbar (navbar-white) Theme Buttons ── */
+  .navbar-white .nav-mobile-signin {
+    background: #ffffff;
+    color: #07104a !important;
+    border-color: #07104a;
+    box-shadow: none;
+  }
+  .navbar-white .nav-mobile-signin:hover {
+    background: #f1f5f9;
+  }
+
+  .navbar-white .nav-mobile-signup {
+    background: #1d4ed8;
+    color: #ffffff !important;
+    border-color: #1d4ed8;
+    box-shadow: 0 4px 12px rgba(29, 78, 216, 0.2);
+  }
+  .navbar-white .nav-mobile-signup:hover {
+    background: #1e40af;
+    border-color: #1e40af;
+  }
+
+  /* Sign Out — solid red, full width, obvious */
+  .nav-mobile-signout {
+    background: #dc2626;
+    color: #ffffff !important;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(220,38,38,0.35);
+  }
 }
 
 @media (max-width: 575.98px) {

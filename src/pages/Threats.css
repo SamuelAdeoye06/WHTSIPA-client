@@ -1116,3 +1116,128 @@
     0 8px 32px rgba(0,0,0,0.1) !important;
   background: #f0f4ff !important;
 }
+
+/* ============================================
+   OTHER WAYS TO REACH US — Threats page only
+   ============================================ */
+.threats-contact-section {
+  background: transparent;
+  padding: 4rem 0;
+  border-top: 1px solid rgba(120, 214, 255, 0.12);
+}
+
+.threats-contact-title {
+  font-size: clamp(1.3rem, 4vw, 1.8rem);
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 2rem;
+  text-align: center;
+  letter-spacing: -0.02em;
+}
+
+.threats-contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+
+/* Each contact card */
+.threats-contact-card,
+.threats-contact-card-btn {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(120, 214, 255, 0.14);
+  border-radius: 16px;
+  padding: 1.25rem;
+  text-decoration: none !important;
+  color: #f0f4ff;
+  transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease, background-color 0.22s ease;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.threats-contact-card:hover,
+.threats-contact-card-btn:hover {
+  border-color: rgba(34, 240, 255, 0.45);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 
+    0 12px 32px rgba(0, 0, 0, 0.45),
+    0 0 15px rgba(34, 240, 255, 0.12);
+  transform: translateY(-3px);
+  color: #ffffff;
+}
+
+/* Icon circle */
+.tcc-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.tcc-icon-whatsapp  { background: rgba(22, 163, 74, 0.15); color: #4ade80; border: 1px solid rgba(22, 163, 74, 0.25); }
+.tcc-icon-telegram  { background: rgba(37, 99, 216, 0.15); color: #60a5fa; border: 1px solid rgba(37, 99, 216, 0.25); }
+.tcc-icon-email     { background: rgba(124, 58, 237, 0.15); color: #a78bfa; border: 1px solid rgba(124, 58, 237, 0.25); }
+.tcc-icon-web       { background: rgba(2, 132, 199, 0.15); color: #38bdf8; border: 1px solid rgba(2, 132, 199, 0.25); }
+.tcc-icon-chat      { background: rgba(217, 119, 6, 0.15); color: #fbbf24; border: 1px solid rgba(217, 119, 6, 0.25); }
+
+/* Text */
+.tcc-body { flex: 1; min-width: 0; }
+
+.tcc-name {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 0.2rem;
+}
+
+.tcc-detail {
+  font-size: 0.8rem;
+  color: rgba(233, 243, 255, 0.65);
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.45;
+}
+
+.tcc-arrow {
+  color: rgba(233, 243, 255, 0.4);
+  font-size: 0.95rem;
+  flex-shrink: 0;
+  transition: transform 0.22s ease, color 0.22s ease;
+}
+
+.threats-contact-card:hover .tcc-arrow,
+.threats-contact-card-btn:hover .tcc-arrow {
+  transform: translateX(4px);
+  color: #22f0ff;
+}
+
+/* Mobile responsive overrides */
+@media (max-width: 575.98px) {
+  .threats-contact-section { padding: 3rem 0; }
+  .tcc-icon { width: 42px; height: 42px; font-size: 1.1rem; border-radius: 10px; }
+  .tcc-name { font-size: 0.9rem; }
+  .tcc-detail { font-size: 0.78rem; }
+  .threats-contact-card,
+  .threats-contact-card-btn { padding: 1rem; gap: 0.85rem; }
+  .threats-contact-grid {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+}
+
+/* ── Threats-themed livechat header override ── */
+.threats-livechat-header {
+  background: linear-gradient(135deg, #0a1628 0%, #0d2744 50%, #0f3355 100%) !important;
+  border-bottom: 1px solid rgba(34, 240, 255, 0.2) !important;
+}

@@ -237,6 +237,18 @@ async function detectCountry() {
   } catch { return null }
 }
 
+const getFriendlyCode = (code) => {
+  const mapping = {
+    US: 'USA', CA: 'CAN', GB: 'UK', AU: 'AUS', NZ: 'NZL',
+    DE: 'GER', FR: 'FRA', NL: 'NLD', SE: 'SWE', NO: 'NOR',
+    DK: 'DNK', FI: 'FIN', CH: 'CHE', SG: 'SGP', JP: 'JPN',
+    KR: 'KOR', AE: 'UAE', QA: 'QAT', IL: 'ISR', AT: 'AUT',
+    BE: 'BEL', IT: 'ITA', ES: 'ESP', PL: 'POL', PT: 'PRT',
+    IE: 'IRL', GR: 'GRC', CZ: 'CZE', NG: 'NGA'
+  }
+  return mapping[code] || code.toUpperCase()
+}
+
 /* ── Reusable Phone Field with Country Code Dropdown ── */
 function PhoneCountryField({ formik, fieldName, phoneDialFieldName, phoneCodeFieldName, isRequired }) {
   const [showDropdown, setShowDropdown] = useState(false)
@@ -265,7 +277,7 @@ function PhoneCountryField({ formik, fieldName, phoneDialFieldName, phoneCodeFie
           className="btn phone-country-btn dropdown-toggle"
           onClick={() => setShowDropdown(prev => !prev)}
         >
-          {selectedCountry ? `${selectedCountry.code} (${selectedCountry.dial})` : 'US (+1)'}
+          {selectedCountry ? `${getFriendlyCode(selectedCountry.code)} (${selectedCountry.dial})` : 'USA (+1)'}
         </button>
         <input
           id={fieldName}
@@ -292,7 +304,7 @@ function PhoneCountryField({ formik, fieldName, phoneDialFieldName, phoneCodeFie
                     }}
                   >
                     <span className="country-name">{c.name}</span>
-                    <span className="country-dial">{c.dial}</span>
+                    <span className="country-dial">{getFriendlyCode(c.code)} ({c.dial})</span>
                   </button>
                 </li>
               ))}
@@ -375,22 +387,32 @@ const CHAT_FLOW = {
     ]
   },
   live_agent: {
-    text: "Direct live representative routing is available instantly. For secure live recovery assistance, connect directly via our official instant message lines:",
+    text: "Would you like to connect with a live representative? Please choose your preferred channel:",
     options: [
-      { text: "🟢 Connect via WhatsApp", action: "open_wa" },
-      { text: "🔵 Connect via Telegram", action: "open_tg" },
-      { text: "⬅️ Go back to main menu", next: "main" },
+      { text: "💬 Connect via WhatsApp",                   action: "open_wa" },
+      { text: "📲 Connect via Telegram",                   action: "open_tg" },
+      { text: "🧑‍💼 Chat with an Active Representative",     next: "live_agent_confirm" },
+      { text: "⬅️ Go back to main menu",                   next: "main" },
     ]
-  }
+  },
+  live_agent_confirm: {
+    text: "Would you like to chat with an Active Representative?\n\n⏱️ Estimated wait time: 15–20 minutes.\n\nAn available specialist will be assigned to your ticket and will respond here shortly.",
+    options: [
+      { text: "✅ Yes — Connect me now",       action: "connect_human" },
+      { text: "💬 Connect via WhatsApp instead", action: "open_wa" },
+      { text: "⬅️ Back",                        next: "live_agent" },
+    ]
+  },
 }
 
 /* ── Live Support Chat Component ── */
-function LiveChatModal({ isOpen, onClose, userName, setReportType }) {
+function LiveChatModal({ isOpen, onClose, userName, setReportType, isHumanAgent = false }) {
   const [currentNode, setCurrentNode] = useState('main')
+  const [isHuman, setIsHuman] = useState(isHumanAgent)
   const [messages, setMessages] = useState([
     {
       sender: 'agent',
-      text: `Hello ${userName || 'there'}! Welcome to WHTSIPA Secure Live Support. I am an Active Representative. How can I help you with your incident reports, threat recovery, or related assistance today?`,
+      text: `Hello ${userName || 'there'}! Welcome to WHTSIPA Secure Live Support. I'm your AI assistant. How can I help you with your incident reports, threat recovery, or related assistance today?`,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     }
   ])
@@ -438,6 +460,13 @@ function LiveChatModal({ isOpen, onClose, userName, setReportType }) {
           window.open('https://wa.me/16502184673', '_blank')
         } else if (opt.action === 'open_tg') {
           window.open('https://t.me/Wehelptrackscammersipaddress', '_blank')
+        } else if (opt.action === 'connect_human') {
+          setIsHuman(true)
+          setMessages(prev => [...prev, {
+            sender: 'agent',
+            text: "Connecting to an Active Representative...\n\n⏱️ Estimated wait time: 15–20 minutes.\n\nYou have been placed in the queue. A representative will respond here shortly.",
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          }])
         }
       }, 1000)
       return
@@ -492,13 +521,13 @@ function LiveChatModal({ isOpen, onClose, userName, setReportType }) {
         <div className="livechat-header">
           <div className="d-flex align-items-center gap-2">
             <div className="livechat-avatar">
-              <i className="bi bi-shield-fill-check text-white"></i>
+              <i className={`bi ${isHuman ? 'bi-person-fill' : 'bi-shield-fill-check'} text-white`}></i>
             </div>
             <div>
               <div className="livechat-title text-white">WHTSIPA Live Support</div>
               <div className="livechat-status">
                 <span className="livechat-status-dot"></span>
-                Active Representative Online
+                {isHuman ? 'Active Representative Online' : 'AI Representative Online'}
               </div>
             </div>
           </div>
@@ -617,7 +646,7 @@ export default function Report() {
         'Please provide your contact details for the selected method',
         function (value) {
           const { communicationMethod } = this.parent
-          if (['Phone Call', 'SMS/Text', 'Secure Messaging App (e.g., Signal, WhatsApp)'].includes(communicationMethod)) {
+          if (['Email', 'Phone Call', 'SMS/Text', 'Secure Messaging App (e.g., Signal, WhatsApp)'].includes(communicationMethod)) {
             return !!value && value.trim().length > 0
           }
           return true
@@ -1102,17 +1131,6 @@ export default function Report() {
                         )}
                       </div>
 
-                      {/* Phone Number */}
-                      <div className="col-12 col-md-6">
-                        <PhoneCountryField
-                          formik={personalFormik}
-                          fieldName="phone"
-                          phoneCodeFieldName="phoneCountryCode"
-                          phoneDialFieldName="phoneCountryDial"
-                          isRequired={true}
-                        />
-                      </div>
-
                       {/* Country of Residence */}
                       <div className="col-12 col-md-6">
                         <label className="form-label cyber-label" htmlFor="personal-country">Country of Residence <span className="text-danger">* (Required)</span></label>
@@ -1142,6 +1160,17 @@ export default function Report() {
                         {personalFormik.touched.country && personalFormik.errors.country && (
                           <div className="cyber-error-msg"><i className="bi bi-exclamation-triangle-fill me-1"></i>{personalFormik.errors.country}</div>
                         )}
+                      </div>
+
+                      {/* Phone Number */}
+                      <div className="col-12 col-md-6">
+                        <PhoneCountryField
+                          formik={personalFormik}
+                          fieldName="phone"
+                          phoneCodeFieldName="phoneCountryCode"
+                          phoneDialFieldName="phoneCountryDial"
+                          isRequired={true}
+                        />
                       </div>
 
                       {/* Preferred Communication Method */}
@@ -1218,6 +1247,27 @@ export default function Report() {
                               name="communicationValue"
                               type="text"
                               placeholder="e.g. +1 234 567 8900 or @username"
+                              className={`form-control cyber-input ${personalFormik.touched.communicationValue && personalFormik.errors.communicationValue ? 'is-invalid' : ''}`}
+                              value={personalFormik.values.communicationValue}
+                              onChange={personalFormik.handleChange}
+                              onBlur={personalFormik.handleBlur}
+                            />
+                            {personalFormik.touched.communicationValue && personalFormik.errors.communicationValue && (
+                              <div className="cyber-error-msg"><i className="bi bi-exclamation-triangle-fill me-1"></i>{personalFormik.errors.communicationValue}</div>
+                            )}
+                          </div>
+                        )}
+
+                        {personalFormik.values.communicationMethod === 'Email' && (
+                          <div className="comm-value-wrap mt-3">
+                            <label className="form-label cyber-label" htmlFor="personal-commVal-email">
+                              Email address to contact you on <span className="text-danger">*</span>
+                            </label>
+                            <input
+                              id="personal-commVal-email"
+                              name="communicationValue"
+                              type="email"
+                              placeholder="you@example.com"
                               className={`form-control cyber-input ${personalFormik.touched.communicationValue && personalFormik.errors.communicationValue ? 'is-invalid' : ''}`}
                               value={personalFormik.values.communicationValue}
                               onChange={personalFormik.handleChange}
@@ -1319,7 +1369,7 @@ export default function Report() {
                               const cur = COUNTRY_CURRENCIES[c.code] || 'USD $'
                               return (
                                 <option key={c.code} value={cur}>
-                                  {c.code} ({cur})
+                                  {getFriendlyCode(c.code)} ({cur})
                                 </option>
                               )
                             })}
@@ -1466,17 +1516,6 @@ export default function Report() {
                         )}
                       </div>
 
-                      {/* Phone Number */}
-                      <div className="col-12 col-md-6">
-                        <PhoneCountryField
-                          formik={publicFormik}
-                          fieldName="phone"
-                          phoneCodeFieldName="phoneCountryCode"
-                          phoneDialFieldName="phoneCountryDial"
-                          isRequired={true}
-                        />
-                      </div>
-
                       {/* Country */}
                       <div className="col-12 col-md-6">
                         <label className="form-label cyber-label" htmlFor="public-country">Country <span className="text-danger">* (Required – for threat mapping)</span></label>
@@ -1504,6 +1543,17 @@ export default function Report() {
                         {publicFormik.touched.country && publicFormik.errors.country && (
                           <div className="cyber-error-msg"><i className="bi bi-exclamation-triangle-fill me-1"></i>{publicFormik.errors.country}</div>
                         )}
+                      </div>
+
+                      {/* Phone Number */}
+                      <div className="col-12 col-md-6">
+                        <PhoneCountryField
+                          formik={publicFormik}
+                          fieldName="phone"
+                          phoneCodeFieldName="phoneCountryCode"
+                          phoneDialFieldName="phoneCountryDial"
+                          isRequired={true}
+                        />
                       </div>
 
                       {/* Organisation */}

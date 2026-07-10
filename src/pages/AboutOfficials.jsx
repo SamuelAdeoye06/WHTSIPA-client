@@ -653,6 +653,14 @@ export default function AboutOfficials() {
         </div>
       </section>
 
+      {/* ── Arrow separator — points from individual officials down to the combined section ── */}
+      <div className="officials-arrow-separator">
+        <div className="officials-arrow-line"></div>
+        <div className="officials-arrow-head">
+          <i className="bi bi-chevron-down"></i>
+        </div>
+      </div>
+
       {/* ── Combined "The Hackers" video — full width ── */}
       <CombinedVideo />
 

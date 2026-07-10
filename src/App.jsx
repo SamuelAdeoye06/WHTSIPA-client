@@ -26,7 +26,8 @@ const KNOWN_ROUTES = [
   '/', '/threats', '/threats/:slug', '/report',
   '/signin', '/signup',
   '/about', '/about-officials', '/contact',
-  '/essential-eight', '/for-victims-government', '/blog', '/threats-tools'
+  '/essential-eight', '/for-victims-government', '/blog', '/threats-tools',
+  '/recover'
 ]
 const BARE_ROUTES = ['/signin', '/signup']
 
@@ -62,6 +63,7 @@ function Layout() {
           <Route path="/for-victims-government" element={<ForVictimsGovernment />} />
           <Route path="/blog"                   element={<Blog />} />
           <Route path="/threats-tools" element={<Navigate to="/threats" replace />} />
+          <Route path="/recover"                element={<Navigate to="/report" state={{ scrollTo: 'recover' }} replace />} />
           <Route path="*"                       element={<NotFound />} />
         </Routes>
       </main>
