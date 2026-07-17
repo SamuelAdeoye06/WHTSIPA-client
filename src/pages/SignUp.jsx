@@ -83,7 +83,6 @@ export default function SignUp() {
   const [submitError,   setSubmitError]     = useState('')
   const [loading,       setLoading]         = useState(false)
   const [blocked,       setBlocked]         = useState(false)
-  const [submitted,     setSubmitted]        = useState(false)
   const dropdownRef = useRef(null)
 
   /* ── Auto-detect country on mount ── */
@@ -199,7 +198,7 @@ export default function SignUp() {
         phone:     form.phone,
         password:  form.password,
       })
-      setSubmitted(true)
+      navigate('/verify-otp', { state: { email: form.email, ...location.state } })
     } catch (err) {
       setSubmitError(err.response?.data?.message || 'Registration failed. Please try again.')
     } finally {
@@ -224,31 +223,6 @@ export default function SignUp() {
   }
 
   // Email confirmation sent screen
-  if (submitted) {
-    return (
-      <div style={{ minHeight: '100vh', background: '#f8f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
-        <div style={{ maxWidth: 460, textAlign: 'center' }}>
-          <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>📧</div>
-          <h2 style={{ fontWeight: 800, color: '#0f172a', marginBottom: '0.5rem' }}>Check your email</h2>
-          <p style={{ color: '#4a5568', lineHeight: 1.75, marginBottom: '1.5rem' }}>
-            We've sent a confirmation link to <strong>{form.email}</strong>.
-            Click the link in that email to activate your account, then you can sign in.
-          </p>
-          <p style={{ color: '#6b7280', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
-            Didn't receive it? Check your spam folder. The link expires in 24 hours.
-          </p>
-          <Link
-            to="/signin"
-            state={location.state}
-            className="auth-submit-btn"
-            style={{ textDecoration: 'none', display: 'inline-flex', width: 'auto', padding: '0.75rem 2rem' }}
-          >
-            Go to Sign In <i className="bi bi-arrow-right ms-2"></i>
-          </Link>
-        </div>
-      </div>
-    )
-  }
   return (
     <div className="auth-split">
 

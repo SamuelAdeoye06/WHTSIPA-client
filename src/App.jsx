@@ -17,19 +17,19 @@ import Contact from './pages/Contact'
 import EssentialEight from './pages/EssentialEight'
 import ForVictimsGovernment from './pages/ForVictimsGovernment'
 import Blog from './pages/Blog'
-import VerifyEmail from './pages/VerifyEmail'
+import VerifyOtp from './pages/VerifyOtp'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import './styles/cyber.css'
 
 const KNOWN_ROUTES = [
   '/', '/threats', '/threats/:slug', '/report',
-  '/signin', '/signup',
+  '/signin', '/signup', '/verify-otp',
   '/about', '/about-officials', '/contact',
   '/essential-eight', '/for-victims-government', '/blog', '/threats-tools',
   '/recover'
 ]
-const BARE_ROUTES = ['/signin', '/signup']
+const BARE_ROUTES = ['/signin', '/signup', '/verify-otp']
 
 function Layout() {
   const location = useLocation()
@@ -53,7 +53,7 @@ function Layout() {
           <Route path="/report"                 element={<Report />} />
           <Route path="/signin"                 element={<SignIn />} />
           <Route path="/signup"                 element={<SignUp />} />
-          <Route path="/verify-email"           element={<VerifyEmail />} />
+          <Route path="/verify-otp"             element={<VerifyOtp />} />
           <Route path="/forgot-password"        element={<ForgotPassword />} />
           <Route path="/reset-password"         element={<ResetPassword />} />
           <Route path="/about"                  element={<About />} />
