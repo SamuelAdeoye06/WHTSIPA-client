@@ -83,7 +83,8 @@ export default function VerifyOtp() {
     try {
       const { data } = await api.post('/auth/verify-otp', { email, otp: otpValue })
       login({ ...data.user, token: data.token })
-      navigate('/', { replace: true })
+      const { from = '/', email: _e, ...rest } = location.state || {}
+      navigate(from, Object.keys(rest).length ? { state: rest, replace: true } : { replace: true })
     } catch (err) {
       setError(err.response?.data?.message || 'Verification failed. Please try again.')
       setDigits(Array(OTP_LENGTH).fill(''))

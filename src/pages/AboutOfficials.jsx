@@ -8,6 +8,7 @@ import virusPoster from '../assets/media/virus-image.png'
 import anonymousPoster from '../assets/media/anonymous-image.png'
 import shadowBrokersPoster from '../assets/media/shadow-brokers-image.png'
 import apt29Poster from '../assets/media/apt29-image.png'
+import api from '../services/api'
 
 
 
@@ -346,7 +347,14 @@ function CombinedVideo() {
   const [ccOn, setCcOn] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [skipHint, setSkipHint] = useState(null)
+  const [findUsLink, setFindUsLink] = useState('https://t.me/WHTSIPADigitalSecurityWorld')
   const lastTapRef = useRef({ side: null, time: 0 })
+
+  useEffect(() => {
+    api.get('/config').then(res => {
+      if (res.data?.findUsTelegramLink) setFindUsLink(res.data.findUsTelegramLink)
+    }).catch(() => {})
+  }, [])
 
   const fmt = (s) => {
     if (!s || isNaN(s)) return '0:00'
@@ -602,7 +610,13 @@ function CombinedVideo() {
         </div>
 
         <div className="combined-video-find-us-wrap">
-          <button className="combined-ctrl-find-us" onClick={playFullscreen} type="button">
+          <a
+            href={findUsLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="combined-ctrl-find-us"
+            aria-label="Find us on Telegram"
+          >
             <span className="find-us-inner">
               <span className="find-us-bracket find-us-bracket-tl"></span>
               <span className="find-us-bracket find-us-bracket-tr"></span>
@@ -610,7 +624,7 @@ function CombinedVideo() {
               <span className="find-us-bracket find-us-bracket-bl"></span>
               <span className="find-us-bracket find-us-bracket-br"></span>
             </span>
-          </button>
+          </a>
         </div>
 
       </div>
@@ -621,9 +635,9 @@ function CombinedVideo() {
 export default function AboutOfficials() {
   return (
     <div className="page-light">
-      <header className="about-hero">
-        <div className="container text-center" style={{ paddingTop: '4rem', paddingBottom: '4rem' }}>
-          <div className="section-label mb-2">The Officials</div>
+      <header className="about-hero" style={{ paddingTop: '0.5rem' }}>
+        <div className="container text-center" style={{ paddingTop: '5rem', paddingBottom: '4rem' }}>
+          <div className="section-label mb-3" style={{ paddingTop: '0.5rem' }}>The Officials</div>
           <h1 className="fw-bold mb-3" style={{ color: '#0f172a', fontSize: 'clamp(1.8rem,3vw,2.8rem)', lineHeight: 1.1 }}>
             Meet The Six Officials
           </h1>
@@ -641,7 +655,7 @@ export default function AboutOfficials() {
         </div>
       </header>
 
-      <section className="section-pad-lg" style={{ background: '#ffffff' }}>
+      <section className="section-pad-lg pb-0" style={{ background: '#ffffff' }}>
         <div className="container">
           <div className="row g-5">
             {OFFICIALS.map(official => (
@@ -651,15 +665,15 @@ export default function AboutOfficials() {
             ))}
           </div>
         </div>
-      </section>
 
-      {/* ── Arrow separator — points from individual officials down to the combined section ── */}
-      <div className="officials-arrow-separator">
-        <div className="officials-arrow-line"></div>
-        <div className="officials-arrow-head">
-          <i className="bi bi-chevron-down"></i>
+        {/* ── Arrow separator — points from individual officials down to the combined section ── */}
+        <div className="officials-arrow-separator">
+          <div className="officials-arrow-line"></div>
+          <div className="officials-arrow-head">
+            <i className="bi bi-chevron-down"></i>
+          </div>
         </div>
-      </div>
+      </section>
 
       {/* ── Combined "The Hackers" video — full width ── */}
       <CombinedVideo />

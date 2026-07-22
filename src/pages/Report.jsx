@@ -420,6 +420,16 @@ function LiveChatModal({ isOpen, onClose, userName, setReportType, isHumanAgent 
   const [isTyping, setIsTyping] = useState(false)
   const chatEndRef = useRef(null)
 
+  // Listen for real Tidio agent connection event
+  useEffect(() => {
+    localStorage.removeItem('whts_chat_ishuman')
+    if (window.tidioChatApi) {
+      try {
+        window.tidioChatApi.on('agentJoined', () => setIsHuman(true))
+      } catch { /* ignore */ }
+    }
+  }, [])
+
   useEffect(() => {
     if (chatEndRef.current) {
       chatEndRef.current.scrollIntoView({ behavior: 'smooth' })
@@ -461,12 +471,14 @@ function LiveChatModal({ isOpen, onClose, userName, setReportType, isHumanAgent 
         } else if (opt.action === 'open_tg') {
           window.open('https://t.me/Wehelptrackscammersipaddress', '_blank')
         } else if (opt.action === 'connect_human') {
-          setIsHuman(true)
           setMessages(prev => [...prev, {
             sender: 'agent',
-            text: "Connecting to an Active Representative...\n\n⏱️ Estimated wait time: 15–20 minutes.\n\nYou have been placed in the queue. A representative will respond here shortly.",
+            text: "Connecting to an Active Representative...\n\n⏱️ Estimated wait time: 15–20 minutes.\n\nYou have been placed in the queue. Our AI assistant remains available here, or connect directly via WhatsApp or Telegram for instant human response.",
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           }])
+          if (window.tidioChatApi) {
+            try { window.tidioChatApi.show(); window.tidioChatApi.open() } catch { /* ignore */ }
+          }
         }
       }, 1000)
       return
@@ -652,7 +664,10 @@ export default function Report() {
           return true
         }
       ),
-      incidentTypes: Yup.array().min(1, 'Please select at least one incident type').required('Type of Incident is required'),
+      incidentTypes: Yup.array()
+        .min(1, 'Please select at least one incident type')
+        .max(3, 'You may select a maximum of 3 incident types')
+        .required('Type of Incident is required'),
       incidentTypesOther: Yup.string().test(
         'is-required-other',
         'Please specify the other incident type',
@@ -664,7 +679,13 @@ export default function Report() {
           return true
         }
       ),
-      detail: Yup.string().required('Report Details are required'),
+      detail: Yup.string()
+        .required('Report Details are required')
+        .test(
+          'min-25-words',
+          'Please provide at least 25 words in your report details',
+          value => value ? value.trim().split(/\s+/).filter(Boolean).length >= 25 : false
+        ),
     }),
     onSubmit: async (values) => {
       await handleFormSubmit(values)
@@ -711,7 +732,10 @@ export default function Report() {
           return true
         }
       ),
-      incidentTypes: Yup.array().min(1, 'Please select at least one incident type').required('Type of Incident is required'),
+      incidentTypes: Yup.array()
+        .min(1, 'Please select at least one incident type')
+        .max(3, 'You may select a maximum of 3 incident types')
+        .required('Type of Incident is required'),
       incidentTypesOther: Yup.string().test(
         'is-required-other',
         'Please specify the other incident type',
@@ -739,7 +763,13 @@ export default function Report() {
       socialHandles: Yup.string().required('Social Media Handles or Targeted Websites is required'),
       linksImposterDetails: Yup.string(),
       effectsOfIncident: Yup.string().required('Effects of the Incident is required'),
-      detail: Yup.string().required('Report Details are required'),
+      detail: Yup.string()
+        .required('Report Details are required')
+        .test(
+          'min-25-words',
+          'Please provide at least 25 words in your report details',
+          value => value ? value.trim().split(/\s+/).filter(Boolean).length >= 25 : false
+        ),
     }),
     onSubmit: async (values) => {
       await handleFormSubmit(values)
@@ -1284,28 +1314,49 @@ export default function Report() {
 
                       {/* Type of Incident Checkboxes */}
                       <div className="col-12">
-                        <label className="form-label cyber-label">Type of Incident <span className="text-danger">* (Required – select all that apply)</span></label>
+                        <label className="form-label cyber-label">
+                          Type of Incident <span className="text-danger">* (Required – select up to 3; selecting "Other" deselects all others)</span>
+                        </label>
                         <div className="row g-2 mt-1">
-                          {INCIDENT_TYPES.map(type => (
-                            <div key={type} className="col-12 col-md-6">
-                              <label className="cyber-checkbox-label">
-                                <input
-                                  type="checkbox"
-                                  name="incidentTypes"
-                                  value={type}
-                                  checked={personalFormik.values.incidentTypes.includes(type)}
-                                  onChange={(e) => {
-                                    const checked = e.target.checked
-                                    const updated = checked
-                                      ? [...personalFormik.values.incidentTypes, type]
-                                      : personalFormik.values.incidentTypes.filter(t => t !== type)
-                                    personalFormik.setFieldValue('incidentTypes', updated)
-                                  }}
-                                />
-                                <span className="cyber-checkbox-text">{type}</span>
-                              </label>
-                            </div>
-                          ))}
+                          {INCIDENT_TYPES.map(type => {
+                            const isOtherSelected = personalFormik.values.incidentTypes.includes('Other (please specify)')
+                            const isThisOther = type === 'Other (please specify)'
+                            const isChecked = personalFormik.values.incidentTypes.includes(type)
+                            const atMax = personalFormik.values.incidentTypes.length >= 3
+                            const isDisabled = !isChecked && ((atMax && !isThisOther) || (isOtherSelected && !isThisOther))
+                            return (
+                              <div key={type} className="col-12 col-md-6">
+                                <label className={`cyber-checkbox-label${isDisabled ? ' opacity-50' : ''}`}>
+                                  <input
+                                    type="checkbox"
+                                    name="incidentTypes"
+                                    value={type}
+                                    checked={isChecked}
+                                    disabled={isDisabled}
+                                    onChange={(e) => {
+                                      const checked = e.target.checked
+                                      let updated
+                                      if (isThisOther && checked) {
+                                        // "Other" selected → deselect all others, select only Other
+                                        updated = ['Other (please specify)']
+                                      } else if (isThisOther && !checked) {
+                                        updated = []
+                                      } else {
+                                        updated = checked
+                                          ? [...personalFormik.values.incidentTypes, type]
+                                          : personalFormik.values.incidentTypes.filter(t => t !== type)
+                                      }
+                                      personalFormik.setFieldValue('incidentTypes', updated)
+                                    }}
+                                  />
+                                  <span className="cyber-checkbox-text">{type}</span>
+                                </label>
+                              </div>
+                            )
+                          })}
+                        </div>
+                        <div className="text-muted-cyber small mt-1">
+                          {personalFormik.values.incidentTypes.length}/3 selected
                         </div>
                         {personalFormik.values.incidentTypes.includes('Other (please specify)') && (
                           <div className="mt-2">
@@ -1330,7 +1381,7 @@ export default function Report() {
 
                       {/* Detail */}
                       <div className="col-12">
-                        <label className="form-label cyber-label" htmlFor="personal-detail">Report Details <span className="text-danger">* (Required)</span></label>
+                        <label className="form-label cyber-label" htmlFor="personal-detail">Report Details <span className="text-danger">* (Required – minimum 25 words)</span></label>
                         <textarea
                           id="personal-detail"
                           name="detail"
@@ -1341,9 +1392,18 @@ export default function Report() {
                           onChange={personalFormik.handleChange}
                           onBlur={personalFormik.handleBlur}
                         />
-                        {personalFormik.touched.detail && personalFormik.errors.detail && (
-                          <div className="cyber-error-msg"><i className="bi bi-exclamation-triangle-fill me-1"></i>{personalFormik.errors.detail}</div>
-                        )}
+                        <div className="d-flex justify-content-between align-items-center mt-1">
+                          <div>
+                            {personalFormik.touched.detail && personalFormik.errors.detail && (
+                              <div className="cyber-error-msg"><i className="bi bi-exclamation-triangle-fill me-1"></i>{personalFormik.errors.detail}</div>
+                            )}
+                          </div>
+                          <small className={`text-end ${
+                            personalFormik.values.detail.trim().split(/\s+/).filter(Boolean).length >= 25 ? 'text-success' : 'text-muted-cyber'
+                          }`}>
+                            {personalFormik.values.detail.trim().split(/\s+/).filter(Boolean).length} / 25 words
+                          </small>
+                        </div>
                       </div>
 
                       {/* Total Financial Losses */}
@@ -1631,28 +1691,48 @@ export default function Report() {
 
                       {/* Type of Incident */}
                       <div className="col-12">
-                        <label className="form-label cyber-label">Type of Incident <span className="text-danger">* (Required – select all that apply)</span></label>
+                        <label className="form-label cyber-label">
+                          Type of Incident <span className="text-danger">* (Required – select up to 3; selecting "Other" deselects all others)</span>
+                        </label>
                         <div className="row g-2 mt-1">
-                          {INCIDENT_TYPES.map(type => (
-                            <div key={type} className="col-12 col-md-6">
-                              <label className="cyber-checkbox-label">
-                                <input
-                                  type="checkbox"
-                                  name="incidentTypes"
-                                  value={type}
-                                  checked={publicFormik.values.incidentTypes.includes(type)}
-                                  onChange={(e) => {
-                                    const checked = e.target.checked
-                                    const updated = checked
-                                      ? [...publicFormik.values.incidentTypes, type]
-                                      : publicFormik.values.incidentTypes.filter(t => t !== type)
-                                    publicFormik.setFieldValue('incidentTypes', updated)
-                                  }}
-                                />
-                                <span className="cyber-checkbox-text">{type}</span>
-                              </label>
-                            </div>
-                          ))}
+                          {INCIDENT_TYPES.map(type => {
+                            const isOtherSelected = publicFormik.values.incidentTypes.includes('Other (please specify)')
+                            const isThisOther = type === 'Other (please specify)'
+                            const isChecked = publicFormik.values.incidentTypes.includes(type)
+                            const atMax = publicFormik.values.incidentTypes.length >= 3
+                            const isDisabled = !isChecked && ((atMax && !isThisOther) || (isOtherSelected && !isThisOther))
+                            return (
+                              <div key={type} className="col-12 col-md-6">
+                                <label className={`cyber-checkbox-label${isDisabled ? ' opacity-50' : ''}`}>
+                                  <input
+                                    type="checkbox"
+                                    name="incidentTypes"
+                                    value={type}
+                                    checked={isChecked}
+                                    disabled={isDisabled}
+                                    onChange={(e) => {
+                                      const checked = e.target.checked
+                                      let updated
+                                      if (isThisOther && checked) {
+                                        updated = ['Other (please specify)']
+                                      } else if (isThisOther && !checked) {
+                                        updated = []
+                                      } else {
+                                        updated = checked
+                                          ? [...publicFormik.values.incidentTypes, type]
+                                          : publicFormik.values.incidentTypes.filter(t => t !== type)
+                                      }
+                                      publicFormik.setFieldValue('incidentTypes', updated)
+                                    }}
+                                  />
+                                  <span className="cyber-checkbox-text">{type}</span>
+                                </label>
+                              </div>
+                            )
+                          })}
+                        </div>
+                        <div className="text-muted-cyber small mt-1">
+                          {publicFormik.values.incidentTypes.length}/3 selected
                         </div>
                         {publicFormik.values.incidentTypes.includes('Other (please specify)') && (
                           <div className="mt-2">
@@ -1785,7 +1865,7 @@ export default function Report() {
 
                       {/* Detail */}
                       <div className="col-12">
-                        <label className="form-label cyber-label" htmlFor="public-detail">Report Details <span className="text-danger">* (Required)</span></label>
+                        <label className="form-label cyber-label" htmlFor="public-detail">Report Details <span className="text-danger">* (Required – minimum 25 words)</span></label>
                         <textarea
                           id="public-detail"
                           name="detail"
@@ -1796,9 +1876,18 @@ export default function Report() {
                           onChange={publicFormik.handleChange}
                           onBlur={publicFormik.handleBlur}
                         />
-                        {publicFormik.touched.detail && publicFormik.errors.detail && (
-                          <div className="cyber-error-msg"><i className="bi bi-exclamation-triangle-fill me-1"></i>{publicFormik.errors.detail}</div>
-                        )}
+                        <div className="d-flex justify-content-between align-items-center mt-1">
+                          <div>
+                            {publicFormik.touched.detail && publicFormik.errors.detail && (
+                              <div className="cyber-error-msg"><i className="bi bi-exclamation-triangle-fill me-1"></i>{publicFormik.errors.detail}</div>
+                            )}
+                          </div>
+                          <small className={`text-end ${
+                            publicFormik.values.detail.trim().split(/\s+/).filter(Boolean).length >= 25 ? 'text-success' : 'text-muted-cyber'
+                          }`}>
+                            {publicFormik.values.detail.trim().split(/\s+/).filter(Boolean).length} / 25 words
+                          </small>
+                        </div>
                       </div>
 
                       {/* Evidence upload */}

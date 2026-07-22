@@ -936,7 +936,10 @@
   flex-direction: column;
   align-items: center;
   background: #ffffff;
-  padding: 0.5rem 0 0;
+  padding: 2.5rem 0 4rem; /* generous bottom padding to keep arrow strictly inside white background */
+  margin-top: 0;
+  position: relative;
+  z-index: 2;
 }
 
 .officials-arrow-line {

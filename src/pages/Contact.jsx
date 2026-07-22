@@ -248,6 +248,16 @@ function ContactLiveChat({ isOpen, onClose, userName, navigate, isHumanAgent = f
   const [isTyping,  setIsTyping]  = useState(false)
   const chatEndRef = useRef(null)
 
+  // Listen for real Tidio agent connection event
+  useEffect(() => {
+    localStorage.removeItem('whts_chat_ishuman')
+    if (window.tidioChatApi) {
+      try {
+        window.tidioChatApi.on('agentJoined', () => setIsHuman(true))
+      } catch { /* ignore */ }
+    }
+  }, [])
+
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, isTyping])
@@ -278,12 +288,14 @@ function ContactLiveChat({ isOpen, onClose, userName, navigate, isHumanAgent = f
           open_tg:            () => window.open(`https://t.me/${TG_HANDLE}`, '_blank'),
           open_email:         () => window.open(`mailto:${SUPPORT_EMAIL}`, '_blank'),
           connect_human:      () => {
-            setIsHuman(true)
             setMessages(prev => [...prev, {
               sender: 'agent',
-              text: "Connecting to an Active Representative...\n\n⏱️ Estimated wait time: 15–20 minutes.\n\nYou have been placed in the queue. A representative will respond here shortly.",
+              text: "Connecting to an Active Representative...\n\n⏱️ Estimated wait time: 15–20 minutes.\n\nYou have been placed in the queue. Our AI assistant remains available here, or connect directly via WhatsApp or Telegram for instant human response.",
               time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             }])
+            if (window.tidioChatApi) {
+              try { window.tidioChatApi.show(); window.tidioChatApi.open() } catch { /* ignore */ }
+            }
           }
         }
         actionMap[opt.action]?.()
@@ -430,6 +442,8 @@ export default function Contact() {
   const [showChat,  setShowChat]  = useState(false)
   const set = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }))
 
+  const wordCount = form.message.trim().split(/\s+/).filter(Boolean).length
+
   // Restore a saved draft (left behind by an auth redirect) and prefill from the signed-in user
   useEffect(() => {
     const saved = localStorage.getItem('whts_contact_draft')
@@ -461,6 +475,11 @@ export default function Contact() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+
+    if (wordCount < 25) {
+      setError('Please provide at least 25 words in your message.')
+      return
+    }
 
     if (!user) {
       // Save what they've typed so far and send them to sign in
@@ -553,7 +572,7 @@ export default function Contact() {
                   <form onSubmit={handleSubmit}>
                     <div className="row g-3">
                       <div className="col-12 col-sm-6">
-                        <label className="contact-label">Full Name</label>
+                        <label className="contact-label">Full Name <span className="text-danger">*</span></label>
                         <div className="contact-input-wrap">
                           <i className="bi bi-person contact-icon"></i>
                           <input className="contact-field ps-contact" type="text"
@@ -561,7 +580,7 @@ export default function Contact() {
                         </div>
                       </div>
                       <div className="col-12 col-sm-6">
-                        <label className="contact-label">Email Address</label>
+                        <label className="contact-label">Email Address <span className="text-danger">*</span></label>
                         <div className="contact-input-wrap">
                           <i className="bi bi-envelope contact-icon"></i>
                           <input className="contact-field ps-contact" type="email"
@@ -569,7 +588,7 @@ export default function Contact() {
                         </div>
                       </div>
                       <div className="col-12">
-                        <label className="contact-label">Subject</label>
+                        <label className="contact-label">Subject <span className="text-danger">*</span></label>
                         <div className="contact-input-wrap">
                           <i className="bi bi-chat-left-text contact-icon"></i>
                           <input className="contact-field ps-contact" type="text"
@@ -577,17 +596,22 @@ export default function Contact() {
                         </div>
                       </div>
                       <div className="col-12">
-                        <label className="contact-label">Message</label>
+                        <label className="contact-label">Message <span className="text-danger">* (minimum 25 words)</span></label>
                         <textarea className="contact-field" rows={5}
                           placeholder="Type your message here..."
                           value={form.message} onChange={set('message')} required />
+                        <div className="d-flex justify-content-end mt-1">
+                          <small className={wordCount >= 25 ? 'text-success' : 'text-muted'}>
+                            {wordCount} / 25 words
+                          </small>
+                        </div>
                       </div>
                       <div className="col-12">
                         <button
                           type="submit"
                           className="btn btn-primary w-100"
                           style={{ padding: '0.85rem', borderRadius: 12, fontWeight: 600 }}
-                          disabled={loading}
+                          disabled={loading || wordCount < 25}
                         >
                           {loading ? (
                             <><span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Sending…</>

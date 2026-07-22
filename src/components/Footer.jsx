@@ -1,11 +1,25 @@
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import logoWhts from '../assets/media/logo-whts.jpg'
+import api from '../services/api'
 
 export default function Footer() {
   const year = new Date().getFullYear()
   const navigate = useNavigate()
+  const [config, setConfig] = useState({
+    telegramCommunityLink: 'https://t.me/WHTSIPADigitalSecurityWorld',
+    facebookCommunityLink: '',
+    whatsappLink: 'https://wa.me/16502184673',
+  })
 
-  // Handles clicking a link that goes to a section on a different page
+  useEffect(() => {
+    api.get('/config')
+      .then(res => {
+        if (res.data) setConfig(prev => ({ ...prev, ...res.data }))
+      })
+      .catch(() => {})
+  }, [])
+
   const goTo = (path, sectionId) => {
     navigate(path, { state: { scrollTo: sectionId } })
   }
@@ -28,13 +42,43 @@ export default function Footer() {
               A cybersecurity intelligence platform helping individuals and organizations
               identify threats, report incidents, and recover safely.
             </p>
-            <div className="d-flex gap-2 flex-wrap">
+            <div className="d-flex gap-2 flex-wrap mb-3">
               <span className="pill low" style={{ fontSize: '0.68rem' }}>
                 <span className="dot"></span> ACSW Verified
               </span>
               <span className="pill" style={{ fontSize: '0.68rem', borderColor: 'rgba(120,214,255,0.3)' }}>
                 <i className="bi bi-shield-fill-check" style={{ color: 'var(--cyan)', fontSize: '0.75rem' }}></i> Secure Platform
               </span>
+            </div>
+
+            {/* Join our Community Section */}
+            <div className="mt-3">
+              <div className="fw-bold text-white small mb-2" style={{ letterSpacing: '0.05em' }}>
+                JOIN OUR COMMUNITY
+              </div>
+              <div className="d-flex align-items-center gap-2">
+                <a
+                  href={config.telegramCommunityLink || 'https://t.me/WHTSIPADigitalSecurityWorld'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-sm btn-outline-info d-inline-flex align-items-center gap-1"
+                  style={{ borderRadius: '8px', fontSize: '0.82rem' }}
+                  title="Join Telegram Community"
+                >
+                  <i className="bi bi-telegram text-info"></i> Telegram
+                </a>
+                <a
+                  href={config.facebookCommunityLink || '#'}
+                  onClick={e => { if (!config.facebookCommunityLink) e.preventDefault() }}
+                  target={config.facebookCommunityLink ? '_blank' : '_self'}
+                  rel="noopener noreferrer"
+                  className={`btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1 ${!config.facebookCommunityLink ? 'disabled opacity-50' : ''}`}
+                  style={{ borderRadius: '8px', fontSize: '0.82rem' }}
+                  title={config.facebookCommunityLink ? 'Join Facebook Community' : 'Facebook (Coming Soon)'}
+                >
+                  <i className="bi bi-facebook"></i> Facebook {!config.facebookCommunityLink && '(Soon)'}
+                </a>
+              </div>
             </div>
           </div>
 
@@ -43,7 +87,6 @@ export default function Footer() {
             <div className="footer-col-title">Platform</div>
             <ul className="list-unstyled mb-0">
               <li className="mb-2">
-                {/* Home — scroll to top */}
                 <button className="footer-link-btn" onClick={() => { navigate('/'); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>
                   Home
                 </button>
@@ -114,6 +157,14 @@ export default function Footer() {
               <Link className="btn btn-cyber" to="/report" state={{ scrollTo: 'recover' }}>
                 <i className="bi bi-shield-check me-2"></i>Start Recovery
               </Link>
+
+              {/* Book a Call Session button — same solid style as Report / Start Recovery above */}
+              <button
+                className="btn btn-cyber"
+                onClick={() => navigate('/essential-eight?bookCall=true')}
+              >
+                <i className="bi bi-telephone-outbound me-2"></i>Book a Call Session
+              </button>
             </div>
             <div className="card-glass p-3 d-flex align-items-start gap-3">
               <div className="icon-box" style={{ width: 36, height: 36, fontSize: '1rem', flexShrink: 0 }}>🚨</div>
@@ -128,7 +179,7 @@ export default function Footer() {
 
         </div>
 
-        {/* Bottom bar — styled background */}
+        {/* Bottom bar */}
         <div className="footer-bottom-bar">
           <div className="footer-bottom-inner">
             <div className="footer-bottom-copy">

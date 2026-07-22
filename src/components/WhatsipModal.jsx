@@ -102,7 +102,7 @@ const TOOLS_FLOW = {
     ]
   },
   purchase_confirm: {
-    text: "Great choice! To complete your purchase, our team will verify your requirements and provide a secure payment link. Connect directly via Telegram or WhatsApp with your Ticket ID for the fastest processing.",
+    text: "Great choice! To complete your purchase, our team will verify your requirements and provide a secure payment link. Connect directly via Telegram or WhatsApp with your Ticket ID above for the fastest processing.",
     options: [
       { text: "📲 Continue on Telegram (WHTSIPA Tools)", action: "open_tg" },
       { text: "💬 Continue on WhatsApp", action: "open_wa" },
@@ -166,7 +166,7 @@ const TOOLS_FLOW = {
   live_rep_confirm: {
     text: "Would you like to chat with an Active Representative?\n\n⏱️ Estimated wait time: 15–20 minutes.\n\nAn available specialist will be assigned to your ticket and will reach out to you via your preferred contact channel (Telegram or WhatsApp).",
     options: [
-      { text: "✅ Yes — Connect me now",      action: "open_tg" },
+      { text: "✅ Yes — Open Telegram Now",      action: "open_tg" },
       { text: "💬 Connect via WhatsApp instead", action: "open_wa" },
       { text: "⬅️ Back",                       next: "live_rep" },
     ]
@@ -178,16 +178,40 @@ const TOOLS_FLOW = {
    ══════════════════════════════════════════ */
 function ToolsLiveChat({ ticketId, threatTitle, onClose, onBack, user, userName, waLink, isHumanAgent = false }) {
   const [currentNode, setCurrentNode] = useState('main')
+  // isHuman only becomes true when Tidio confirms an actual human agent connected (connect_human action).
+  // Clicking "Open Telegram Now" does NOT flip this flag — the user left to Telegram, no in-app agent.
   const [isHuman, setIsHuman] = useState(isHumanAgent)
-  const [messages, setMessages] = useState([
-    {
-      sender: 'agent',
-      text: `Hello ${userName || 'there'}! Welcome to WHTSIPA Tools AI Chat.${threatTitle ? ` I see you need tools for: ${threatTitle}.` : ''} I'm here to help you find, request, or purchase the right security tools. What can I assist you with?`,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+  const [messages, setMessages] = useState(() => {
+    const saved = localStorage.getItem('whts_tools_chat_messages')
+    if (saved) {
+      try { return JSON.parse(saved) } catch { /* ignore */ }
     }
-  ])
+    return [{
+      sender: 'agent',
+      text: `Hello ${userName || 'there'}! Welcome to WHTSIPA Tools Support.${threatTitle ? ` I see you need tools for: ${threatTitle}.` : ''} I'm here to help you find, request, or purchase the right security tools. What can I assist you with?`,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    }]
+  })
   const [isTyping, setIsTyping] = useState(false)
   const chatEndRef = useRef(null)
+
+  // Clear any stale "human" flag set by old code (open_tg incorrectly set it)
+  useEffect(() => { localStorage.removeItem('whts_chat_ishuman') }, [])
+
+  // Save chat messages to localStorage for session continuity (but NOT isHuman)
+  useEffect(() => {
+    localStorage.setItem('whts_tools_chat_messages', JSON.stringify(messages))
+  }, [messages])
+
+  // Listen for real Tidio agent connection event
+  useEffect(() => {
+    localStorage.removeItem('whts_chat_ishuman')
+    if (window.tidioChatApi) {
+      try {
+        window.tidioChatApi.on('agentJoined', () => setIsHuman(true))
+      } catch { /* ignore */ }
+    }
+  }, [])
 
   useEffect(() => {
     const recordSession = async () => {
@@ -229,9 +253,10 @@ function ToolsLiveChat({ ticketId, threatTitle, onClose, onBack, user, userName,
           window.open(TG_CHANNEL_LINK, '_blank')
           setMessages(prev => [...prev, {
             sender: 'agent',
-            text: `Opening Telegram now at @WHTSIPA_DigitalTools. Your Ticket ID is: ${ticketId} — please share it with the representative for faster assistance.`,
+            text: `Redirecting you to Telegram (@WHTSIPA_DigitalTools) now. \n\nYour Ticket ID is: ${ticketId} \u2014 please share it with the representative for faster assistance.\n\nℹ️ Note: You\'re now on Telegram. Our AI assistant here remains available if you have further questions.`,
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           }])
+          // Do NOT set isHuman = true here — no Tidio agent has confirmed an in-app connection.
         } else if (opt.action === 'open_wa') {
           window.open(waLink, '_blank')
           setMessages(prev => [...prev, {
@@ -240,12 +265,14 @@ function ToolsLiveChat({ ticketId, threatTitle, onClose, onBack, user, userName,
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           }])
         } else if (opt.action === 'connect_human') {
-          setIsHuman(true)
           setMessages(prev => [...prev, {
             sender: 'agent',
-            text: "Connecting to an Active Representative...\n\n⏱️ Estimated wait time: 15–20 minutes.\n\nYou have been placed in the queue. A representative will respond to your messages here or contact you via your registered details shortly.",
+            text: "Connecting to an Active Representative...\n\n⏱️ Estimated wait time: 15–20 minutes.\n\nYou have been placed in the queue. Our AI assistant remains available here, or connect directly via WhatsApp or Telegram for instant human response.",
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           }])
+          if (window.tidioChatApi) {
+            try { window.tidioChatApi.show(); window.tidioChatApi.open() } catch { /* ignore */ }
+          }
         }
       }, 900)
       return
@@ -702,7 +729,7 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
             <div className="wm-field">
               <label>Preferred Contact Method</label>
               <div className="wm-radio-row">
-                {['WhatsApp', 'Telegram', 'Email', 'Live Chat'].map(m => (
+                {['WhatsApp', 'Telegram', 'Email'].map(m => (
                   <label key={m} className="wm-radio-item">
                     <input type="radio" name="contactMethod" value={m} checked={form.contactMethod === m}
                       onChange={() => setForm(f => ({ ...f, contactMethod: m }))} />

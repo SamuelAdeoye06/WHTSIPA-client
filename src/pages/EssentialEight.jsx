@@ -271,6 +271,9 @@ function BookCallModal({ onClose }) {
   })
   const [errors, setErrors] = useState({})
 
+  // Live word count for the notes field
+  const notesWordCount = form.notes.trim().split(/\s+/).filter(Boolean).length
+
   // Fetch the admin-configured callback number on mount
   useEffect(() => {
     api.get('/booking/callback-number')
@@ -323,6 +326,7 @@ function BookCallModal({ onClose }) {
     if (!form.preferredDate)        e.preferredDate = 'Please select a preferred date'
     if (!form.preferredTime && !form.preferredTimeCustom)
                               e.preferredTime = 'Please select or enter a preferred time'
+    if (notesWordCount < 25)    e.notes = 'Please provide at least 25 words in the Additional Notes field'
     if (!form.consentPrivacy)   e.consentPrivacy = 'You must agree to the Privacy Policy and Terms'
     return e
   }
@@ -455,10 +459,13 @@ function BookCallModal({ onClose }) {
             </F>
           </div>
 
-          <F id="bc-notes" label="Additional Notes (optional)">
-            <textarea id="bc-notes" className="bc-input bc-textarea"
-              placeholder="Briefly describe what you need help with…"
-              rows={3} value={form.notes} onChange={set('notes')} />
+          <F id="bc-notes" label="Additional Notes * (minimum 25 words)" error={errors.notes}>
+            <textarea id="bc-notes" className={`bc-input bc-textarea ${errors.notes ? 'bc-input-err' : ''}`}
+              placeholder="Briefly describe what you need help with — please provide at least 25 words…"
+              rows={4} value={form.notes} onChange={set('notes')} />
+            <small className={notesWordCount >= 25 ? 'text-success' : 'text-muted'} style={{ fontSize: '0.72rem' }}>
+              {notesWordCount} / 25 words {notesWordCount >= 25 ? '✓' : ''}
+            </small>
           </F>
 
           {errors.submit && (

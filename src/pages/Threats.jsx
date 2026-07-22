@@ -171,6 +171,16 @@ function ThreatsChatModal({ isOpen, onClose, navigate, isHumanAgent = false }) {
   const [inputText,  setInputText]  = useState('')
   const chatEndRef = useRef(null)
 
+  // Listen for real Tidio agent connection event
+  useEffect(() => {
+    localStorage.removeItem('whts_chat_ishuman')
+    if (window.tidioChatApi) {
+      try {
+        window.tidioChatApi.on('agentJoined', () => setIsHuman(true))
+      } catch { /* ignore */ }
+    }
+  }, [])
+
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, isTyping])
@@ -203,12 +213,14 @@ function ThreatsChatModal({ isOpen, onClose, navigate, isHumanAgent = false }) {
           open_tg:            () => window.open(TG_LINK, '_blank'),
           open_email:         () => window.open(EMAIL_LINK, '_blank'),
           connect_human:      () => {
-            setIsHuman(true)
             setMessages(prev => [...prev, {
               sender: 'agent',
-              text: "Connecting to an Active Representative...\n\n⏱️ Estimated wait time: 15–20 minutes.\n\nYou have been placed in the queue. A representative will respond here shortly.",
+              text: "Connecting to an Active Representative...\n\n⏱️ Estimated wait time: 15–20 minutes.\n\nYou have been placed in the queue. Our AI assistant remains available here, or connect directly via WhatsApp or Telegram for instant human response.",
               time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             }])
+            if (window.tidioChatApi) {
+              try { window.tidioChatApi.show(); window.tidioChatApi.open() } catch { /* ignore */ }
+            }
           }
         }
         actions[opt.action]?.()
