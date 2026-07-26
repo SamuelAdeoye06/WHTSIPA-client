@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import '../styles/cyber.css'
 import './Contact.css'
 import './Report.css'   /* shared livechat modal styles */
+import { openLiveChat, onAgentJoined } from '../utils/tidio'
 
 /* ── Contact channel constants ── */
 const WA_NUMBER       = '16502184673'
@@ -251,11 +252,7 @@ function ContactLiveChat({ isOpen, onClose, userName, navigate, isHumanAgent = f
   // Listen for real Tidio agent connection event
   useEffect(() => {
     localStorage.removeItem('whts_chat_ishuman')
-    if (window.tidioChatApi) {
-      try {
-        window.tidioChatApi.on('agentJoined', () => setIsHuman(true))
-      } catch { /* ignore */ }
-    }
+    onAgentJoined(() => setIsHuman(true))
   }, [])
 
   useEffect(() => {
@@ -288,14 +285,10 @@ function ContactLiveChat({ isOpen, onClose, userName, navigate, isHumanAgent = f
           open_tg:            () => window.open(`https://t.me/${TG_HANDLE}`, '_blank'),
           open_email:         () => window.open(`mailto:${SUPPORT_EMAIL}`, '_blank'),
           connect_human:      () => {
-            setMessages(prev => [...prev, {
-              sender: 'agent',
-              text: "Connecting to an Active Representative...\n\n⏱️ Estimated wait time: 15–20 minutes.\n\nYou have been placed in the queue. Our AI assistant remains available here, or connect directly via WhatsApp or Telegram for instant human response.",
-              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            }])
-            if (window.tidioChatApi) {
-              try { window.tidioChatApi.show(); window.tidioChatApi.open() } catch { /* ignore */ }
-            }
+            openLiveChat(
+              `Visitor requesting an Active Representative from the Contact page.${userName ? `\nName: ${userName}` : ''}`
+            )
+            onClose()
           }
         }
         actionMap[opt.action]?.()
@@ -767,6 +760,7 @@ export default function Contact() {
         isOpen={showChat}
         onClose={() => setShowChat(false)}
         navigate={navigate}
+        userName={user?.firstName}
       />
 
     </div>

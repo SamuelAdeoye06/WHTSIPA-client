@@ -10,6 +10,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
+import { openLiveChat, onAgentJoined } from '../utils/tidio'
 import './WhatsipModal.css'
 
 /* ── Contact details ── */
@@ -206,11 +207,7 @@ function ToolsLiveChat({ ticketId, threatTitle, onClose, onBack, user, userName,
   // Listen for real Tidio agent connection event
   useEffect(() => {
     localStorage.removeItem('whts_chat_ishuman')
-    if (window.tidioChatApi) {
-      try {
-        window.tidioChatApi.on('agentJoined', () => setIsHuman(true))
-      } catch { /* ignore */ }
-    }
+    onAgentJoined(() => setIsHuman(true))
   }, [])
 
   useEffect(() => {
@@ -265,14 +262,10 @@ function ToolsLiveChat({ ticketId, threatTitle, onClose, onBack, user, userName,
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           }])
         } else if (opt.action === 'connect_human') {
-          setMessages(prev => [...prev, {
-            sender: 'agent',
-            text: "Connecting to an Active Representative...\n\n⏱️ Estimated wait time: 15–20 minutes.\n\nYou have been placed in the queue. Our AI assistant remains available here, or connect directly via WhatsApp or Telegram for instant human response.",
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          }])
-          if (window.tidioChatApi) {
-            try { window.tidioChatApi.show(); window.tidioChatApi.open() } catch { /* ignore */ }
-          }
+          openLiveChat(
+            `Visitor requesting an Active Representative from the Threats/Tools page.\nTicket ID: ${ticketId}${threatTitle ? `\nTool: ${threatTitle}` : ''}${user?.email ? `\nAccount: ${user.email}` : ''}`
+          )
+          onClose()
         }
       }, 900)
       return

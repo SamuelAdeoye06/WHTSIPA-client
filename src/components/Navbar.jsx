@@ -464,7 +464,6 @@ export default function Navbar() {
                 <ul className="dropdown-menu dropdown-menu-end cyber-dropdown p-3">
                   <li><Link className="dropdown-item cyber-dropdown-item" to="/essential-eight"><i className="bi bi-shield-check me-2" style={{ color: 'var(--green)' }}></i>Essential Eight</Link></li>
                   <li><Link className="dropdown-item cyber-dropdown-item" to="/blog"><i className="bi bi-newspaper me-2" style={{ color: 'var(--cyan)' }}></i>Knowledge Base</Link></li>
-                  <li><Link className="dropdown-item cyber-dropdown-item" to="/essential-eight?bookCall=true"><i className="bi bi-telephone-outbound me-2" style={{ color: 'var(--blue)' }}></i>Book a Call Session</Link></li>
                   <li><a className="dropdown-item cyber-dropdown-item" href="https://t.me/WHTSIPADigitalSecurityWorld" target="_blank" rel="noopener noreferrer"><i className="bi bi-telegram me-2" style={{ color: '#0088cc' }}></i>Join our Community</a></li>
                 </ul>
               </li>

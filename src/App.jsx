@@ -1,5 +1,7 @@
+import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, useLocation, matchPath, Navigate } from 'react-router-dom'
-import { AuthProvider } from './context/AuthContext'
+import { AuthProvider, useAuth } from './context/AuthContext'
+import { hideDefaultBubble, autoHideOnClose, setTidioVisitor } from './utils/tidio'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ScrollManager from './components/ScrollManager'
@@ -33,6 +35,22 @@ const BARE_ROUTES = ['/signin', '/signup', '/verify-otp']
 
 function Layout() {
   const location = useLocation()
+  const { user } = useAuth()
+
+  // Hide Tidio's own floating bubble once on load — the app already has its
+  // own "Chat with an Active Representative" entry points on Threats,
+  // Contact, and Report, so a second floating bubble would be redundant.
+  useEffect(() => {
+    hideDefaultBubble()
+    autoHideOnClose()
+  }, [])
+
+  // Once a user is signed in, pass their name/email into Tidio so the human
+  // rep sees who they're talking to instead of an anonymous visitor.
+  useEffect(() => {
+    if (user) setTidioVisitor({ name: user.firstName || user.name, email: user.email })
+  }, [user])
+
   const isKnownRoute = KNOWN_ROUTES.some(pattern =>
     matchPath({ path: pattern, end: true }, location.pathname)
   )

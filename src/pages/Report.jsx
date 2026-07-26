@@ -7,6 +7,7 @@ import './Report.css'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import api from '../services/api'
+import { openLiveChat, onAgentJoined } from '../utils/tidio'
 
 /* ── Incident types (Updated per spec) ── */
 const INCIDENT_TYPES = [
@@ -423,11 +424,7 @@ function LiveChatModal({ isOpen, onClose, userName, setReportType, isHumanAgent 
   // Listen for real Tidio agent connection event
   useEffect(() => {
     localStorage.removeItem('whts_chat_ishuman')
-    if (window.tidioChatApi) {
-      try {
-        window.tidioChatApi.on('agentJoined', () => setIsHuman(true))
-      } catch { /* ignore */ }
-    }
+    onAgentJoined(() => setIsHuman(true))
   }, [])
 
   useEffect(() => {
@@ -471,14 +468,10 @@ function LiveChatModal({ isOpen, onClose, userName, setReportType, isHumanAgent 
         } else if (opt.action === 'open_tg') {
           window.open('https://t.me/Wehelptrackscammersipaddress', '_blank')
         } else if (opt.action === 'connect_human') {
-          setMessages(prev => [...prev, {
-            sender: 'agent',
-            text: "Connecting to an Active Representative...\n\n⏱️ Estimated wait time: 15–20 minutes.\n\nYou have been placed in the queue. Our AI assistant remains available here, or connect directly via WhatsApp or Telegram for instant human response.",
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          }])
-          if (window.tidioChatApi) {
-            try { window.tidioChatApi.show(); window.tidioChatApi.open() } catch { /* ignore */ }
-          }
+          openLiveChat(
+            `Visitor requesting an Active Representative from the Report page.${userName ? `\nName: ${userName}` : ''}`
+          )
+          onClose()
         }
       }, 1000)
       return
