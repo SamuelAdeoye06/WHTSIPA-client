@@ -22,6 +22,18 @@ import Blog from './pages/Blog'
 import VerifyOtp from './pages/VerifyOtp'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
+import AdminLayout from './pages/admin/AdminLayout'
+import AdminOverview from './pages/admin/AdminOverview'
+import AdminReports from './pages/admin/AdminReports'
+import AdminReportDetail from './pages/admin/AdminReportDetail'
+import AdminTickets from './pages/admin/AdminTickets'
+import AdminTicketDetail from './pages/admin/AdminTicketDetail'
+import AdminBookings from './pages/admin/AdminBookings'
+import AdminBookingDetail from './pages/admin/AdminBookingDetail'
+import AdminContactMessages from './pages/admin/AdminContactMessages'
+import AdminContactMessageDetail from './pages/admin/AdminContactMessageDetail'
+import AdminUsers from './pages/admin/AdminUsers'
+import AdminSettings from './pages/admin/AdminSettings'
 import './styles/cyber.css'
 
 const KNOWN_ROUTES = [
@@ -57,6 +69,8 @@ function Layout() {
   const isBare = BARE_ROUTES.includes(location.pathname) || !isKnownRoute
   const isThreatsPage = location.pathname === '/threats' ||
     location.pathname.startsWith('/threats/')
+    // Admin panel has its own sidebar shell — never show the public navbar/footer there
+  const isAdminPage = location.pathname === '/admin' || location.pathname.startsWith('/admin/')
   const isDarkTheme = isThreatsPage
 
   return (
@@ -82,10 +96,25 @@ function Layout() {
           <Route path="/blog"                   element={<Blog />} />
           <Route path="/threats-tools" element={<Navigate to="/threats" replace />} />
           <Route path="/recover"                element={<Navigate to="/report" state={{ scrollTo: 'recover' }} replace />} />
+          {/* ── Admin panel (parent/child routing — AdminLayout gates on user.role === 'admin') ── */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index                          element={<AdminOverview />} />
+            <Route path="reports"                 element={<AdminReports />} />
+            <Route path="reports/:id"             element={<AdminReportDetail />} />
+            <Route path="tickets"                 element={<AdminTickets />} />
+            <Route path="tickets/:id"              element={<AdminTicketDetail />} />
+            <Route path="bookings"                element={<AdminBookings />} />
+            <Route path="bookings/:id"             element={<AdminBookingDetail />} />
+            <Route path="contact-messages"        element={<AdminContactMessages />} />
+            <Route path="contact-messages/:id"    element={<AdminContactMessageDetail />} />
+            <Route path="users"                   element={<AdminUsers />} />
+            <Route path="settings"                element={<AdminSettings />} />
+          </Route>
+
           <Route path="*"                       element={<NotFound />} />
         </Routes>
       </main>
-      {!isBare && !isThreatsPage && <Footer />}
+      {!isBare && !isThreatsPage && !isAdminPage && <Footer />}
     </div>
   )
 }
