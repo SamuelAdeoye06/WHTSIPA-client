@@ -23,7 +23,11 @@ dist-ssr
 *.sln
 *.sw?
 
-public/*
+# Ignore large video files in public (videos are served via Cloudinary)
+public/*.mp4
+public/*.MP4
+public/*.mov
+public/*.MOV
 # Ignore sensitive local env files
 .env
 .env.local
