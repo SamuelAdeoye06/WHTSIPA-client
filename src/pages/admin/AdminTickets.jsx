@@ -64,30 +64,62 @@ export default function AdminTickets() {
         ) : filtered.length === 0 ? (
           <div className="admin-table-empty">No tickets match your filters.</div>
         ) : (
-          <div className="admin-table-wrap">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Ticket ID</th>
-                  <th>Name</th>
-                  <th>Type</th>
-                  <th>Submitted</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map(t => (
-                  <tr key={t._id} className="admin-table-row-clickable" onClick={() => navigate(`/admin/tickets/${t._id}`)}>
-                    <td>{t.ticketId}</td>
-                    <td>{t.name}</td>
-                    <td style={{ textTransform: 'capitalize' }}>{t.type}</td>
-                    <td>{new Date(t.createdAt).toLocaleDateString()}</td>
-                    <td><StatusPill status={t.status} /></td>
+          <>
+            {/* Desktop Table View */}
+            <div className="admin-table-wrap admin-desktop-table">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Ticket ID</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Submitted</th>
+                    <th>Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {filtered.map(t => (
+                    <tr key={t._id} className="admin-table-row-clickable" onClick={() => navigate(`/admin/tickets/${t._id}`)}>
+                      <td>{t.ticketId}</td>
+                      <td>{t.name}</td>
+                      <td style={{ textTransform: 'capitalize' }}>{t.type}</td>
+                      <td>{new Date(t.createdAt).toLocaleDateString()}</td>
+                      <td><StatusPill status={t.status} /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card List View */}
+            <div className="admin-mobile-cards">
+              {filtered.map(t => (
+                <div key={t._id} className="admin-mobile-card" onClick={() => navigate(`/admin/tickets/${t._id}`)}>
+                  <div className="admin-mobile-card-top">
+                    <div>
+                      <div className="admin-mobile-card-title">#{t.ticketId}</div>
+                      <div className="admin-mobile-card-sub">{t.name} ({t.email})</div>
+                    </div>
+                    <div className="admin-mobile-card-pills">
+                      <StatusPill status={t.status} />
+                    </div>
+                  </div>
+                  <div className="admin-mobile-card-body">
+                    <strong>Request/Threat:</strong> {t.threatTitle || t.summary || 'General Ticket'}
+                    {t.type && (
+                      <div style={{ marginTop: '0.2rem', textTransform: 'capitalize', color: '#64748b', fontSize: '0.78rem' }}>
+                        Category: {t.type} ticket
+                      </div>
+                    )}
+                  </div>
+                  <div className="admin-mobile-card-footer">
+                    <span>{new Date(t.createdAt).toLocaleDateString()}</span>
+                    <span className="admin-mobile-card-action">View details &rarr;</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>

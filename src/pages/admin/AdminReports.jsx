@@ -63,30 +63,62 @@ export default function AdminReports() {
         ) : filtered.length === 0 ? (
           <div className="admin-table-empty">No reports match your filters.</div>
         ) : (
-          <div className="admin-table-wrap">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Reporter</th>
-                  <th>Incident Type</th>
-                  <th>Type</th>
-                  <th>Submitted</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map(r => (
-                  <tr key={r._id} className="admin-table-row-clickable" onClick={() => navigate(`/admin/reports/${r._id}`)}>
-                    <td>{r.fullName || r.user?.firstName || 'Anonymous'}</td>
-                    <td>{r.incidentType}</td>
-                    <td style={{ textTransform: 'capitalize' }}>{r.reportType}</td>
-                    <td>{new Date(r.createdAt).toLocaleDateString()}</td>
-                    <td><StatusPill status={r.status} /></td>
+          <>
+            {/* Desktop Table View */}
+            <div className="admin-table-wrap admin-desktop-table">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Reporter</th>
+                    <th>Incident Type</th>
+                    <th>Type</th>
+                    <th>Submitted</th>
+                    <th>Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {filtered.map(r => (
+                    <tr key={r._id} className="admin-table-row-clickable" onClick={() => navigate(`/admin/reports/${r._id}`)}>
+                      <td>{r.fullName || r.user?.firstName || 'Anonymous'}</td>
+                      <td>{r.incidentType}</td>
+                      <td style={{ textTransform: 'capitalize' }}>{r.reportType}</td>
+                      <td>{new Date(r.createdAt).toLocaleDateString()}</td>
+                      <td><StatusPill status={r.status} /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card List View */}
+            <div className="admin-mobile-cards">
+              {filtered.map(r => (
+                <div key={r._id} className="admin-mobile-card" onClick={() => navigate(`/admin/reports/${r._id}`)}>
+                  <div className="admin-mobile-card-top">
+                    <div>
+                      <div className="admin-mobile-card-title">{r.fullName || r.user?.firstName || 'Anonymous'}</div>
+                      <div className="admin-mobile-card-sub">{r.email || 'No email provided'}</div>
+                    </div>
+                    <div className="admin-mobile-card-pills">
+                      <StatusPill status={r.status} />
+                    </div>
+                  </div>
+                  <div className="admin-mobile-card-body">
+                    <strong>Incident:</strong> {r.incidentType || 'Not specified'}
+                    {r.reportType && (
+                      <div style={{ marginTop: '0.2rem', textTransform: 'capitalize', color: '#64748b', fontSize: '0.78rem' }}>
+                        Scope: {r.reportType} report
+                      </div>
+                    )}
+                  </div>
+                  <div className="admin-mobile-card-footer">
+                    <span>{new Date(r.createdAt).toLocaleDateString()}</span>
+                    <span className="admin-mobile-card-action">View details &rarr;</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>

@@ -48,30 +48,57 @@ export default function AdminBookings() {
         ) : filtered.length === 0 ? (
           <div className="admin-table-empty">No bookings match your search.</div>
         ) : (
-          <div className="admin-table-wrap">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Preferred Date</th>
-                  <th>Preferred Time</th>
-                  <th>Submitted</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map(b => (
-                  <tr key={b._id} className="admin-table-row-clickable" onClick={() => navigate(`/admin/bookings/${b._id}`)}>
-                    <td>{b.name}</td>
-                    <td>{b.preferredDate}</td>
-                    <td>{b.preferredTime}</td>
-                    <td>{new Date(b.createdAt).toLocaleDateString()}</td>
-                    <td><StatusPill status={b.status} /></td>
+          <>
+            {/* Desktop Table View */}
+            <div className="admin-table-wrap admin-desktop-table">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Preferred Date</th>
+                    <th>Preferred Time</th>
+                    <th>Submitted</th>
+                    <th>Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {filtered.map(b => (
+                    <tr key={b._id} className="admin-table-row-clickable" onClick={() => navigate(`/admin/bookings/${b._id}`)}>
+                      <td>{b.name}</td>
+                      <td>{b.preferredDate}</td>
+                      <td>{b.preferredTime}</td>
+                      <td>{new Date(b.createdAt).toLocaleDateString()}</td>
+                      <td><StatusPill status={b.status} /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card List View */}
+            <div className="admin-mobile-cards">
+              {filtered.map(b => (
+                <div key={b._id} className="admin-mobile-card" onClick={() => navigate(`/admin/bookings/${b._id}`)}>
+                  <div className="admin-mobile-card-top">
+                    <div>
+                      <div className="admin-mobile-card-title">{b.name}</div>
+                      <div className="admin-mobile-card-sub">{b.email} {b.phone ? `• ${b.phone}` : ''}</div>
+                    </div>
+                    <div className="admin-mobile-card-pills">
+                      <StatusPill status={b.status} />
+                    </div>
+                  </div>
+                  <div className="admin-mobile-card-body">
+                    <strong>Requested Callback Slot:</strong> {b.preferredDate} at {b.preferredTime}
+                  </div>
+                  <div className="admin-mobile-card-footer">
+                    <span>Submitted: {new Date(b.createdAt).toLocaleDateString()}</span>
+                    <span className="admin-mobile-card-action">View session &rarr;</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>

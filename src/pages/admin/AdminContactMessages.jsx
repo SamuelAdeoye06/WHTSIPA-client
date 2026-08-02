@@ -58,28 +58,55 @@ export default function AdminContactMessages() {
         ) : filtered.length === 0 ? (
           <div className="admin-table-empty">No messages match your filters.</div>
         ) : (
-          <div className="admin-table-wrap">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Subject</th>
-                  <th>Received</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map(m => (
-                  <tr key={m._id} className="admin-table-row-clickable" onClick={() => navigate(`/admin/contact-messages/${m._id}`)}>
-                    <td style={{ fontWeight: m.status === 'unread' ? 700 : 400 }}>{m.name}</td>
-                    <td>{m.subject}</td>
-                    <td>{new Date(m.createdAt).toLocaleDateString()}</td>
-                    <td><StatusPill status={m.status} /></td>
+          <>
+            {/* Desktop Table View */}
+            <div className="admin-table-wrap admin-desktop-table">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Subject</th>
+                    <th>Received</th>
+                    <th>Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {filtered.map(m => (
+                    <tr key={m._id} className="admin-table-row-clickable" onClick={() => navigate(`/admin/contact-messages/${m._id}`)}>
+                      <td style={{ fontWeight: m.status === 'unread' ? 700 : 400 }}>{m.name}</td>
+                      <td>{m.subject}</td>
+                      <td>{new Date(m.createdAt).toLocaleDateString()}</td>
+                      <td><StatusPill status={m.status} /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card List View */}
+            <div className="admin-mobile-cards">
+              {filtered.map(m => (
+                <div key={m._id} className="admin-mobile-card" onClick={() => navigate(`/admin/contact-messages/${m._id}`)}>
+                  <div className="admin-mobile-card-top">
+                    <div>
+                      <div className="admin-mobile-card-title" style={{ fontWeight: m.status === 'unread' ? 800 : 600 }}>{m.name}</div>
+                      <div className="admin-mobile-card-sub">{m.email}</div>
+                    </div>
+                    <div className="admin-mobile-card-pills">
+                      <StatusPill status={m.status} />
+                    </div>
+                  </div>
+                  <div className="admin-mobile-card-body">
+                    <strong>Subject:</strong> {m.subject || 'General Enquiry'}
+                  </div>
+                  <div className="admin-mobile-card-footer">
+                    <span>Received: {new Date(m.createdAt).toLocaleDateString()}</span>
+                    <span className="admin-mobile-card-action">Read message &rarr;</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>
