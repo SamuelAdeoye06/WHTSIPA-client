@@ -187,8 +187,8 @@ export default function Footer() {
             </div>
             <div className="footer-bottom-links">
               <button className="footer-link-btn small" onClick={() => navigate('/contact')}>Contact</button>
-              <span className="text-muted-cyber small">Privacy Policy</span>
-              <span className="text-muted-cyber small">Terms of Use</span>
+              <button className="footer-link-btn small" onClick={() => navigate('/privacy')}>Privacy Policy</button>
+              <button className="footer-link-btn small" onClick={() => navigate('/terms')}>Terms of Use</button>
             </div>
           </div>
         </div>

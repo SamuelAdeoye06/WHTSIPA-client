@@ -444,7 +444,7 @@ export default function Navbar() {
 
               <li className="nav-item dropdown">
                 <a className={`nav-link dropdown-toggle nav-dropdown-toggle ${isAboutActive ? 'active-link' : ''}`}
-                  href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  href="#" onClick={e => e.preventDefault()} role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   About
                   <span className="nav-underline" aria-hidden="true"></span>
                 </a>
@@ -457,7 +457,7 @@ export default function Navbar() {
 
               <li className="nav-item dropdown">
                 <a className={`nav-link dropdown-toggle nav-dropdown-toggle ${isResourcesActive ? 'active-link' : ''}`}
-                  href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  href="#" onClick={e => e.preventDefault()} role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Resources
                   <span className="nav-underline" aria-hidden="true"></span>
                 </a>
@@ -470,7 +470,7 @@ export default function Navbar() {
 
               <li className="nav-item dropdown">
                 <a className={`nav-link dropdown-toggle nav-dropdown-toggle ${isReportActive ? 'active-link' : ''}`}
-                  href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  href="#" onClick={e => e.preventDefault()} role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Report &amp; Recover
                   <span className="nav-underline" aria-hidden="true"></span>
                 </a>

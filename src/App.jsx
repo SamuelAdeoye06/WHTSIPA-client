@@ -34,16 +34,17 @@ import AdminContactMessages from './pages/admin/AdminContactMessages'
 import AdminContactMessageDetail from './pages/admin/AdminContactMessageDetail'
 import AdminUsers from './pages/admin/AdminUsers'
 import AdminSettings from './pages/admin/AdminSettings'
+import PrivacyTerms from './pages/PrivacyTerms'
 import './styles/cyber.css'
 
 const KNOWN_ROUTES = [
   '/', '/threats', '/threats/:slug', '/report',
-  '/signin', '/signup', '/verify-otp',
+  '/signin', '/signup', '/verify-otp', '/forgot-password', '/reset-password',
   '/about', '/about-officials', '/contact',
-  '/essential-eight', '/for-victims-government', '/blog', '/threats-tools',
-  '/recover'
+  '/essential-eight', '/for-victims-government', '/blog', '/threats-tools', '/tools',
+  '/recover', '/privacy', '/terms'
 ]
-const BARE_ROUTES = ['/signin', '/signup', '/verify-otp']
+const BARE_ROUTES = ['/signin', '/signup', '/verify-otp', '/forgot-password', '/reset-password']
 
 function Layout() {
   const location = useLocation()
@@ -94,7 +95,10 @@ function Layout() {
           <Route path="/essential-eight"        element={<EssentialEight />} />
           <Route path="/for-victims-government" element={<ForVictimsGovernment />} />
           <Route path="/blog"                   element={<Blog />} />
-          <Route path="/threats-tools" element={<Navigate to="/threats" replace />} />
+          <Route path="/threats-tools"          element={<ThreatsTools />} />
+          <Route path="/tools"                  element={<ThreatsTools />} />
+          <Route path="/privacy"                element={<PrivacyTerms mode="privacy" />} />
+          <Route path="/terms"                  element={<PrivacyTerms mode="terms" />} />
           <Route path="/recover"                element={<Navigate to="/report" state={{ scrollTo: 'recover' }} replace />} />
           {/* ── Admin panel (parent/child routing — AdminLayout gates on user.role === 'admin') ── */}
           <Route path="/admin" element={<AdminLayout />}>

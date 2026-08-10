@@ -18,6 +18,8 @@ const PAGE_TITLES = {
   '/about-officials':        'Meet the Officials — WHTSIPA Team & Partners',
   '/contact':                'Contact WHTSIPA — Get Support & Report an Incident',
   '/threats-tools':          'Security Tools & Threat Resources — WHTSIPA',
+  '/privacy':                'Privacy Policy — WHTSIPA',
+  '/terms':                  'Terms of Service — WHTSIPA',
 }
 
 export default function ScrollManager() {

@@ -277,8 +277,14 @@ function ContactLiveChat({ isOpen, onClose, userName, navigate, isHumanAgent = f
           go_report_personal: () => { onClose(); navigate('/report') },
           go_report_public:   () => { onClose(); navigate('/report') },
           go_threats:         () => { onClose(); navigate('/threats') },
-          go_tools:           () => { onClose(); navigate('/tools') },
-          go_hire:            () => { onClose(); navigate('/tools') },
+          go_tools:           () => { onClose(); navigate('/threats-tools') },
+          go_hire:            () => {
+            onClose()
+            setTimeout(() => {
+              const el = document.getElementById('contact')
+              if (el) el.scrollIntoView({ behavior: 'smooth' })
+            }, 100)
+          },
           go_signup:          () => { onClose(); navigate('/signup') },
           go_forgot_password: () => { onClose(); navigate('/forgot-password') },
           open_wa:            () => window.open(`https://wa.me/${WA_NUMBER}`, '_blank'),

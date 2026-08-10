@@ -72,10 +72,10 @@ export default function ForVictimsGovernment() {
                 cybercrime, and government agencies and organisations working to combat it.
                 </p>
                 <div className="d-flex justify-content-center gap-3 flex-wrap">
-                <a className="btn btn-danger px-4" href="#victims" style={{ borderRadius: 12, fontWeight: 600 }}>
+                <a className="btn btn-danger px-4" href="#victims" onClick={e => { e.preventDefault(); document.getElementById('victims')?.scrollIntoView({ behavior: 'smooth' }) }} style={{ borderRadius: 12, fontWeight: 600 }}>
                     <i className="bi bi-heart me-2"></i>I'm a Victim — Help Me
                 </a>
-                <a className="btn btn-primary px-4" href="#government" style={{ borderRadius: 12, fontWeight: 600 }}>
+                <a className="btn btn-primary px-4" href="#government" onClick={e => { e.preventDefault(); document.getElementById('government')?.scrollIntoView({ behavior: 'smooth' }) }} style={{ borderRadius: 12, fontWeight: 600 }}>
                     <i className="bi bi-building me-2"></i>Government &amp; Organisations
                 </a>
                 </div>

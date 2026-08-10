@@ -201,7 +201,10 @@ function ThreatsChatModal({ isOpen, onClose, navigate, isHumanAgent = false }) {
         setIsTyping(false)
         const actions = {
           go_report:          () => { onClose(); navigate('/report') },
-          go_tools:           () => { onClose(); navigate('/tools') },
+          go_tools:           () => {
+            onClose()
+            setTimeout(() => document.getElementById('threats-tools')?.scrollIntoView({ behavior: 'smooth' }), 100)
+          },
           go_threats_library: () => {
             onClose()
             setTimeout(() => document.getElementById('types-of-threats')?.scrollIntoView({ behavior: 'smooth' }), 100)
