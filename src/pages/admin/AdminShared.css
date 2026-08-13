@@ -69,6 +69,7 @@
 .admin-pill-replied,
 .admin-pill-confirmed,
 .admin-pill-completed   { background: #dcfce7; color: #15803d; }
+.admin-pill-ended       { background: #e0f2fe; color: #0369a1; }
 .admin-pill-cancelled   { background: #f3f4f6; color: #6b7280; }
 
 .admin-status-select {

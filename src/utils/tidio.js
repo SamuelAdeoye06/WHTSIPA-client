@@ -45,6 +45,10 @@ export function openLiveChat(starterMessage) {
     try {
       api.show()
       api.open()
+      // Send official WHTSIPA service greeting message into Tidio
+      if (api.messageFromService) {
+        api.messageFromService("Welcome to WHTSIPA Help portal. How can we assist you today? ✅")
+      }
       if (starterMessage) api.messageFromVisitor(starterMessage)
     } catch { /* ignore */ }
   })

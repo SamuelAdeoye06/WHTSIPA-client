@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
 import { openLiveChat, onAgentJoined } from '../utils/tidio'
+import ChatSessionHistory from './ChatSessionHistory'
 import './WhatsipModal.css'
 
 /* ── Contact details ── */
@@ -189,11 +190,12 @@ function ToolsLiveChat({ ticketId, threatTitle, onClose, onBack, user, userName,
     }
     return [{
       sender: 'agent',
-      text: `Hello ${userName || 'there'}! Welcome to WHTSIPA Tools Support.${threatTitle ? ` I see you need tools for: ${threatTitle}.` : ''} I'm here to help you find, request, or purchase the right security tools. What can I assist you with?`,
+      text: `Hello ${userName || 'there'}! Welcome to WHTSIPA Help portal. How can we assist you today? ✅`,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     }]
   })
   const [isTyping, setIsTyping] = useState(false)
+  const [showHistory, setShowHistory] = useState(!!user)
   const chatEndRef = useRef(null)
 
   // Clear any stale "human" flag set by old code (open_tg incorrectly set it)
@@ -262,10 +264,15 @@ function ToolsLiveChat({ ticketId, threatTitle, onClose, onBack, user, userName,
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           }])
         } else if (opt.action === 'connect_human') {
+          setIsHuman(true)
+          setMessages(prev => [...prev, {
+            sender: 'agent',
+            text: `Connecting you with an Active Representative...\n\n⏱️ Estimated wait time: 15–20 minutes.\n\nYour Ticket ID is: ${ticketId} — an available specialist will be assigned and will respond directly to you shortly.`,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          }])
           openLiveChat(
             `Visitor requesting an Active Representative from the Threats/Tools page.\nTicket ID: ${ticketId}${threatTitle ? `\nTool: ${threatTitle}` : ''}${user?.email ? `\nAccount: ${user.email}` : ''}`
           )
-          onClose()
         }
       }, 900)
       return
@@ -301,9 +308,9 @@ function ToolsLiveChat({ ticketId, threatTitle, onClose, onBack, user, userName,
         </div>
         <div className="wm-tools-chat-info">
           <div className="wm-tools-chat-title">WHTSIPA Live Support</div>
-          <div className="wm-tools-chat-status">
+          <div className="wm-tools-chat-status" style={{ fontWeight: 700 }}>
             <span className="wm-tools-status-dot"></span>
-            {isHuman ? 'Active Representative Online' : 'AI Representative Online'}
+            {isHuman ? `Active Representative (${messages.length})` : `Ai Representative (${messages.length})`}
           </div>
         </div>
         <button className="wm-close wm-tools-close-btn" onClick={onClose} aria-label="Close">
@@ -311,40 +318,53 @@ function ToolsLiveChat({ ticketId, threatTitle, onClose, onBack, user, userName,
         </button>
       </div>
 
-      {/* Messages */}
-      <div className="wm-tools-chat-body">
-        {messages.map((m, i) => (
-          <div key={i} className={`wm-tools-msg-row ${m.sender === 'user' ? 'wm-tools-user-row' : 'wm-tools-agent-row'}`}>
-            <div className="wm-tools-bubble">
-              <div className="wm-tools-msg-text">{m.text}</div>
-              <div className="wm-tools-msg-time">{m.time}</div>
-            </div>
-          </div>
-        ))}
-        {isTyping && (
-          <div className="wm-tools-msg-row wm-tools-agent-row">
-            <div className="wm-tools-bubble wm-tools-typing">
-              <span className="wm-tools-typing-dot"></span>
-              <span className="wm-tools-typing-dot"></span>
-              <span className="wm-tools-typing-dot"></span>
-            </div>
-          </div>
-        )}
-        <div ref={chatEndRef} />
-      </div>
+      {/* Session history (logged-in users only) */}
+      {showHistory && (
+        <ChatSessionHistory
+          user={user}
+          chatLabel="New Chat"
+          onNewChat={() => setShowHistory(false)}
+        />
+      )}
 
-      {/* Options */}
-      {!isTyping && nodeData?.options && (
-        <div className="wm-tools-options-panel">
-          <div className="wm-tools-options-label">Select an option:</div>
-          <div className="d-flex flex-column gap-1">
-            {nodeData.options.map((opt, i) => (
-              <button key={i} type="button" className="wm-tools-opt-btn" onClick={() => selectOption(opt)}>
-                {opt.text}
-              </button>
+      {/* Messages */}
+      {!showHistory && (
+        <>
+          <div className="wm-tools-chat-body">
+            {messages.map((m, i) => (
+              <div key={i} className={`wm-tools-msg-row ${m.sender === 'user' ? 'wm-tools-user-row' : 'wm-tools-agent-row'}`}>
+                <div className="wm-tools-bubble">
+                  <div className="wm-tools-msg-text">{m.text}</div>
+                  <div className="wm-tools-msg-time">{m.time}</div>
+                </div>
+              </div>
             ))}
+            {isTyping && (
+              <div className="wm-tools-msg-row wm-tools-agent-row">
+                <div className="wm-tools-bubble wm-tools-typing">
+                  <span className="wm-tools-typing-dot"></span>
+                  <span className="wm-tools-typing-dot"></span>
+                  <span className="wm-tools-typing-dot"></span>
+                </div>
+              </div>
+            )}
+            <div ref={chatEndRef} />
           </div>
-        </div>
+
+          {/* Options */}
+          {!isTyping && nodeData?.options && (
+            <div className="wm-tools-options-panel">
+              <div className="wm-tools-options-label">Select an option:</div>
+              <div className="d-flex flex-column gap-1">
+                {nodeData.options.map((opt, i) => (
+                  <button key={i} type="button" className="wm-tools-opt-btn" onClick={() => selectOption(opt)}>
+                    {opt.text}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   )

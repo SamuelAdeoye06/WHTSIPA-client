@@ -20,6 +20,15 @@ const FIELD_LABELS = [
   ['duration', 'Duration'],
 ]
 
+const CLOSING_MESSAGES = [
+  { value: '', label: '— Select closing reason —' },
+  { value: "Due to our chat becoming inactive, I'll go ahead and end this chat session. If you still need any assistance, feel free to contact us. Thanks for reaching out.", label: 'Inactivity (12h auto-close)' },
+  { value: 'Your incident report has been successfully filed and assigned to an investigation unit. You can track progress on your dashboard.', label: 'Report Submitted' },
+  { value: 'This case has been marked as resolved by our specialist team. Thank you for using WHTSIPA Support.', label: 'Case Solved / Resolved' },
+  { value: 'Your case is actively under review by our senior investigation unit. Further updates will be communicated directly.', label: 'Still Under Investigation' },
+  { value: 'Thank you for contacting WHTSIPA Active Support. If you need anything further, please reach out to us. Have a great day!', label: 'General Close' },
+]
+
 export default function AdminTicketDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -29,6 +38,7 @@ export default function AdminTicketDetail() {
   const [savingStatus, setSavingStatus] = useState(false)
   const [confirmOpen, setConfirmOpen]   = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [closingMsg, setClosingMsg] = useState('')
 
   useEffect(() => {
     api.get('/tickets/all')
@@ -45,8 +55,10 @@ export default function AdminTicketDetail() {
     const status = e.target.value
     setSavingStatus(true)
     try {
-      const { data } = await api.patch(`/tickets/${id}/status`, { status })
-      setTicket(prev => ({ ...prev, status: data.status }))
+      const payload = { status }
+      if (status === 'ended' && closingMsg) payload.closingSummary = closingMsg
+      const { data } = await api.patch(`/tickets/${id}/status`, payload)
+      setTicket(prev => ({ ...prev, status: data.status, closingSummary: data.closingSummary }))
     } catch {
       alert('Could not update status. Please try again.')
     } finally {
@@ -90,11 +102,19 @@ export default function AdminTicketDetail() {
           <p className="admin-page-sub">{ticket.name} · {new Date(ticket.createdAt).toLocaleString()}</p>
         </div>
         <div className="admin-detail-actions">
-          <select className="admin-status-select" value={ticket.status} onChange={handleStatusChange} disabled={savingStatus}>
-            <option value="open">Open</option>
-            <option value="in-progress">In progress</option>
-            <option value="resolved">Resolved</option>
-          </select>
+          <div className="d-flex flex-column gap-2">
+            <select className="admin-status-select" value={ticket.status} onChange={handleStatusChange} disabled={savingStatus}>
+              <option value="open">Open</option>
+              <option value="in-progress">In progress</option>
+              <option value="resolved">Resolved</option>
+              <option value="ended">Ended</option>
+            </select>
+            {ticket.status !== 'ended' && (
+              <select className="admin-status-select" value={closingMsg} onChange={e => setClosingMsg(e.target.value)} style={{ fontSize: '0.78rem' }}>
+                {CLOSING_MESSAGES.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+              </select>
+            )}
+          </div>
           <button className="admin-btn admin-btn-ghost" onClick={handleExportPDF}>
             <i className="bi bi-file-earmark-pdf"></i> Download PDF
           </button>
@@ -131,6 +151,24 @@ export default function AdminTicketDetail() {
             <div className="admin-detail-field-label">Status</div>
             <div className="admin-detail-field-value"><StatusPill status={ticket.status} /></div>
           </div>
+          {ticket.messageCount > 0 && (
+            <div>
+              <div className="admin-detail-field-label">Message Count</div>
+              <div className="admin-detail-field-value">{ticket.messageCount}</div>
+            </div>
+          )}
+          {ticket.hasHumanAgent && (
+            <div>
+              <div className="admin-detail-field-label">Agent Type</div>
+              <div className="admin-detail-field-value">Active Representative</div>
+            </div>
+          )}
+          {ticket.closingSummary && (
+            <div className="admin-detail-field-full">
+              <div className="admin-detail-field-label">Closing Summary</div>
+              <div className="admin-detail-field-value" style={{ fontStyle: 'italic', color: '#0369a1' }}>{ticket.closingSummary}</div>
+            </div>
+          )}
         </div>
       </div>
 

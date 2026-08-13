@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import api from '../services/api'
 import { openLiveChat, onAgentJoined } from '../utils/tidio'
+import ChatSessionHistory from '../components/ChatSessionHistory'
 
 /* ── Incident types (Updated per spec) ── */
 const INCIDENT_TYPES = [
@@ -407,18 +408,19 @@ const CHAT_FLOW = {
 }
 
 /* ── Live Support Chat Component ── */
-function LiveChatModal({ isOpen, onClose, userName, setReportType, isHumanAgent = false }) {
+function LiveChatModal({ isOpen, onClose, userName, user, setReportType, isHumanAgent = false }) {
   const [currentNode, setCurrentNode] = useState('main')
   const [isHuman, setIsHuman] = useState(isHumanAgent)
   const [messages, setMessages] = useState([
     {
       sender: 'agent',
-      text: `Hello ${userName || 'there'}! Welcome to WHTSIPA Secure Live Support. I'm your AI assistant. How can I help you with your incident reports, threat recovery, or related assistance today?`,
+      text: `Hello ${userName || 'there'}! Welcome to WHTSIPA Help portal. How can we assist you today? ✅`,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     }
   ])
   const [inputText, setInputText] = useState('')
   const [isTyping, setIsTyping] = useState(false)
+  const [showHistory, setShowHistory] = useState(!!user)
   const chatEndRef = useRef(null)
 
   // Listen for real Tidio agent connection event
@@ -468,10 +470,15 @@ function LiveChatModal({ isOpen, onClose, userName, setReportType, isHumanAgent 
         } else if (opt.action === 'open_tg') {
           window.open('https://t.me/Wehelptrackscammersipaddress', '_blank')
         } else if (opt.action === 'connect_human') {
+          setIsHuman(true)
+          setMessages(prev => [...prev, {
+            sender: 'agent',
+            text: `Connecting you with an Active Representative...\n\n⏱️ Estimated wait time: 15–20 minutes.\n\nAn available specialist will be assigned to your incident report and will respond directly to you shortly.`,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          }])
           openLiveChat(
             `Visitor requesting an Active Representative from the Report page.${userName ? `\nName: ${userName}` : ''}`
           )
-          onClose()
         }
       }, 1000)
       return
@@ -530,9 +537,9 @@ function LiveChatModal({ isOpen, onClose, userName, setReportType, isHumanAgent 
             </div>
             <div>
               <div className="livechat-title text-white">WHTSIPA Live Support</div>
-              <div className="livechat-status">
+              <div className="livechat-status" style={{ fontWeight: 700 }}>
                 <span className="livechat-status-dot"></span>
-                {isHuman ? 'Active Representative Online' : 'AI Representative Online'}
+                {isHuman ? `Active Representative (${messages.length})` : `Ai Representative (${messages.length})`}
               </div>
             </div>
           </div>
@@ -541,68 +548,81 @@ function LiveChatModal({ isOpen, onClose, userName, setReportType, isHumanAgent 
           </button>
         </div>
 
-        {/* Chat Body */}
-        <div className="livechat-body">
-          {messages.map((m, idx) => (
-            <div key={idx} className={`livechat-msg-row ${m.sender === 'user' ? 'user-row' : 'agent-row'}`}>
-              <div className="livechat-bubble">
-                <div className="msg-text">{m.text}</div>
-                <div className="msg-time">{m.time}</div>
-              </div>
-            </div>
-          ))}
-          {isTyping && (
-            <div className="livechat-msg-row agent-row">
-              <div className="livechat-bubble typing-bubble">
-                <span className="typing-dot"></span>
-                <span className="typing-dot"></span>
-                <span className="typing-dot"></span>
-              </div>
-            </div>
-          )}
-          <div ref={chatEndRef} />
-        </div>
-
-        {/* Quick Options Selection */}
-        {!isTyping && currentNodeData && currentNodeData.options && (
-          <div className="livechat-options-panel p-2">
-            <div className="d-flex flex-column gap-1">
-              {currentNodeData.options.map((opt, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  className="btn btn-sm livechat-opt-btn"
-                  onClick={() => selectOption(opt)}
-                >
-                  {opt.text}
-                </button>
-              ))}
-            </div>
-          </div>
+        {/* Session history home screen (logged-in users only) */}
+        {showHistory && (
+          <ChatSessionHistory
+            user={user}
+            chatLabel="New Chat"
+            onNewChat={() => setShowHistory(false)}
+          />
         )}
 
-        {/* Chat Footer */}
-        <form className="livechat-footer" onSubmit={handleSend}>
-          <input
-            type="text"
-            className="form-control livechat-input"
-            placeholder="Type your message here..."
-            value={inputText}
-            onChange={e => setInputText(e.target.value)}
-          />
-          <button type="submit" className="btn btn-primary livechat-send-btn" style={{ color: '#ffffff', backgroundColor: '#1d4ed8' }}>
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              width="16" 
-              height="16" 
-              fill="#ffffff" 
-              viewBox="0 0 16 16"
-              style={{ fill: '#ffffff', color: '#ffffff', display: 'block' }}
-            >
-              <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/>
-            </svg>
-          </button>
-        </form>
+        {/* Chat Body */}
+        {!showHistory && (
+          <>
+            <div className="livechat-body">
+              {messages.map((m, idx) => (
+                <div key={idx} className={`livechat-msg-row ${m.sender === 'user' ? 'user-row' : 'agent-row'}`}>
+                  <div className="livechat-bubble">
+                    <div className="msg-text">{m.text}</div>
+                    <div className="msg-time">{m.time}</div>
+                  </div>
+                </div>
+              ))}
+              {isTyping && (
+                <div className="livechat-msg-row agent-row">
+                  <div className="livechat-bubble typing-bubble">
+                    <span className="typing-dot"></span>
+                    <span className="typing-dot"></span>
+                    <span className="typing-dot"></span>
+                  </div>
+                </div>
+              )}
+              <div ref={chatEndRef} />
+            </div>
+
+            {/* Quick Options Selection */}
+            {!isTyping && currentNodeData && currentNodeData.options && (
+              <div className="livechat-options-panel p-2">
+                <div className="d-flex flex-column gap-1">
+                  {currentNodeData.options.map((opt, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      className="btn btn-sm livechat-opt-btn"
+                      onClick={() => selectOption(opt)}
+                    >
+                      {opt.text}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Chat Footer */}
+            <form className="livechat-footer" onSubmit={handleSend}>
+              <input
+                type="text"
+                className="form-control livechat-input"
+                placeholder="Type your message here..."
+                value={inputText}
+                onChange={e => setInputText(e.target.value)}
+              />
+              <button type="submit" className="btn btn-primary livechat-send-btn" style={{ color: '#ffffff', backgroundColor: '#1d4ed8' }}>
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  width="16" 
+                  height="16" 
+                  fill="#ffffff" 
+                  viewBox="0 0 16 16"
+                  style={{ fill: '#ffffff', color: '#ffffff', display: 'block' }}
+                >
+                  <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/>
+                </svg>
+              </button>
+            </form>
+          </>
+        )}
       </div>
     </div>
   )
@@ -2126,6 +2146,7 @@ export default function Report() {
           isOpen={showLiveChat}
           onClose={() => setShowLiveChat(false)}
           userName={user?.firstName}
+          user={user}
           setReportType={setReportType}
         />
       </>

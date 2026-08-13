@@ -865,3 +865,308 @@ textarea.cyber-input { resize: vertical; min-height: 120px; }
     border: none !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════
+   CHAT SESSION HISTORY  (shared across all live-chat modals)
+   ══════════════════════════════════════════════════════════ */
+.csh-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: #f9fafb;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* ── Header bar ── */
+.csh-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 1rem;
+  background: #f1f5f9;
+  border-bottom: 1px solid #e2e8f0;
+  flex-shrink: 0;
+}
+.csh-header-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.csh-unread-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #2563eb;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.csh-new-btn {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #2563eb;
+  background: none;
+  border: 1px solid #bfdbfe;
+  border-radius: 20px;
+  padding: 0.28rem 0.75rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.csh-new-btn:hover {
+  background: #2563eb;
+  color: #fff;
+}
+
+/* ── Loading / empty ── */
+.csh-loading {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  flex: 1;
+}
+.csh-empty {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #9ca3af;
+  font-size: 0.82rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.csh-empty-icon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.5rem;
+  opacity: 0.4;
+}
+.csh-start-btn {
+  margin-top: 0.75rem;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 0.4rem 1.1rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.csh-start-btn:hover { background: #1d4ed8; }
+
+/* ── Session list — flex 1 fills remaining modal space ── */
+.csh-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+/* ── Sticky bottom action footer ── */
+.csh-footer {
+  flex-shrink: 0;
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* ── Single session item ── */
+.csh-item {
+  border-bottom: 1px solid #e5e7eb;
+  transition: background 0.1s;
+}
+.csh-item--ended { background: #fafafa; }
+.csh-item--active { background: #fff; }
+.csh-item--open { background: #eff6ff; }
+
+.csh-item-header {
+  width: 100%;
+  display: block;
+  padding: 0.65rem 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s;
+}
+.csh-item-header:hover { background: #f1f5f9; }
+
+.csh-item-header-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+}
+
+.csh-item-row-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.csh-item-type-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.csh-item-row-sub {
+  font-size: 0.72rem;
+  color: #4b5563;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-left: 0.2rem;
+  line-height: 1.3;
+}
+
+.csh-unread-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2563eb;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 2px #bfdbfe;
+  animation: cshPulse 2s infinite;
+}
+@keyframes cshPulse {
+  0%, 100% { box-shadow: 0 0 0 2px #bfdbfe; }
+  50%       { box-shadow: 0 0 0 4px #93c5fd; }
+}
+.csh-item-type {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #1e293b;
+  white-space: nowrap;
+}
+.csh-item-right {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+.csh-item-date {
+  font-size: 0.66rem;
+  color: #9ca3af;
+  white-space: nowrap;
+}
+.csh-chevron {
+  font-size: 0.7rem;
+  color: #9ca3af;
+}
+
+/* ── Expanded body ── */
+.csh-item-body {
+  padding: 0.75rem 1rem 1rem;
+  animation: cshSlideIn 0.18s ease;
+}
+@keyframes cshSlideIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.csh-ticket-id {
+  font-size: 0.68rem;
+  color: #6b7280;
+  font-family: monospace;
+  margin-bottom: 0.6rem;
+}
+
+/* ── Ended session locked card ── */
+.csh-ended-card {
+  display: flex;
+  gap: 0.75rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.85rem;
+  position: relative;
+  overflow: hidden;
+}
+.csh-ended-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: #64748b;
+  border-radius: 10px 0 0 10px;
+}
+.csh-ended-icon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+.csh-ended-content { flex: 1; min-width: 0; }
+.csh-ended-title {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #374151;
+  margin-bottom: 0.3rem;
+}
+.csh-ended-summary {
+  font-size: 0.78rem;
+  color: #4b5563;
+  margin: 0 0 0.5rem;
+  line-height: 1.5;
+  font-style: italic;
+}
+.csh-ended-hint {
+  font-size: 0.68rem;
+  color: #9ca3af;
+}
+
+/* ── Active session actions ── */
+.csh-item-summary {
+  font-size: 0.76rem;
+  color: #4b5563;
+  margin-bottom: 0.6rem;
+  line-height: 1.45;
+}
+.csh-active-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.csh-active-hint {
+  font-size: 0.68rem;
+  color: #9ca3af;
+}
+.csh-continue-btn {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #2563eb;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 20px;
+  padding: 0.3rem 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.csh-continue-btn:hover {
+  background: #2563eb;
+  color: #fff;
+}

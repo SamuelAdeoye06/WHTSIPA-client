@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import api from '../services/api'
 import { useAuth } from '../context/AuthContext'
+import ChatSessionHistory from '../components/ChatSessionHistory'
 import '../styles/cyber.css'
 import './Contact.css'
 import './Report.css'   /* shared livechat modal styles */
@@ -237,16 +238,17 @@ const SITE_CHAT_FLOW = {
 /* ══════════════════════════════════════════════════════════
    SITE-WIDE LIVE CHAT MODAL COMPONENT
    ══════════════════════════════════════════════════════════ */
-function ContactLiveChat({ isOpen, onClose, userName, navigate, isHumanAgent = false }) {
+function ContactLiveChat({ isOpen, onClose, userName, user, navigate, isHumanAgent = false }) {
   const [currentNode, setCurrentNode] = useState('main')
   const [isHuman, setIsHuman] = useState(isHumanAgent)
   const [messages, setMessages]       = useState([{
     sender: 'agent',
-    text:   `Hello ${userName || 'there'}! Welcome to WHTSIPA Central Support. I can help with anything on our platform — reports, threats, tools, accounts, hiring, and more. What do you need today?`,
+    text:   `Hello ${userName || 'there'}! Welcome to WHTSIPA Help portal. How can we assist you today? ✅`,
     time:   new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
   }])
   const [inputText, setInputText] = useState('')
   const [isTyping,  setIsTyping]  = useState(false)
+  const [showHistory, setShowHistory] = useState(!!user)
   const chatEndRef = useRef(null)
 
   // Listen for real Tidio agent connection event
@@ -291,10 +293,15 @@ function ContactLiveChat({ isOpen, onClose, userName, navigate, isHumanAgent = f
           open_tg:            () => window.open(`https://t.me/${TG_HANDLE}`, '_blank'),
           open_email:         () => window.open(`mailto:${SUPPORT_EMAIL}`, '_blank'),
           connect_human:      () => {
+            setIsHuman(true)
+            setMessages(prev => [...prev, {
+              sender: 'agent',
+              text: `Connecting you with an Active Representative...\n\n⏱️ Estimated wait time: 15–20 minutes.\n\nAn available specialist will be assigned and will respond directly to you shortly.`,
+              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            }])
             openLiveChat(
               `Visitor requesting an Active Representative from the Contact page.${userName ? `\nName: ${userName}` : ''}`
             )
-            onClose()
           }
         }
         actionMap[opt.action]?.()
@@ -350,9 +357,9 @@ function ContactLiveChat({ isOpen, onClose, userName, navigate, isHumanAgent = f
             </div>
             <div>
               <div className="livechat-title text-white">WHTSIPA Live Support</div>
-              <div className="livechat-status">
+              <div className="livechat-status" style={{ fontWeight: 700 }}>
                 <span className="livechat-status-dot"></span>
-                {isHuman ? 'Active Representative Online' : 'AI Representative Online'}
+                {isHuman ? `Active Representative (${messages.length})` : `Ai Representative (${messages.length})`}
               </div>
             </div>
           </div>
@@ -361,8 +368,19 @@ function ContactLiveChat({ isOpen, onClose, userName, navigate, isHumanAgent = f
           </button>
         </div>
 
+        {/* Session history home screen (logged-in users only) */}
+        {showHistory && (
+          <ChatSessionHistory
+            user={user}
+            chatLabel="New Chat"
+            onNewChat={() => setShowHistory(false)}
+          />
+        )}
+
         {/* Messages */}
-        <div className="livechat-body">
+        {!showHistory && (
+          <>
+            <div className="livechat-body">
           {messages.map((m, idx) => (
             <div key={idx} className={`livechat-msg-row ${m.sender === 'user' ? 'user-row' : 'agent-row'}`}>
               <div className="livechat-bubble">
@@ -383,44 +401,46 @@ function ContactLiveChat({ isOpen, onClose, userName, navigate, isHumanAgent = f
           <div ref={chatEndRef} />
         </div>
 
-        {/* Quick options */}
-        {!isTyping && currentNodeData?.options && (
-          <div className="livechat-options-panel p-2">
-            <div className="d-flex flex-column gap-1">
-              {currentNodeData.options.map((opt, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  className="btn btn-sm livechat-opt-btn"
-                  onClick={() => selectOption(opt)}
-                >
-                  {opt.text}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+            {/* Quick options */}
+            {!isTyping && currentNodeData?.options && (
+              <div className="livechat-options-panel p-2">
+                <div className="d-flex flex-column gap-1">
+                  {currentNodeData.options.map((opt, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      className="btn btn-sm livechat-opt-btn"
+                      onClick={() => selectOption(opt)}
+                    >
+                      {opt.text}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
-        {/* Input footer */}
-        <form className="livechat-footer" onSubmit={handleSend}>
-          <input
-            type="text"
-            className="form-control livechat-input"
-            placeholder="Type a message…"
-            value={inputText}
-            onChange={e => setInputText(e.target.value)}
-          />
-          <button
-            type="submit"
-            className="btn btn-primary livechat-send-btn"
-            style={{ color: '#ffffff', backgroundColor: '#1d4ed8' }}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffffff" viewBox="0 0 16 16"
-              style={{ fill: '#ffffff', display: 'block' }}>
-              <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/>
-            </svg>
-          </button>
-        </form>
+            {/* Input footer */}
+            <form className="livechat-footer" onSubmit={handleSend}>
+              <input
+                type="text"
+                className="form-control livechat-input"
+                placeholder="Type a message…"
+                value={inputText}
+                onChange={e => setInputText(e.target.value)}
+              />
+              <button
+                type="submit"
+                className="btn btn-primary livechat-send-btn"
+                style={{ color: '#ffffff', backgroundColor: '#1d4ed8' }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffffff" viewBox="0 0 16 16"
+                  style={{ fill: '#ffffff', display: 'block' }}>
+                  <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/>
+                </svg>
+              </button>
+            </form>
+          </>
+        )}
 
       </div>
     </div>
@@ -767,6 +787,7 @@ export default function Contact() {
         onClose={() => setShowChat(false)}
         navigate={navigate}
         userName={user?.firstName}
+        user={user}
       />
 
     </div>
