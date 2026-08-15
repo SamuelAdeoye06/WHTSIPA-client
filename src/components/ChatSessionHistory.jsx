@@ -74,7 +74,7 @@ export default function ChatSessionHistory({ user, onNewChat, chatLabel = 'New C
           Previous Sessions
           {unreadCount > 0 && (
             <span className="csh-unread-badge" title={`${unreadCount} unread update${unreadCount > 1 ? 's' : ''}`}>
-              {unreadCount}
+              {unreadCount > 6 ? '+6' : unreadCount}
             </span>
           )}
         </span>
