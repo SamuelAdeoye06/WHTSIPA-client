@@ -907,7 +907,7 @@ textarea.cyber-input { resize: vertical; min-height: 120px; }
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #2563eb;
+  background: #dc2626;
   color: #fff;
   font-size: 0.65rem;
   font-weight: 800;
@@ -1054,6 +1054,18 @@ textarea.cyber-input { resize: vertical; min-height: 120px; }
   font-size: 0.76rem;
   font-weight: 700;
   color: #1e293b;
+  white-space: nowrap;
+}
+.csh-human-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #15803d;
+  background: #dcfce7;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
   white-space: nowrap;
 }
 .csh-item-right {

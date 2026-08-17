@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
 import { openLiveChat, onAgentJoined } from '../utils/tidio'
+import { genTicketId } from '../utils/ticketId'
 import ChatSessionHistory from './ChatSessionHistory'
 import './WhatsipModal.css'
 
@@ -19,12 +20,6 @@ const WHATSAPP_NUMBER   = '19293816441'
 const TELEGRAM_USERNAME = 'WHTSIPA_DigitalTools'
 const SUPPORT_EMAIL     = 'support@whtsipa.com'
 const TG_CHANNEL_LINK   = 'https://t.me/WHTSIPA_DigitalTools'
-
-const genTicketId = () => {
-  const d = new Date()
-  const dp = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`
-  return `WHTSIPA-TKT-${dp}-${Math.floor(10000 + Math.random() * 90000)}`
-}
 
 /* ══════════════════════════════════════════
    TOOLS CHATBOT CONVERSATION TREE
@@ -206,16 +201,26 @@ function ToolsLiveChat({ ticketId, threatTitle, onClose, onBack, user, userName,
     localStorage.setItem('whts_tools_chat_messages', JSON.stringify(messages))
   }, [messages])
 
+  // Track the ticket's real MongoDB _id (distinct from our own ticketId
+  // string) so we can PATCH it later when a human agent actually joins —
+  // the activity endpoint looks tickets up by _id, not by our ticketId.
+  const ticketDbIdRef = useRef(null)
+
   // Listen for real Tidio agent connection event
   useEffect(() => {
     localStorage.removeItem('whts_chat_ishuman')
-    onAgentJoined(() => setIsHuman(true))
+    onAgentJoined(() => {
+      setIsHuman(true)
+      if (ticketDbIdRef.current) {
+        api.patch(`/tickets/${ticketDbIdRef.current}/activity`, { hasHumanAgent: true }).catch(() => { /* non-critical */ })
+      }
+    })
   }, [])
 
   useEffect(() => {
     const recordSession = async () => {
       try {
-        await api.post('/tickets/create', {
+        const { data } = await api.post('/tickets/create', {
           ticketId,
           type: 'livechat',
           threatTitle: threatTitle || 'General Threat Tools Inquiry',
@@ -225,6 +230,7 @@ function ToolsLiveChat({ ticketId, threatTitle, onClose, onBack, user, userName,
           email: user?.email || 'chat-client@whtsipa.com',
           contactMethod: 'Live Chat'
         })
+        ticketDbIdRef.current = data._id
       } catch (err) {
         console.error('Error pre-registering ticket session:', err)
       }

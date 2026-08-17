@@ -122,6 +122,11 @@ export default function ChatSessionHistory({ user, onNewChat, chatLabel = 'New C
                       <div className="csh-item-type-wrap">
                         {isUnread && <span className="csh-unread-dot" title="New update"></span>}
                         <span className="csh-item-type">{TYPE_LABELS[ticket.type] || '💬 Session'}</span>
+                        {ticket.hasHumanAgent && (
+                          <span className="csh-human-badge" title="A human representative joined this conversation">
+                            <i className="bi bi-person-check-fill"></i> Human
+                          </span>
+                        )}
                       </div>
                       <div className="csh-item-right">
                         <span className={statusMeta.cls} style={{ fontSize: '0.68rem' }}>{statusMeta.label}</span>

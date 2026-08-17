@@ -9,6 +9,8 @@ import './Threats.css'
 import './Report.css'   /* shared livechat modal styles */
 import { THREATS_AND_TOOLS } from '../data/threatsToolsData'
 import { openLiveChat, onAgentJoined } from '../utils/tidio'
+import { genTicketId } from '../utils/ticketId'
+import api from '../services/api'
 import { useAuth } from '../context/AuthContext'
 
 /* ─────────────────────────────────────────────────────────
@@ -174,11 +176,36 @@ function ThreatsChatModal({ isOpen, onClose, navigate, user, isHumanAgent = fals
   const [inputText,  setInputText]  = useState('')
   const [showHistory, setShowHistory] = useState(!!user)
   const chatEndRef = useRef(null)
+  const [ticketId] = useState(genTicketId)
+  const ticketDbIdRef = useRef(null)
+
+  // Create/track a ticket for this session so it shows up in Previous
+  // Sessions, same as the Threats/Tools live chat does.
+  useEffect(() => {
+    if (!user) return
+    api.post('/tickets/create', {
+      ticketId,
+      type: 'livechat',
+      threatTitle: 'Threats Page Inquiry',
+      summary: 'AI Live Chat Session - Threats Page',
+      goals: 'User initiated live chatbot conversation from the Threats page.',
+      name: user?.firstName || user?.name || 'Anonymous Client',
+      email: user?.email || 'chat-client@whtsipa.com',
+      contactMethod: 'Live Chat'
+    })
+      .then(({ data }) => { ticketDbIdRef.current = data._id })
+      .catch(err => console.error('Error pre-registering ticket session:', err))
+  }, [ticketId, user])
 
   // Listen for real Tidio agent connection event
   useEffect(() => {
     localStorage.removeItem('whts_chat_ishuman')
-    onAgentJoined(() => setIsHuman(true))
+    onAgentJoined(() => {
+      setIsHuman(true)
+      if (ticketDbIdRef.current) {
+        api.patch(`/tickets/${ticketDbIdRef.current}/activity`, { hasHumanAgent: true }).catch(() => { /* non-critical */ })
+      }
+    })
   }, [])
 
   useEffect(() => {
