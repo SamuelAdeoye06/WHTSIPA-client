@@ -249,7 +249,14 @@ function ContactLiveChat({ isOpen, onClose, userName, user, navigate, isHumanAge
   }])
   const [inputText, setInputText] = useState('')
   const [isTyping,  setIsTyping]  = useState(false)
-  const [showHistory, setShowHistory] = useState(!!user)
+  // Don't decide whether to show history until auth has actually finished
+  // loading — see WhatsipModal.jsx for why deciding at mount off `user`
+  // alone races against AuthContext's async check.
+  const { loading: authLoading } = useAuth()
+  const [showHistory, setShowHistory] = useState(false)
+  useEffect(() => {
+    if (!authLoading) setShowHistory(!!user)
+  }, [authLoading, user])
   const chatEndRef = useRef(null)
   const [ticketId] = useState(genTicketId)
   const ticketDbIdRef = useRef(null)

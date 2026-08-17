@@ -190,7 +190,16 @@ function ToolsLiveChat({ ticketId, threatTitle, onClose, onBack, user, userName,
     }]
   })
   const [isTyping, setIsTyping] = useState(false)
-  const [showHistory, setShowHistory] = useState(!!user)
+  // Don't decide whether to show history until auth has actually finished
+  // loading — deciding at mount time off `user` alone races against
+  // AuthContext's async /auth/me check, so a fast click right after page
+  // load could see `user` still null and permanently skip history for
+  // that session even though the person really is logged in.
+  const { loading: authLoading } = useAuth()
+  const [showHistory, setShowHistory] = useState(false)
+  useEffect(() => {
+    if (!authLoading) setShowHistory(!!user)
+  }, [authLoading, user])
   const chatEndRef = useRef(null)
 
   // Clear any stale "human" flag set by old code (open_tg incorrectly set it)
