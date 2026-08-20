@@ -232,13 +232,40 @@ const RECOVERY_SCENARIOS = [
 ]
 
 /* ── IP → country detection ── */
+// Calls our own server endpoint first (no CORS, no rate limits).
+// Falls back to public APIs only if the server returns null (e.g., local loopback).
 async function detectCountry() {
+  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+
+  // 1. Try our own server — it sees the real external IP
   try {
-    const r = await fetch('https://ipapi.co/json/')
+    const r = await fetch(`${API_BASE}/geo`, { signal: AbortSignal.timeout(5000) })
     const d = await r.json()
-    return d.country_code || null
-  } catch { return null }
+    if (d.country_code && d.country_code.length === 2) return d.country_code
+  } catch { /* fall through */ }
+
+  // 2. Fallback: direct browser APIs (may be rate-limited but worth trying)
+  const fallbacks = [
+    async () => {
+      const r = await fetch('https://ipwho.is/', { signal: AbortSignal.timeout(4000) })
+      const d = await r.json()
+      return d.success ? d.country_code : null
+    },
+    async () => {
+      const r = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(4000) })
+      const d = await r.json()
+      return d.country_code || null
+    },
+  ]
+  for (const fn of fallbacks) {
+    try {
+      const code = await fn()
+      if (code && code.length === 2) return code
+    } catch { /* try next */ }
+  }
+  return null
 }
+
 
 const getFriendlyCode = (code) => {
   const mapping = {
@@ -253,7 +280,7 @@ const getFriendlyCode = (code) => {
 }
 
 /* ── Reusable Phone Field with Country Code Dropdown ── */
-function PhoneCountryField({ formik, fieldName, phoneDialFieldName, phoneCodeFieldName, isRequired }) {
+function PhoneCountryField({ formik, fieldName, phoneDialFieldName, phoneCodeFieldName, countryFieldName = 'country', isRequired }) {
   const [showDropdown, setShowDropdown] = useState(false)
   const dropdownRef = useRef(null)
 
@@ -268,20 +295,31 @@ function PhoneCountryField({ formik, fieldName, phoneDialFieldName, phoneCodeFie
 
   const selectedCode = formik.values[phoneCodeFieldName] || 'US'
   const selectedCountry = ALLOWED_COUNTRIES.find(c => c.code === selectedCode) || ALLOWED_COUNTRIES[0]
+  // The full dial prefix shown locked (e.g. "+234")
+  const dialPrefix = (formik.values[phoneDialFieldName] || selectedCountry?.dial || '+1')
 
   return (
     <div className="phone-country-field-wrap">
       <label className="form-label cyber-label" htmlFor={fieldName}>
         Phone Number {isRequired ? <span className="text-danger">* (Required – with country code)</span> : <span className="text-muted-cyber">(Optional)</span>}
       </label>
-      <div className="input-group" ref={dropdownRef}>
+      <div className="input-group phone-field-group" ref={dropdownRef}>
+
+        {/* Country selector dropdown button */}
         <button
           type="button"
-          className="btn phone-country-btn dropdown-toggle"
+          className="btn phone-country-btn"
           onClick={() => setShowDropdown(prev => !prev)}
+          title="Change country"
         >
-          {selectedCountry ? `${getFriendlyCode(selectedCountry.code)} (${selectedCountry.dial})` : 'USA (+1)'}
+          {selectedCountry ? getFriendlyCode(selectedCountry.code) : 'USA'}
+          <i className="bi bi-chevron-down ms-1" style={{ fontSize: '0.7rem' }}></i>
         </button>
+
+        {/* Locked dial prefix — shows '+234', '+1', etc. Read-only. */}
+        <span className="phone-plus-prefix input-group-text">{dialPrefix}</span>
+
+        {/* Editable phone number digits only */}
         <input
           id={fieldName}
           name={fieldName}
@@ -292,6 +330,8 @@ function PhoneCountryField({ formik, fieldName, phoneDialFieldName, phoneCodeFie
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
         />
+
+        {/* Country dropdown list */}
         {showDropdown && (
           <div className="phone-country-dropdown-menu">
             <ul className="list-unstyled mb-0">
@@ -303,11 +343,15 @@ function PhoneCountryField({ formik, fieldName, phoneDialFieldName, phoneCodeFie
                     onClick={() => {
                       formik.setFieldValue(phoneCodeFieldName, c.code)
                       formik.setFieldValue(phoneDialFieldName, c.dial)
+                      formik.setFieldValue(countryFieldName, c.code)
+                      if (countryFieldName === 'country' && formik.values.financialLossCurrency !== undefined) {
+                        formik.setFieldValue('financialLossCurrency', COUNTRY_CURRENCIES[c.code] || 'USD $')
+                      }
                       setShowDropdown(false)
                     }}
                   >
                     <span className="country-name">{c.name}</span>
-                    <span className="country-dial">{getFriendlyCode(c.code)} ({c.dial})</span>
+                    <span className="country-dial">{c.dial}</span>
                   </button>
                 </li>
               ))}
@@ -323,6 +367,7 @@ function PhoneCountryField({ formik, fieldName, phoneDialFieldName, phoneCodeFie
     </div>
   )
 }
+
 
 /* ── File upload component ── */
 function FileUpload({ files, onChange }) {
@@ -876,10 +921,14 @@ export default function Report() {
 
   /* ── 4. Restore Drafts & Detect IP Country on Mount ── */
   useEffect(() => {
+    let personalDraftValues = null
+    let publicDraftValues = null
+
     const savedPersonal = localStorage.getItem('whts_personal_draft')
     if (savedPersonal) {
       try {
-        personalFormik.setValues(JSON.parse(savedPersonal))
+        personalDraftValues = JSON.parse(savedPersonal)
+        personalFormik.setValues(personalDraftValues)
       } catch (e) {
         console.error('Error parsing personal draft', e)
       }
@@ -888,28 +937,34 @@ export default function Report() {
     const savedPublic = localStorage.getItem('whts_public_draft')
     if (savedPublic) {
       try {
-        publicFormik.setValues(JSON.parse(savedPublic))
+        publicDraftValues = JSON.parse(savedPublic)
+        publicFormik.setValues(publicDraftValues)
       } catch (e) {
         console.error('Error parsing public draft', e)
       }
     }
 
-    // IP Detection for country/dial prefill (if no drafts exist)
+    // IP Detection — always runs, but only overwrites if still at US default
+    // (i.e. user hasn't already picked a country manually in a saved draft)
     detectCountry().then(code => {
       if (!code) return
       const match = ALLOWED_COUNTRIES.find(c => c.code === code)
-      if (match) {
-        if (!savedPersonal) {
-          personalFormik.setFieldValue('country', match.code)
-          personalFormik.setFieldValue('phoneCountryCode', match.code)
-          personalFormik.setFieldValue('phoneCountryDial', match.dial)
-          personalFormik.setFieldValue('financialLossCurrency', COUNTRY_CURRENCIES[match.code] || 'USD $')
-        }
-        if (!savedPublic) {
-          publicFormik.setFieldValue('country', match.code)
-          publicFormik.setFieldValue('phoneCountryCode', match.code)
-          publicFormik.setFieldValue('phoneCountryDial', match.dial)
-        }
+      if (!match) return
+
+      const personalCountry = personalDraftValues?.country
+      const publicCountry   = publicDraftValues?.country
+
+      // Only apply if country is blank OR still the US default (not a user choice)
+      if (!personalCountry || personalCountry === 'US') {
+        personalFormik.setFieldValue('country', match.code)
+        personalFormik.setFieldValue('phoneCountryCode', match.code)
+        personalFormik.setFieldValue('phoneCountryDial', match.dial)
+        personalFormik.setFieldValue('financialLossCurrency', COUNTRY_CURRENCIES[match.code] || 'USD $')
+      }
+      if (!publicCountry || publicCountry === 'US') {
+        publicFormik.setFieldValue('country', match.code)
+        publicFormik.setFieldValue('phoneCountryCode', match.code)
+        publicFormik.setFieldValue('phoneCountryDial', match.dial)
       }
     })
 
@@ -1245,6 +1300,7 @@ export default function Report() {
                           fieldName="phone"
                           phoneCodeFieldName="phoneCountryCode"
                           phoneDialFieldName="phoneCountryDial"
+                          countryFieldName="country"
                           isRequired={true}
                         />
                       </div>
@@ -1658,6 +1714,7 @@ export default function Report() {
                           fieldName="phone"
                           phoneCodeFieldName="phoneCountryCode"
                           phoneDialFieldName="phoneCountryDial"
+                          countryFieldName="country"
                           isRequired={true}
                         />
                       </div>

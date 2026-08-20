@@ -116,8 +116,10 @@ export default function About() {
               <div className="section-label mb-2">Our Partners</div>
               <h2 className="fw-bold mb-2" style={{ color: '#0f172a' }}>Government Affiliated Agencies</h2>
               <p style={{ color: '#4a5568', maxWidth: '56ch', margin: '0 auto' }}>
-                WHTSIPA operates in formal alignment with these US government agencies and
-                international law enforcement bodies. Every valid report is shared with the relevant authority.
+                WHTSIPA operates in formal alignment with the listed U.S. government agencies and
+                international law enforcement bodies. All valid reports received are reviewed and
+                submitted to the relevant authorities listed to support partnership and ensure smooth
+                operational coordination.
               </p>
             </div>
             <div className="row g-4">

@@ -266,7 +266,7 @@ export default function Home() {
           <div className="home-video-intro">
             <div className="home-video-label">
               <span className="home-video-label-dot"></span>
-              WHTSIP &amp; The Officials — Who We Are
+              WHTSIPA &amp; The Officials — Who We Are
             </div>
             <h2 className="home-video-heading">
               Introducing Our Elite Cybersecurity Partners

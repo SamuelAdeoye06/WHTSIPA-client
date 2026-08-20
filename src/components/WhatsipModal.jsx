@@ -397,7 +397,7 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
   const [error, setError] = useState('')
   const [form, setForm] = useState({
     summary: '', services: [], duration: 'One-Time Assistance',
-    goals: '', name: '', email: '', phone: '', contactMethod: 'WhatsApp',
+    goals: '', name: '', email: '', phone: '', contactMethod: '',
     evidence: null,
   })
 
@@ -747,16 +747,20 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
 
             <div className="wm-field">
               <label>Contact Information</label>
-              <div className="wm-row">
-                <input placeholder="Full Name" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required />
-                <input type="email" placeholder="Email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} required />
-              </div>
-              <input placeholder="Phone / WhatsApp number" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
-            </div>
+              {/* Full Name — always visible */}
+              <input
+                placeholder="Full Name"
+                value={form.name}
+                onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                required
+                style={{ marginBottom: '0.75rem' }}
+              />
 
-            <div className="wm-field">
-              <label>Preferred Contact Method</label>
-              <div className="wm-radio-row">
+              {/* Preferred Contact Method — ALWAYS shown, BEFORE the value input */}
+              <label style={{ fontSize: '0.82rem', fontWeight: 600, marginBottom: '0.4rem', display: 'block' }}>
+                Preferred Contact Method <span className="wm-required">*</span>
+              </label>
+              <div className="wm-radio-row" style={{ marginBottom: '0.55rem' }}>
                 {['WhatsApp', 'Telegram', 'Email'].map(m => (
                   <label key={m} className="wm-radio-item">
                     <input type="radio" name="contactMethod" value={m} checked={form.contactMethod === m}
@@ -765,6 +769,30 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
                   </label>
                 ))}
               </div>
+
+              {/* Contact value input — hidden until a method is selected */}
+              {form.contactMethod && (
+                <input
+                  type={form.contactMethod === 'Email' ? 'email' : 'text'}
+                  placeholder={
+                    form.contactMethod === 'Email'
+                      ? 'Input email'
+                      : form.contactMethod === 'WhatsApp'
+                        ? 'Input WhatsApp number with country code (e.g. +1234567890)'
+                        : 'Input Telegram username (e.g. @username)'
+                  }
+                  value={form.contactMethod === 'Email' ? form.email : form.phone}
+                  onChange={e =>
+                    form.contactMethod === 'Email'
+                      ? setForm(f => ({ ...f, email: e.target.value }))
+                      : setForm(f => ({ ...f, phone: e.target.value }))
+                  }
+                  required
+                />
+              )}
+              {!form.contactMethod && (
+                <small className="wm-hint">Select a method above to enter your contact details.</small>
+              )}
             </div>
 
             <div className="wm-field">

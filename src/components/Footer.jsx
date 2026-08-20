@@ -68,15 +68,16 @@ export default function Footer() {
                   <i className="bi bi-telegram text-info"></i> Telegram
                 </a>
                 <a
-                  href={config.facebookCommunityLink || '#'}
+                  href={config.facebookCommunityLink || undefined}
                   onClick={e => { if (!config.facebookCommunityLink) e.preventDefault() }}
-                  target={config.facebookCommunityLink ? '_blank' : '_self'}
+                  target={config.facebookCommunityLink ? '_blank' : undefined}
                   rel="noopener noreferrer"
-                  className={`btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1 ${!config.facebookCommunityLink ? 'disabled opacity-50' : ''}`}
+                  aria-disabled={!config.facebookCommunityLink}
+                  className="btn btn-sm btn-outline-info d-inline-flex align-items-center gap-1"
                   style={{ borderRadius: '8px', fontSize: '0.82rem' }}
-                  title={config.facebookCommunityLink ? 'Join Facebook Community' : 'Facebook (Coming Soon)'}
+                  title="Join Facebook Community"
                 >
-                  <i className="bi bi-facebook"></i> Facebook {!config.facebookCommunityLink && '(Soon)'}
+                  <i className="bi bi-facebook text-info"></i> Facebook
                 </a>
               </div>
             </div>
