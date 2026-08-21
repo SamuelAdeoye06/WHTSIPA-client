@@ -10,6 +10,7 @@ import api from '../services/api'
 import { openLiveChat, onAgentJoined } from '../utils/tidio'
 import { genTicketId } from '../utils/ticketId'
 import ChatSessionHistory from '../components/ChatSessionHistory'
+import { getCountryFlag } from '../utils/countryUtils'
 
 /* ── Incident types (Updated per spec) ── */
 const INCIDENT_TYPES = [
@@ -305,15 +306,15 @@ function PhoneCountryField({ formik, fieldName, phoneDialFieldName, phoneCodeFie
       </label>
       <div className="input-group phone-field-group" ref={dropdownRef}>
 
-        {/* Country selector dropdown button */}
+        {/* Country selector dropdown button — Flag + Caret arrow as in reference image */}
         <button
           type="button"
-          className="btn phone-country-btn"
+          className={`btn phone-country-btn ${showDropdown ? 'is-active' : ''}`}
           onClick={() => setShowDropdown(prev => !prev)}
-          title="Change country"
+          title="Select country code"
         >
-          {selectedCountry ? getFriendlyCode(selectedCountry.code) : 'USA'}
-          <i className="bi bi-chevron-down ms-1" style={{ fontSize: '0.7rem' }}></i>
+          <span className="country-flag-emoji">{getCountryFlag(selectedCountry.code)}</span>
+          <i className={`bi bi-caret-${showDropdown ? 'up' : 'down'}-fill country-arrow-icon`}></i>
         </button>
 
         {/* Locked dial prefix — shows '+234', '+1', etc. Read-only. */}
@@ -331,30 +332,34 @@ function PhoneCountryField({ formik, fieldName, phoneDialFieldName, phoneCodeFie
           onBlur={formik.handleBlur}
         />
 
-        {/* Country dropdown list */}
+        {/* Country dropdown list — Country Name (+DialCode) as in reference image */}
         {showDropdown && (
           <div className="phone-country-dropdown-menu">
             <ul className="list-unstyled mb-0">
-              {ALLOWED_COUNTRIES.map(c => (
-                <li key={c.code}>
-                  <button
-                    type="button"
-                    className="phone-country-dropdown-item"
-                    onClick={() => {
-                      formik.setFieldValue(phoneCodeFieldName, c.code)
-                      formik.setFieldValue(phoneDialFieldName, c.dial)
-                      formik.setFieldValue(countryFieldName, c.code)
-                      if (countryFieldName === 'country' && formik.values.financialLossCurrency !== undefined) {
-                        formik.setFieldValue('financialLossCurrency', COUNTRY_CURRENCIES[c.code] || 'USD $')
-                      }
-                      setShowDropdown(false)
-                    }}
-                  >
-                    <span className="country-name">{c.name}</span>
-                    <span className="country-dial">{c.dial}</span>
-                  </button>
-                </li>
-              ))}
+              {ALLOWED_COUNTRIES.map(c => {
+                const isSelected = selectedCode === c.code
+                const cleanName = c.name.replace(' (Dev)', '')
+                return (
+                  <li key={c.code}>
+                    <button
+                      type="button"
+                      className={`phone-country-dropdown-item ${isSelected ? 'active' : ''}`}
+                      onClick={() => {
+                        formik.setFieldValue(phoneCodeFieldName, c.code)
+                        formik.setFieldValue(phoneDialFieldName, c.dial)
+                        formik.setFieldValue(countryFieldName, c.code)
+                        if (countryFieldName === 'country' && formik.values.financialLossCurrency !== undefined) {
+                          formik.setFieldValue('financialLossCurrency', COUNTRY_CURRENCIES[c.code] || 'USD $')
+                        }
+                        setShowDropdown(false)
+                      }}
+                    >
+                      <span className="country-flag-emoji me-2">{getCountryFlag(c.code)}</span>
+                      <span className="country-option-text">{cleanName} ({c.dial})</span>
+                    </button>
+                  </li>
+                )
+              })}
             </ul>
           </div>
         )}

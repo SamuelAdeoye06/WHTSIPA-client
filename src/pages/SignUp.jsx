@@ -5,6 +5,7 @@ import './Auth.css'
 import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
 import logoWhts from '../assets/media/logo-whts.jpg'
+import { getCountryFlag } from '../utils/countryUtils'
 
 /* ── Allowed countries (client spec) ── */
 const ALLOWED_COUNTRIES = [
@@ -57,13 +58,31 @@ const getFriendlyCode = (code) => {
   return mapping[code] || code.toUpperCase()
 }
 
-/* ── IP → country detection ── */
+/* ── IP → country detection (same strategy as Report page) ── */
 async function detectCountry() {
+  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+
+  // 1. Try server-side proxy first (no CORS, uses platform headers correctly)
   try {
-    const r = await fetch('https://ipapi.co/json/')
+    const r = await fetch(`${API_BASE}/geo`, { signal: AbortSignal.timeout(5000) })
     const d = await r.json()
-    return d.country_code || null
-  } catch { return null }
+    if (d.country_code && d.country_code.length === 2) return d.country_code
+  } catch { /* fall through */ }
+
+  // 2. Browser fallbacks
+  try {
+    const r = await fetch('https://ipwho.is/', { signal: AbortSignal.timeout(4000) })
+    const d = await r.json()
+    if (d.success && d.country_code) return d.country_code
+  } catch { /* fall through */ }
+
+  try {
+    const r = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(4000) })
+    const d = await r.json()
+    if (d.country_code) return d.country_code
+  } catch { /* fall through */ }
+
+  return null
 }
 
 export default function SignUp() {
@@ -333,11 +352,13 @@ export default function SignUp() {
                       className={`auth-input auth-country-btn${errors.country ? ' auth-input-error' : ''}`}
                       onClick={() => setShowDropdown(p => !p)}
                     >
-                      <i className="bi bi-globe auth-input-icon"></i>
-                      <span className="auth-country-label">
-                        {selectedCountry ? selectedCountry.name : 'Select your country'}
+                      <span className="country-flag-emoji me-2">
+                        {selectedCountry ? getCountryFlag(selectedCountry.code) : '🌐'}
                       </span>
-                      <i className={`bi bi-chevron-${showDropdown ? 'up' : 'down'} auth-country-chevron`}></i>
+                      <span className="auth-country-label">
+                        {selectedCountry ? `${selectedCountry.name.replace(' (Dev)', '')} (${selectedCountry.dial})` : 'Select your country'}
+                      </span>
+                      <i className={`bi bi-caret-${showDropdown ? 'up' : 'down'}-fill country-arrow-icon ms-auto`}></i>
                     </button>
                     {showDropdown && (
                       <div className="auth-country-dropdown">
@@ -355,25 +376,29 @@ export default function SignUp() {
                           {filteredCountries.length === 0 && (
                             <li className="auth-country-empty">No countries found</li>
                           )}
-                          {filteredCountries.map(c => (
-                            <li key={c.code}>
-                              <button
-                                type="button"
-                                className={`auth-country-option${form.country === c.code ? ' selected' : ''}`}
-                                onClick={() => {
-                                  setForm(p => ({ ...p, country: c.code,
-                                    phone: p.phone.startsWith('+') ? c.dial + p.phone.replace(/^\+\d+/, '') : c.dial + ' '
-                                  }))
-                                  setErrors(p => ({ ...p, country: '' }))
-                                  setShowDropdown(false)
-                                  setCountrySearch('')
-                                }}
-                              >
-                                <span className="auth-country-name">{c.name}</span>
-                                <span className="auth-country-dial">{getFriendlyCode(c.code)} ({c.dial})</span>
-                              </button>
-                            </li>
-                          ))}
+                          {filteredCountries.map(c => {
+                            const isSelected = form.country === c.code
+                            const cleanName = c.name.replace(' (Dev)', '')
+                            return (
+                              <li key={c.code}>
+                                <button
+                                  type="button"
+                                  className={`auth-country-option${isSelected ? ' selected' : ''}`}
+                                  onClick={() => {
+                                    setForm(p => ({ ...p, country: c.code,
+                                      phone: p.phone.startsWith('+') ? c.dial + p.phone.replace(/^\+\d+/, '') : c.dial + ' '
+                                    }))
+                                    setErrors(p => ({ ...p, country: '' }))
+                                    setShowDropdown(false)
+                                    setCountrySearch('')
+                                  }}
+                                >
+                                  <span className="country-flag-emoji me-2">{getCountryFlag(c.code)}</span>
+                                  <span className="auth-country-name">{cleanName} ({c.dial})</span>
+                                </button>
+                              </li>
+                            )
+                          })}
                         </ul>
                       </div>
                     )}

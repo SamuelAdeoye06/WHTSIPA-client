@@ -4,6 +4,7 @@ import '../styles/cyber.css'
 import './EssentialEight.css'
 import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
+import { getCountryFlag } from '../utils/countryUtils'
 
 /* ─────────────────────────────────────────────
    Fallback shown while the backend number loads.
@@ -192,6 +193,30 @@ const ALLOWED_COUNTRIES = [
   { code: 'NG', name: 'Nigeria (Dev)',          dial: '+234' },
 ]
 
+/* ── IP → country detection (shared logic across all forms) ── */
+async function detectCountry() {
+  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+  try {
+    const r = await fetch(`${API_BASE}/geo`, { signal: AbortSignal.timeout(5000) })
+    const d = await r.json()
+    if (d.country_code && d.country_code.length === 2) return d.country_code
+  } catch { /* fall through */ }
+
+  try {
+    const r = await fetch('https://ipwho.is/', { signal: AbortSignal.timeout(4000) })
+    const d = await r.json()
+    if (d.success && d.country_code) return d.country_code
+  } catch { /* fall through */ }
+
+  try {
+    const r = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(4000) })
+    const d = await r.json()
+    if (d.country_code) return d.country_code
+  } catch { /* fall through */ }
+
+  return null
+}
+
 /* ── Phone field with country-code dropdown — same UX as SignUp/Report,
    built for plain useState instead of Formik, and kept at module scope
    so React never remounts it (which would break input focus). ── */
@@ -208,29 +233,39 @@ const getFriendlyCode = (code) => {
 }
 
 function BookingPhoneField({ countryCode, setCountryCode, dialCode, setDialCode, digits, setDigits, error }) {
+  const [showDropdown, setShowDropdown] = useState(false)
+  const dropdownRef = useRef(null)
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target))
+        setShowDropdown(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const selectedCountry = ALLOWED_COUNTRIES.find(c => c.code === countryCode) || ALLOWED_COUNTRIES[0]
+
   return (
     <div className="bc-field">
       <label className="bc-label" htmlFor="bc-phone">Phone Number *</label>
-      <div className="bc-phone-wrap">
-        {/* Native select — works reliably inside overflow-y:auto modals */}
-        <select
-          className="bc-phone-select"
-          value={countryCode}
-          onChange={e => {
-            const chosen = ALLOWED_COUNTRIES.find(c => c.code === e.target.value)
-            if (chosen) {
-              setCountryCode(chosen.code)
-              setDialCode(chosen.dial)
-            }
-          }}
-          aria-label="Country code"
+      <div className="bc-phone-wrap" ref={dropdownRef} style={{ position: 'relative' }}>
+        {/* Custom Country Selector Button — Flag + Caret arrow as in reference image */}
+        <button
+          type="button"
+          className={`bc-phone-btn ${showDropdown ? 'is-active' : ''}`}
+          onClick={() => setShowDropdown(prev => !prev)}
+          title="Select country code"
         >
-          {ALLOWED_COUNTRIES.map(c => (
-            <option key={c.code} value={c.code}>
-              {getFriendlyCode(c.code)} ({c.dial})
-            </option>
-          ))}
-        </select>
+          <span className="country-flag-emoji">{getCountryFlag(selectedCountry.code)}</span>
+          <i className={`bi bi-caret-${showDropdown ? 'up' : 'down'}-fill country-arrow-icon`}></i>
+        </button>
+
+        {/* Locked dial prefix badge */}
+        <span className="bc-phone-prefix">{dialCode || selectedCountry.dial}</span>
+
+        {/* Editable phone digits */}
         <input
           id="bc-phone"
           type="tel"
@@ -239,6 +274,34 @@ function BookingPhoneField({ countryCode, setCountryCode, dialCode, setDialCode,
           value={digits}
           onChange={e => setDigits(e.target.value)}
         />
+
+        {/* Floating Dropdown Overlay */}
+        {showDropdown && (
+          <div className="bc-phone-dropdown-menu">
+            <ul className="list-unstyled mb-0">
+              {ALLOWED_COUNTRIES.map(c => {
+                const isSelected = countryCode === c.code
+                const cleanName = c.name.replace(' (Dev)', '')
+                return (
+                  <li key={c.code}>
+                    <button
+                      type="button"
+                      className={`bc-phone-dropdown-item ${isSelected ? 'active' : ''}`}
+                      onClick={() => {
+                        setCountryCode(c.code)
+                        setDialCode(c.dial)
+                        setShowDropdown(false)
+                      }}
+                    >
+                      <span className="country-flag-emoji me-2">{getCountryFlag(c.code)}</span>
+                      <span className="country-option-text">{cleanName} ({c.dial})</span>
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        )}
       </div>
       {error && <span className="bc-error"><i className="bi bi-exclamation-circle me-1"></i>{error}</span>}
     </div>
@@ -279,6 +342,17 @@ function BookCallModal({ onClose }) {
     api.get('/booking/callback-number')
       .then(({ data }) => { if (data.callbackNumber) setCallbackNumber(data.callbackNumber) })
       .catch(() => { /* keep fallback */ })
+  }, [])
+
+  // Auto-detect visitor's country and pre-fill phone country code
+  useEffect(() => {
+    detectCountry().then(code => {
+      if (!code) return
+      const match = ALLOWED_COUNTRIES.find(c => c.code === code)
+      if (match) {
+        setForm(p => ({ ...p, countryCode: match.code, dialCode: match.dial }))
+      }
+    })
   }, [])
 
   /* If not signed in — show auth prompt instead of form */

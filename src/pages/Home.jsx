@@ -276,9 +276,9 @@ export default function Home() {
               online.
             </p>
             <p className="home-video-sub">
-              Watch to understand the full scope of WHTS intelligence operations.
+              Watch to understand the full scope of WHTSIPA intelligence operations.
             </p>
-            <div className="home-video-sub-badge">WHTSIP &amp; The Officials</div>
+            <div className="home-video-sub-badge">WHTSIPA &amp; The Officials</div>
           </div>
 
           {/* ── Cinematic player ── */}
@@ -286,7 +286,7 @@ export default function Home() {
 
             <div className="cinematic-topbar">
               <div className="cinematic-dots" aria-hidden="true"><span></span><span></span><span></span></div>
-              <div className="cinematic-title">WHTSIP &amp; The Officials</div>
+              <div className="cinematic-title">WHTSIPA &amp; The Officials</div>
               <div className="cinematic-duration">2:57</div>
             </div>
 

@@ -680,3 +680,173 @@
   }
   .wm-request-option-card { padding: 0.85rem; }
 }
+
+/* ══════════════════════════════════════════
+   PHONE COUNTRY CODE DROPDOWN — dark modal theme
+   ══════════════════════════════════════════ */
+
+/* Container wrapping the trigger btn + prefix badge + digits input */
+.wm-phone-wrap {
+  display: flex;
+  align-items: stretch;
+  position: relative;
+  border: 1px solid rgba(120, 214, 255, 0.22);
+  border-radius: 10px;
+  overflow: visible;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Country selector trigger button — shows flag + caret */
+.wm-phone-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
+  border-right: 1px solid rgba(120, 214, 255, 0.18);
+  border-radius: 10px 0 0 10px;
+  color: #f0f4ff;
+  padding: 0.65rem 0.75rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease;
+  min-width: 56px;
+}
+
+.wm-phone-btn:hover,
+.wm-phone-btn.is-active {
+  background: rgba(34, 211, 238, 0.1);
+  border-color: rgba(34, 211, 238, 0.4);
+}
+
+.wm-phone-flag {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.wm-phone-arrow {
+  font-size: 0.62rem;
+  color: #22d3ee;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.wm-phone-btn.is-active .wm-phone-arrow {
+  transform: rotate(180deg);
+}
+
+/* Locked dial prefix badge — e.g. "+234" */
+.wm-phone-prefix {
+  display: flex;
+  align-items: center;
+  padding: 0 0.6rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  border-right: 1px solid rgba(120, 214, 255, 0.18);
+  color: #22d3ee;
+  font-weight: 700;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  letter-spacing: 0.4px;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+/* Editable phone digits */
+.wm-phone-digits {
+  flex: 1;
+  min-width: 0;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 10px 10px 0 !important;
+  color: #f0f4ff !important;
+  font-size: 0.88rem;
+  padding: 0.65rem 0.85rem;
+  outline: none !important;
+  box-shadow: none !important;
+  font-family: inherit;
+}
+
+.wm-phone-digits::placeholder {
+  color: rgba(233, 243, 255, 0.28);
+}
+
+.wm-phone-digits:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.wm-phone-wrap:focus-within {
+  border-color: rgba(34, 211, 238, 0.5);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.08);
+}
+
+/* Floating dropdown list */
+.wm-phone-dropdown {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  z-index: 9999;
+  min-width: 270px;
+  max-height: 240px;
+  overflow-y: auto;
+  background: #0f2040;
+  border: 1px solid rgba(120, 214, 255, 0.25);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+  padding: 0.35rem 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(34, 211, 238, 0.2) transparent;
+}
+
+/* List reset */
+.wm-phone-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Each country option */
+.wm-phone-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.55rem 1rem;
+  font-size: 0.85rem;
+  color: rgba(233, 243, 255, 0.82);
+  background: none;
+  border: none;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.13s ease, color 0.13s ease;
+}
+
+.wm-phone-item:hover {
+  background: rgba(34, 211, 238, 0.09);
+  color: #f0f4ff;
+}
+
+.wm-phone-item.active {
+  background: rgba(34, 211, 238, 0.14);
+  color: #22d3ee;
+  font-weight: 600;
+}
+
+.wm-phone-item-flag {
+  font-size: 1.15rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.wm-phone-item-text {
+  font-size: 0.84rem;
+}
+
+/* Mobile */
+@media (max-width: 575.98px) {
+  .wm-phone-dropdown { min-width: 220px; }
+}
