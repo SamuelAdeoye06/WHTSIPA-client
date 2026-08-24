@@ -62,29 +62,24 @@ const getFriendlyCode = (code) => {
 /* ── IP → country detection (same strategy as Report page) ── */
 async function detectCountry() {
   const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
-
-  // 1. Try server-side proxy first (no CORS, uses platform headers correctly)
   try {
     const r = await fetch(`${API_BASE}/geo`, { signal: AbortSignal.timeout(5000) })
     const d = await r.json()
     if (d.country_code && d.country_code.length === 2) return d.country_code
   } catch { /* fall through */ }
-
-  // 2. Browser fallbacks
+  try {
+    const r = await fetch('https://api.country.is/', { signal: AbortSignal.timeout(4000) })
+    const d = await r.json()
+    if (d.country && d.country.length === 2) return d.country
+  } catch { /* fall through */ }
   try {
     const r = await fetch('https://ipwho.is/', { signal: AbortSignal.timeout(4000) })
     const d = await r.json()
     if (d.success && d.country_code) return d.country_code
   } catch { /* fall through */ }
-
-  try {
-    const r = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(4000) })
-    const d = await r.json()
-    if (d.country_code) return d.country_code
-  } catch { /* fall through */ }
-
   return null
 }
+
 
 /* ── SignUp Phone Field with Country Dropdown & Editable Dial Code ── */
 function SignUpPhoneField({ form, setForm, errors, setErrors, handleBlur }) {

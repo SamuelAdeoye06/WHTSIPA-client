@@ -65,17 +65,18 @@ async function detectCountry() {
     if (d.country_code && d.country_code.length === 2) return d.country_code
   } catch { /* fall through */ }
   try {
+    const r = await fetch('https://api.country.is/', { signal: AbortSignal.timeout(4000) })
+    const d = await r.json()
+    if (d.country && d.country.length === 2) return d.country
+  } catch { /* fall through */ }
+  try {
     const r = await fetch('https://ipwho.is/', { signal: AbortSignal.timeout(4000) })
     const d = await r.json()
     if (d.success && d.country_code) return d.country_code
   } catch { /* fall through */ }
-  try {
-    const r = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(4000) })
-    const d = await r.json()
-    if (d.country_code) return d.country_code
-  } catch { /* fall through */ }
   return null
 }
+
 
 /* ── Contact details ── */
 const WHATSAPP_NUMBER   = '19293816441'

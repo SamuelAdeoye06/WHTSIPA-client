@@ -203,19 +203,20 @@ async function detectCountry() {
   } catch { /* fall through */ }
 
   try {
+    const r = await fetch('https://api.country.is/', { signal: AbortSignal.timeout(4000) })
+    const d = await r.json()
+    if (d.country && d.country.length === 2) return d.country
+  } catch { /* fall through */ }
+
+  try {
     const r = await fetch('https://ipwho.is/', { signal: AbortSignal.timeout(4000) })
     const d = await r.json()
     if (d.success && d.country_code) return d.country_code
   } catch { /* fall through */ }
 
-  try {
-    const r = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(4000) })
-    const d = await r.json()
-    if (d.country_code) return d.country_code
-  } catch { /* fall through */ }
-
   return null
 }
+
 
 /* ── Phone field with country-code dropdown — same UX as SignUp/Report,
    built for plain useState instead of Formik, and kept at module scope

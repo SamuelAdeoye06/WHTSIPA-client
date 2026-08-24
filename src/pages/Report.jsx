@@ -234,37 +234,30 @@ const RECOVERY_SCENARIOS = [
 ]
 
 /* ── IP → country detection ── */
-// Calls our own server endpoint first (no CORS, no rate limits).
-// Falls back to public APIs only if the server returns null (e.g., local loopback).
+// Calls our own server endpoint
 async function detectCountry() {
   const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
-  // 1. Try our own server — it sees the real external IP
+  // 1. Try backend server — parses real client IP on cloud hosting (Render, Vercel)
   try {
     const r = await fetch(`${API_BASE}/geo`, { signal: AbortSignal.timeout(5000) })
     const d = await r.json()
     if (d.country_code && d.country_code.length === 2) return d.country_code
   } catch { /* fall through */ }
 
-  // 2. Fallback: direct browser APIs (may be rate-limited but worth trying)
-  const fallbacks = [
-    async () => {
-      const r = await fetch('https://ipwho.is/', { signal: AbortSignal.timeout(4000) })
-      const d = await r.json()
-      return d.success ? d.country_code : null
-    },
-    async () => {
-      const r = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(4000) })
-      const d = await r.json()
-      return d.country_code || null
-    },
-  ]
-  for (const fn of fallbacks) {
-    try {
-      const code = await fn()
-      if (code && code.length === 2) return code
-    } catch { /* try next */ }
-  }
+  // 2. Direct browser fallbacks (api.country.is is CORS-enabled, fast & reliable)
+  try {
+    const r = await fetch('https://api.country.is/', { signal: AbortSignal.timeout(4000) })
+    const d = await r.json()
+    if (d.country && d.country.length === 2) return d.country
+  } catch { /* fall through */ }
+
+  try {
+    const r = await fetch('https://ipwho.is/', { signal: AbortSignal.timeout(4000) })
+    const d = await r.json()
+    if (d.success && d.country_code) return d.country_code
+  } catch { /* fall through */ }
+
   return null
 }
 
