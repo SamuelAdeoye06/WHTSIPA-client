@@ -11,6 +11,7 @@ import { openLiveChat, onAgentJoined } from '../utils/tidio'
 import { genTicketId } from '../utils/ticketId'
 import ChatSessionHistory from '../components/ChatSessionHistory'
 import { getCountryFlag } from '../utils/countryUtils'
+import CountrySelectField from '../components/CountrySelectField'
 
 /* ── Incident types (Updated per spec) ── */
 const INCIDENT_TYPES = [
@@ -296,8 +297,30 @@ function PhoneCountryField({ formik, fieldName, phoneDialFieldName, phoneCodeFie
 
   const selectedCode = formik.values[phoneCodeFieldName] || 'US'
   const selectedCountry = ALLOWED_COUNTRIES.find(c => c.code === selectedCode) || ALLOWED_COUNTRIES[0]
-  // The full dial prefix shown locked (e.g. "+234")
-  const dialPrefix = (formik.values[phoneDialFieldName] || selectedCountry?.dial || '+1')
+
+  // Full dial prefix in formik state, e.g. "+234"
+  const fullDial = formik.values[phoneDialFieldName] || selectedCountry?.dial || '+1'
+  // Digits after '+' for the editable input, e.g. "234"
+  const dialDigits = fullDial.replace(/^\+/, '')
+
+  // Handle manual typing in the country dial code input
+  const handleDialDigitsChange = (e) => {
+    const typed = e.target.value.replace(/\D/g, '') // allow digits only
+    const newFullDial = '+' + typed
+    formik.setFieldValue(phoneDialFieldName, newFullDial)
+
+    const match = ALLOWED_COUNTRIES.find(c => c.dial === newFullDial)
+    if (match) {
+      formik.setFieldValue(phoneCodeFieldName, match.code)
+      formik.setFieldValue(countryFieldName, match.code)
+      if (countryFieldName === 'country' && formik.values.financialLossCurrency !== undefined) {
+        formik.setFieldValue('financialLossCurrency', COUNTRY_CURRENCIES[match.code] || 'USD $')
+      }
+    }
+  }
+
+  // Check if current dial code is in ALLOWED_COUNTRIES
+  const isValidDial = ALLOWED_COUNTRIES.some(c => c.dial === fullDial)
 
   return (
     <div className="phone-country-field-wrap">
@@ -306,7 +329,7 @@ function PhoneCountryField({ formik, fieldName, phoneDialFieldName, phoneCodeFie
       </label>
       <div className="input-group phone-field-group" ref={dropdownRef}>
 
-        {/* Country selector dropdown button — Flag + Caret arrow as in reference image */}
+        {/* Country selector dropdown button — Flag + Caret arrow */}
         <button
           type="button"
           className={`btn phone-country-btn ${showDropdown ? 'is-active' : ''}`}
@@ -317,10 +340,21 @@ function PhoneCountryField({ formik, fieldName, phoneDialFieldName, phoneCodeFie
           <i className={`bi bi-caret-${showDropdown ? 'up' : 'down'}-fill country-arrow-icon`}></i>
         </button>
 
-        {/* Locked dial prefix — shows '+234', '+1', etc. Read-only. */}
-        <span className="phone-plus-prefix input-group-text">{dialPrefix}</span>
+        {/* Manual editable dial prefix — '+' is constant, digits are editable */}
+        <div className={`phone-plus-prefix input-group-text ${!isValidDial && dialDigits.length > 0 ? 'is-invalid-dial' : ''}`}>
+          <span className="plus-symbol">+</span>
+          <input
+            type="text"
+            className="phone-dial-input"
+            value={dialDigits}
+            onChange={handleDialDigitsChange}
+            placeholder="1"
+            maxLength={4}
+            title="Type country dial code"
+          />
+        </div>
 
-        {/* Editable phone number digits only */}
+        {/* Editable phone number digits */}
         <input
           id={fieldName}
           name={fieldName}
@@ -332,7 +366,7 @@ function PhoneCountryField({ formik, fieldName, phoneDialFieldName, phoneCodeFie
           onBlur={formik.handleBlur}
         />
 
-        {/* Country dropdown list — Country Name (+DialCode) as in reference image */}
+        {/* Country dropdown list — populated with ALLOWED_COUNTRIES */}
         {showDropdown && (
           <div className="phone-country-dropdown-menu">
             <ul className="list-unstyled mb-0">
@@ -364,6 +398,15 @@ function PhoneCountryField({ formik, fieldName, phoneDialFieldName, phoneCodeFie
           </div>
         )}
       </div>
+
+      {/* Validation warning if dial code typed is not allowed */}
+      {!isValidDial && dialDigits.length > 0 && (
+        <div className="cyber-error-msg">
+          <i className="bi bi-exclamation-triangle-fill me-1"></i>
+          Country code +{dialDigits} is invalid or not in the allowed countries list.
+        </div>
+      )}
+
       {formik.touched[fieldName] && formik.errors[fieldName] && (
         <div className="cyber-error-msg">
           <i className="bi bi-exclamation-triangle-fill me-1"></i>{formik.errors[fieldName]}
@@ -1269,33 +1312,27 @@ export default function Report() {
 
                       {/* Country of Residence */}
                       <div className="col-12 col-md-6">
-                        <label className="form-label cyber-label" htmlFor="personal-country">Country of Residence <span className="text-danger">* (Required)</span></label>
-                        <select
+                        <CountrySelectField
                           id="personal-country"
                           name="country"
-                          className={`form-select cyber-select ${personalFormik.touched.country && personalFormik.errors.country ? 'is-invalid' : ''}`}
+                          label="Country of Residence"
+                          isRequired={true}
                           value={personalFormik.values.country}
-                          onChange={(e) => {
-                            personalFormik.handleChange(e)
-                            // Prefill currency & phone prefix based on chosen country
-                            const code = e.target.value
+                          onChange={(code) => {
+                            personalFormik.setFieldValue('country', code)
                             const match = ALLOWED_COUNTRIES.find(c => c.code === code)
                             if (match) {
                               personalFormik.setFieldValue('phoneCountryCode', match.code)
                               personalFormik.setFieldValue('phoneCountryDial', match.dial)
-                              personalFormik.setFieldValue('financialLossCurrency', COUNTRY_CURRENCIES[match.code] || 'USD $')
+                              if (personalFormik.values.financialLossCurrency !== undefined) {
+                                personalFormik.setFieldValue('financialLossCurrency', COUNTRY_CURRENCIES[match.code] || 'USD $')
+                              }
                             }
                           }}
                           onBlur={personalFormik.handleBlur}
-                        >
-                          <option value="">Choose country</option>
-                          {ALLOWED_COUNTRIES.map(c => (
-                            <option key={c.code} value={c.code}>{c.name}</option>
-                          ))}
-                        </select>
-                        {personalFormik.touched.country && personalFormik.errors.country && (
-                          <div className="cyber-error-msg"><i className="bi bi-exclamation-triangle-fill me-1"></i>{personalFormik.errors.country}</div>
-                        )}
+                          isInvalid={personalFormik.touched.country && Boolean(personalFormik.errors.country)}
+                          errorMsg={personalFormik.errors.country}
+                        />
                       </div>
 
                       {/* Phone Number */}
@@ -1685,15 +1722,14 @@ export default function Report() {
 
                       {/* Country */}
                       <div className="col-12 col-md-6">
-                        <label className="form-label cyber-label" htmlFor="public-country">Country <span className="text-danger">* (Required – for threat mapping)</span></label>
-                        <select
+                        <CountrySelectField
                           id="public-country"
                           name="country"
-                          className={`form-select cyber-select ${publicFormik.touched.country && publicFormik.errors.country ? 'is-invalid' : ''}`}
+                          label="Country"
+                          isRequired={true}
                           value={publicFormik.values.country}
-                          onChange={(e) => {
-                            publicFormik.handleChange(e)
-                            const code = e.target.value
+                          onChange={(code) => {
+                            publicFormik.setFieldValue('country', code)
                             const match = ALLOWED_COUNTRIES.find(c => c.code === code)
                             if (match) {
                               publicFormik.setFieldValue('phoneCountryCode', match.code)
@@ -1701,15 +1737,9 @@ export default function Report() {
                             }
                           }}
                           onBlur={publicFormik.handleBlur}
-                        >
-                          <option value="">Choose country</option>
-                          {ALLOWED_COUNTRIES.map(c => (
-                            <option key={c.code} value={c.code}>{c.name}</option>
-                          ))}
-                        </select>
-                        {publicFormik.touched.country && publicFormik.errors.country && (
-                          <div className="cyber-error-msg"><i className="bi bi-exclamation-triangle-fill me-1"></i>{publicFormik.errors.country}</div>
-                        )}
+                          isInvalid={publicFormik.touched.country && Boolean(publicFormik.errors.country)}
+                          errorMsg={publicFormik.errors.country}
+                        />
                       </div>
 
                       {/* Phone Number */}

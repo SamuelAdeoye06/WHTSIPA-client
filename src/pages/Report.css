@@ -276,9 +276,10 @@ textarea.cyber-input { resize: vertical; min-height: 120px; }
 .phone-country-field-wrap .input-group {
   border: 1.5px solid #cbd5e1;
   border-radius: 12px;
-  overflow: hidden;
+  overflow: visible !important;
   background: #ffffff;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
 }
 
 .phone-country-field-wrap .input-group:focus-within {
@@ -295,7 +296,7 @@ textarea.cyber-input { resize: vertical; min-height: 120px; }
   border: none !important;
   border-right: 1.5px solid #cbd5e1 !important;
   color: #0f172a !important;
-  border-radius: 0 !important;
+  border-radius: 10px 0 0 10px !important;
   font-size: 0.88rem;
   font-weight: 600;
   padding: 0.55rem 0.75rem !important;
@@ -328,11 +329,12 @@ textarea.cyber-input { resize: vertical; min-height: 120px; }
   transform: rotate(180deg);
 }
 
-/* Locked full dial prefix badge (e.g. '+234', '+1') */
+/* Editable dial prefix container with constant '+' and editable digits */
 .phone-plus-prefix {
-  display: flex;
-  align-items: center;
-  padding: 0 0.65rem;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 1px !important;
+  padding: 0 0.5rem !important;
   background: #f1f5f9 !important;
   border: none !important;
   border-right: 1.5px solid #cbd5e1 !important;
@@ -341,15 +343,44 @@ textarea.cyber-input { resize: vertical; min-height: 120px; }
   font-size: 0.88rem;
   border-radius: 0 !important;
   flex-shrink: 0;
-  user-select: none;
   white-space: nowrap;
   letter-spacing: 0.5px;
+}
+
+.phone-plus-prefix.is-invalid-dial {
+  background: #fef2f2 !important;
+  color: #dc2626 !important;
+  border-right-color: #f87171 !important;
+}
+
+.plus-symbol {
+  font-weight: 700;
+  color: inherit;
+  user-select: none;
+}
+
+.phone-dial-input {
+  border: none !important;
+  background: transparent !important;
+  color: inherit !important;
+  font-weight: 700 !important;
+  font-size: 0.88rem !important;
+  width: 38px;
+  padding: 0.55rem 0.1rem !important;
+  outline: none !important;
+  box-shadow: none !important;
+  letter-spacing: 0.5px;
+}
+
+.phone-dial-input:focus {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 /* The digits input sits inside the group */
 .phone-country-field-wrap .form-control {
   border: none !important;
-  border-radius: 0 !important;
+  border-radius: 0 10px 10px 0 !important;
   box-shadow: none !important;
   background: #ffffff;
   font-size: 0.9rem;
@@ -365,9 +396,9 @@ textarea.cyber-input { resize: vertical; min-height: 120px; }
 /* Floating dropdown menu overlay styled after reference image */
 .phone-country-dropdown-menu {
   position: absolute;
-  top: calc(100% + 4px);
+  top: calc(100% + 6px);
   left: 0;
-  z-index: 1050;
+  z-index: 9999 !important;
   display: block;
   min-width: 260px;
   max-height: 260px;
@@ -375,9 +406,9 @@ textarea.cyber-input { resize: vertical; min-height: 120px; }
   padding: 0.35rem 0;
   font-size: 0.88rem;
   background-color: #ffffff;
-  border: 1px solid #d1d5db;
+  border: 1px solid #cbd5e1;
   border-radius: 10px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.18);
 }
 
 .phone-country-dropdown-item {
@@ -1235,3 +1266,163 @@ textarea.cyber-input { resize: vertical; min-height: 120px; }
   background: #2563eb;
   color: #fff;
 }
+
+/* ── Custom Standalone Country Select Dropdown ── */
+.custom-country-field-wrap {
+  position: relative;
+}
+
+.custom-country-btn {
+  display: flex !important;
+  align-items: center !important;
+  text-align: left !important;
+  width: 100% !important;
+  cursor: pointer !important;
+  background-image: none !important; /* remove default browser select arrow */
+  padding-right: 0.9rem !important;
+}
+
+.custom-country-btn .country-select-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.custom-country-btn.is-active .country-arrow-icon {
+  transform: rotate(180deg);
+}
+
+/* Light mode (default for forms on light pages) */
+.custom-country-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 9999 !important;
+  display: block;
+  background-color: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 10px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.18) !important;
+  overflow: hidden;
+}
+
+.custom-country-search-wrap {
+  position: relative;
+  padding: 0.5rem;
+  border-bottom: 1px solid #e2e8f0 !important;
+  background-color: #ffffff !important;
+}
+
+.custom-country-search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b !important;
+  font-size: 0.8rem;
+}
+
+.custom-country-search {
+  padding-left: 2rem !important;
+  font-size: 0.85rem !important;
+  background-color: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+.custom-country-search::placeholder {
+  color: #94a3b8 !important;
+}
+
+.custom-country-list {
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.custom-country-dropdown-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.55rem 1rem;
+  font-size: 0.88rem;
+  font-weight: 400;
+  color: #0f172a !important;
+  text-align: left;
+  white-space: nowrap;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.custom-country-dropdown-item:hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+.custom-country-dropdown-item.active {
+  background-color: #e2e8f0 !important;
+  font-weight: 600;
+  color: #1d4ed8 !important;
+}
+
+/* Dark mode explicit theme overrides */
+.theme-dark .custom-country-dropdown-menu,
+.page-dark .custom-country-dropdown-menu,
+.dark-theme .custom-country-dropdown-menu {
+  background-color: #0b172a !important;
+  border-color: rgba(120, 214, 255, 0.3) !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6) !important;
+}
+
+.theme-dark .custom-country-search-wrap,
+.page-dark .custom-country-search-wrap,
+.dark-theme .custom-country-search-wrap {
+  border-bottom-color: rgba(120, 214, 255, 0.2) !important;
+  background-color: #0b172a !important;
+}
+
+.theme-dark .custom-country-search-icon,
+.page-dark .custom-country-search-icon,
+.dark-theme .custom-country-search-icon {
+  color: #38bdf8 !important;
+}
+
+.theme-dark .custom-country-search,
+.page-dark .custom-country-search,
+.dark-theme .custom-country-search {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(120, 214, 255, 0.25) !important;
+  color: #f0f4ff !important;
+}
+
+.theme-dark .custom-country-search::placeholder,
+.page-dark .custom-country-search::placeholder,
+.dark-theme .custom-country-search::placeholder {
+  color: rgba(233, 243, 255, 0.4) !important;
+}
+
+.theme-dark .custom-country-dropdown-item,
+.page-dark .custom-country-dropdown-item,
+.dark-theme .custom-country-dropdown-item {
+  color: #e2e8f0 !important;
+}
+
+.theme-dark .custom-country-dropdown-item:hover,
+.page-dark .custom-country-dropdown-item:hover,
+.dark-theme .custom-country-dropdown-item:hover {
+  background-color: rgba(34, 240, 255, 0.1) !important;
+  color: #38bdf8 !important;
+}
+
+.theme-dark .custom-country-dropdown-item.active,
+.page-dark .custom-country-dropdown-item.active,
+.dark-theme .custom-country-dropdown-item.active {
+  background-color: rgba(34, 240, 255, 0.2) !important;
+  color: #38bdf8 !important;
+}
+
+

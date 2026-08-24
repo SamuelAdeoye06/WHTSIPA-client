@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
 import logoWhts from '../assets/media/logo-whts.jpg'
 import { getCountryFlag } from '../utils/countryUtils'
+import CountrySelectField from '../components/CountrySelectField'
 
 /* ── Allowed countries (client spec) ── */
 const ALLOWED_COUNTRIES = [
@@ -85,15 +86,159 @@ async function detectCountry() {
   return null
 }
 
+/* ── SignUp Phone Field with Country Dropdown & Editable Dial Code ── */
+function SignUpPhoneField({ form, setForm, errors, setErrors, handleBlur }) {
+  const [showDropdown, setShowDropdown] = useState(false)
+  const dropdownRef = useRef(null)
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target))
+        setShowDropdown(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const selectedCode = form.phoneCountryCode || form.country || 'US'
+  const selectedCountry = ALLOWED_COUNTRIES.find(c => c.code === selectedCode) || ALLOWED_COUNTRIES[0]
+
+  const fullDial = form.phoneDialCode || selectedCountry?.dial || '+1'
+  const dialDigits = fullDial.replace(/^\+/, '')
+
+  const handleDialDigitsChange = (e) => {
+    const typed = e.target.value.replace(/\D/g, '')
+    const newFullDial = '+' + typed
+    const match = ALLOWED_COUNTRIES.find(c => c.dial === newFullDial)
+
+    setForm(p => ({
+      ...p,
+      phoneDialCode: newFullDial,
+      phoneCountryCode: match ? match.code : p.phoneCountryCode,
+      country: match ? match.code : p.country,
+      phone: `${newFullDial} ${p.phoneDigits || ''}`
+    }))
+    setErrors(p => ({ ...p, phone: '' }))
+  }
+
+  const handleDigitsChange = (e) => {
+    const digits = e.target.value
+    setForm(p => ({
+      ...p,
+      phoneDigits: digits,
+      phone: `${p.phoneDialCode || '+1'} ${digits}`
+    }))
+    setErrors(p => ({ ...p, phone: '' }))
+  }
+
+  const isValidDial = ALLOWED_COUNTRIES.some(c => c.dial === fullDial)
+
+  return (
+    <div className="phone-country-field-wrap mb-0">
+      <label className="auth-label" htmlFor="phone">
+        Phone Number <span className="text-danger">*</span>
+      </label>
+      <div className="input-group phone-field-group" ref={dropdownRef}>
+        {/* Country selector button */}
+        <button
+          type="button"
+          className={`btn phone-country-btn ${showDropdown ? 'is-active' : ''}`}
+          onClick={() => setShowDropdown(prev => !prev)}
+          title="Select country code"
+        >
+          <span className="country-flag-emoji">{getCountryFlag(selectedCountry.code)}</span>
+          <i className={`bi bi-caret-${showDropdown ? 'up' : 'down'}-fill country-arrow-icon`}></i>
+        </button>
+
+        {/* Editable dial prefix — '+' is constant, digits are editable */}
+        <div className={`phone-plus-prefix input-group-text ${!isValidDial && dialDigits.length > 0 ? 'is-invalid-dial' : ''}`}>
+          <span className="plus-symbol">+</span>
+          <input
+            type="text"
+            className="phone-dial-input"
+            value={dialDigits}
+            onChange={handleDialDigitsChange}
+            placeholder="1"
+            maxLength={4}
+            title="Type country dial code"
+          />
+        </div>
+
+        {/* Phone number digits */}
+        <input
+          id="phone"
+          name="phoneDigits"
+          type="tel"
+          className={`form-control cyber-input ${errors.phone ? 'is-invalid' : ''}`}
+          placeholder="Phone number digits"
+          value={form.phoneDigits || ''}
+          onChange={handleDigitsChange}
+          onBlur={handleBlur('phone')}
+        />
+
+        {/* Country dropdown list */}
+        {showDropdown && (
+          <div className="phone-country-dropdown-menu">
+            <ul className="list-unstyled mb-0">
+              {ALLOWED_COUNTRIES.map(c => {
+                const isSelected = selectedCode === c.code
+                const cleanName = c.name.replace(' (Dev)', '')
+                return (
+                  <li key={c.code}>
+                    <button
+                      type="button"
+                      className={`phone-country-dropdown-item ${isSelected ? 'active' : ''}`}
+                      onClick={() => {
+                        setForm(p => ({
+                          ...p,
+                          phoneCountryCode: c.code,
+                          phoneDialCode: c.dial,
+                          country: c.code,
+                          phone: `${c.dial} ${p.phoneDigits || ''}`
+                        }))
+                        setErrors(p => ({ ...p, country: '', phone: '' }))
+                        setShowDropdown(false)
+                      }}
+                    >
+                      <span className="country-flag-emoji me-2">{getCountryFlag(c.code)}</span>
+                      <span className="country-option-text">{cleanName} ({c.dial})</span>
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        )}
+      </div>
+
+      {!isValidDial && dialDigits.length > 0 && (
+        <div className="auth-field-error">
+          <i className="bi bi-exclamation-circle me-1"></i>
+          Country code +{dialDigits} is invalid or not in the allowed countries list.
+        </div>
+      )}
+
+      {errors.phone && (
+        <div className="auth-field-error">
+          <i className="bi bi-exclamation-circle me-1"></i>{errors.phone}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function SignUp() {
+
   const navigate  = useNavigate()
   const location  = useLocation()
   const { register } = useAuth()
 
   const [form, setForm] = useState({
     firstName: '', lastName: '', email: '',
-    country: '', phone: '', password: '', confirmPassword: ''
+    country: '', phoneCountryCode: 'US', phoneDialCode: '+1', phoneDigits: '', phone: '',
+    password: '', confirmPassword: ''
   })
+
   const [countrySearch, setCountrySearch]   = useState('')
   const [showDropdown,  setShowDropdown]    = useState(false)
   const [showPassword,  setShowPassword]    = useState(false)
@@ -110,9 +255,15 @@ export default function SignUp() {
       if (!code) return
       if (BLOCKED_CODES.has(code)) { setBlocked(true); return }
       const match = ALLOWED_COUNTRIES.find(c => c.code === code)
-      if (match) setForm(p => ({ ...p, country: match.code }))
+      if (match) setForm(p => ({
+        ...p,
+        country: match.code,
+        phoneCountryCode: match.code,
+        phoneDialCode: match.dial
+      }))
     })
   }, [])
+
 
   /* ── Close dropdown on outside click ── */
   useEffect(() => {
@@ -172,9 +323,10 @@ export default function SignUp() {
         if (!value) return 'Please select your country.'
         return ''
       case 'phone':
-        if (!value.trim()) return 'Phone number is required.'
-        if (!/^\+?[\d\s\-().]{7,20}$/.test(value)) return 'Enter a valid phone number.'
+        const phoneVal = (form.phoneDigits || form.phone).trim()
+        if (!phoneVal) return 'Phone number is required.'
         return ''
+
       case 'password':
         if (!value) return 'Password is required.'
         if (value.length < 12) return 'Minimum 12 characters.'
@@ -209,14 +361,16 @@ export default function SignUp() {
 
     setLoading(true)
     try {
+      const phoneVal = form.phoneDigits ? `${form.phoneDialCode || '+1'} ${form.phoneDigits}` : form.phone
       await api.post('/auth/register', {
         firstName: form.firstName,
         lastName:  form.lastName,
         email:     form.email,
         country:   form.country,
-        phone:     form.phone,
+        phone:     phoneVal,
         password:  form.password,
       })
+
       navigate('/verify-otp', { state: { email: form.email, ...location.state } })
     } catch (err) {
       setSubmitError(err.response?.data?.message || 'Registration failed. Please try again.')
@@ -341,86 +495,45 @@ export default function SignUp() {
                 </div>
               </div>
 
-              {/* Country — searchable custom dropdown */}
+              {/* Country */}
               <div className="col-12">
-                <div className="auth-field mb-0">
-                  <label className="auth-label" htmlFor="country-btn">Country</label>
-                  <div className="auth-country-wrap" ref={dropdownRef}>
-                    <button
-                      type="button"
-                      id="country-btn"
-                      className={`auth-input auth-country-btn${errors.country ? ' auth-input-error' : ''}`}
-                      onClick={() => setShowDropdown(p => !p)}
-                    >
-                      <span className="country-flag-emoji me-2">
-                        {selectedCountry ? getCountryFlag(selectedCountry.code) : '🌐'}
-                      </span>
-                      <span className="auth-country-label">
-                        {selectedCountry ? `${selectedCountry.name.replace(' (Dev)', '')} (${selectedCountry.dial})` : 'Select your country'}
-                      </span>
-                      <i className={`bi bi-caret-${showDropdown ? 'up' : 'down'}-fill country-arrow-icon ms-auto`}></i>
-                    </button>
-                    {showDropdown && (
-                      <div className="auth-country-dropdown">
-                        <div className="auth-country-search-wrap">
-                          <i className="bi bi-search auth-country-search-icon"></i>
-                          <input
-                            className="auth-country-search"
-                            placeholder="Search country…"
-                            value={countrySearch}
-                            onChange={e => setCountrySearch(e.target.value)}
-                            autoFocus
-                          />
-                        </div>
-                        <ul className="auth-country-list">
-                          {filteredCountries.length === 0 && (
-                            <li className="auth-country-empty">No countries found</li>
-                          )}
-                          {filteredCountries.map(c => {
-                            const isSelected = form.country === c.code
-                            const cleanName = c.name.replace(' (Dev)', '')
-                            return (
-                              <li key={c.code}>
-                                <button
-                                  type="button"
-                                  className={`auth-country-option${isSelected ? ' selected' : ''}`}
-                                  onClick={() => {
-                                    setForm(p => ({ ...p, country: c.code,
-                                      phone: p.phone.startsWith('+') ? c.dial + p.phone.replace(/^\+\d+/, '') : c.dial + ' '
-                                    }))
-                                    setErrors(p => ({ ...p, country: '' }))
-                                    setShowDropdown(false)
-                                    setCountrySearch('')
-                                  }}
-                                >
-                                  <span className="country-flag-emoji me-2">{getCountryFlag(c.code)}</span>
-                                  <span className="auth-country-name">{cleanName} ({c.dial})</span>
-                                </button>
-                              </li>
-                            )
-                          })}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                  {errors.country && <div className="auth-field-error">{errors.country}</div>}
-                </div>
+                <CountrySelectField
+                  id="country"
+                  name="country"
+                  label="Country"
+                  isRequired={true}
+                  value={form.country}
+                  onChange={(code) => {
+                    setForm(p => {
+                      const match = ALLOWED_COUNTRIES.find(c => c.code === code)
+                      const dial = match ? match.dial : (p.phoneDialCode || '+1')
+                      return {
+                        ...p,
+                        country: code,
+                        phoneCountryCode: code,
+                        phoneDialCode: dial,
+                        phone: `${dial} ${p.phoneDigits || ''}`
+                      }
+                    })
+                    setErrors(p => ({ ...p, country: '' }))
+                  }}
+                  onBlur={handleBlur('country')}
+                  isInvalid={Boolean(errors.country)}
+                  errorMsg={errors.country}
+                />
               </div>
 
-              {/* Phone */}
+              {/* Phone Number with Country Dropdown & Editable Dial Code */}
               <div className="col-12">
-                <div className="auth-field mb-0">
-                  <label className="auth-label" htmlFor="phone">Phone Number</label>
-                  <div className="auth-input-wrap">
-                    <i className="bi bi-telephone auth-input-icon"></i>
-                    <input id="phone" type="tel" className={`auth-input${errors.phone ? ' auth-input-error' : ''}`}
-                      placeholder={selectedCountry ? `${getFriendlyCode(selectedCountry.code)} (${selectedCountry.dial}) ...` : 'USA (+1) ...'}
-                      value={form.phone}
-                      onChange={set('phone')} onBlur={handleBlur('phone')} />
-                  </div>
-                  {errors.phone && <div className="auth-field-error">{errors.phone}</div>}
-                </div>
+                <SignUpPhoneField
+                  form={form}
+                  setForm={setForm}
+                  errors={errors}
+                  setErrors={setErrors}
+                  handleBlur={handleBlur}
+                />
               </div>
+
 
               {/* Password */}
               <div className="col-12">

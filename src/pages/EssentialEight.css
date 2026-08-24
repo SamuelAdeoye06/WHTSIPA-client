@@ -523,9 +523,12 @@
   font-size: 0.88rem;
   font-weight: 600;
   padding: 0.55rem 0.75rem !important;
-  white-space: nowrap;
-  flex-shrink: 0;
-  min-width: 65px;
+  white-space: nowrap !important;
+  flex: 0 0 auto !important;
+  flex-shrink: 0 !important;
+  width: auto !important;
+  min-width: 60px !important;
+  max-width: 75px !important;
   cursor: pointer;
   transition: all 0.18s ease;
 }
@@ -537,19 +540,49 @@
 }
 
 .bc-phone-prefix {
-  display: flex;
-  align-items: center;
-  padding: 0 0.65rem;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 1px !important;
+  padding: 0 0.5rem !important;
   background: #f1f5f9 !important;
   border: 1.5px solid #cbd5e1 !important;
   border-right: none !important;
-  color: #1e3a5f;
-  font-weight: 700;
-  font-size: 0.88rem;
-  user-select: none;
-  white-space: nowrap;
+  color: #1e3a5f !important;
+  font-weight: 700 !important;
+  font-size: 0.88rem !important;
+  white-space: nowrap !important;
+  letter-spacing: 0.5px;
+  flex: 0 0 auto !important;
+  flex-shrink: 0 !important;
+  width: auto !important;
+}
+
+.bc-phone-prefix.bc-invalid-dial {
+  background: #fef2f2 !important;
+  color: #dc2626 !important;
+}
+
+.bc-dial-input {
+  border: none !important;
+  background: transparent !important;
+  color: inherit !important;
+  font-weight: 700 !important;
+  font-size: 0.88rem !important;
+  width: 38px !important;
+  min-width: 38px !important;
+  max-width: 38px !important;
+  flex: 0 0 38px !important;
+  padding: 0.55rem 0.1rem !important;
+  outline: none !important;
+  box-shadow: none !important;
   letter-spacing: 0.5px;
 }
+
+.bc-dial-input:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 
 .bc-input-phone {
   border-radius: 0 10px 10px 0 !important;

@@ -861,59 +861,94 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
               </div>
 
               {/* Contact value input — hidden until a method is selected */}
-              {form.contactMethod === 'WhatsApp' && (
-                <div className="wm-phone-wrap" ref={phoneDropdownRef}>
-                  {/* Country code selector button */}
-                  <button
-                    type="button"
-                    className={`wm-phone-btn ${showPhoneDropdown ? 'is-active' : ''}`}
-                    onClick={() => setShowPhoneDropdown(p => !p)}
-                    title="Select country code"
-                  >
-                    <span className="wm-phone-flag">{getCountryFlag(form.phoneCountryCode)}</span>
-                    <i className={`bi bi-caret-${showPhoneDropdown ? 'up' : 'down'}-fill wm-phone-arrow`}></i>
-                  </button>
+              {form.contactMethod === 'WhatsApp' && (() => {
+                const fullDial = form.phoneDialCode || '+1'
+                const dialDigits = fullDial.replace(/^\+/, '')
+                const isValidDial = ALLOWED_COUNTRIES.some(c => c.dial === fullDial)
 
-                  {/* Locked dial prefix badge */}
-                  <span className="wm-phone-prefix">{form.phoneDialCode}</span>
+                const handleDialDigitsChange = (e) => {
+                  const typed = e.target.value.replace(/\D/g, '')
+                  const newFullDial = '+' + typed
+                  const match = ALLOWED_COUNTRIES.find(c => c.dial === newFullDial)
+                  if (match) {
+                    setForm(f => ({ ...f, phoneCountryCode: match.code, phoneDialCode: match.dial }))
+                  } else {
+                    setForm(f => ({ ...f, phoneDialCode: newFullDial }))
+                  }
+                }
 
-                  {/* Editable digits only */}
-                  <input
-                    type="tel"
-                    className="wm-phone-digits"
-                    placeholder="Phone number digits"
-                    value={form.phoneDigits}
-                    onChange={e => setForm(f => ({ ...f, phoneDigits: e.target.value }))}
-                    required
-                  />
+                return (
+                  <div>
+                    <div className="wm-phone-wrap" ref={phoneDropdownRef}>
+                      {/* Country code selector button */}
+                      <button
+                        type="button"
+                        className={`wm-phone-btn ${showPhoneDropdown ? 'is-active' : ''}`}
+                        onClick={() => setShowPhoneDropdown(p => !p)}
+                        title="Select country code"
+                      >
+                        <span className="wm-phone-flag">{getCountryFlag(form.phoneCountryCode)}</span>
+                        <i className={`bi bi-caret-${showPhoneDropdown ? 'up' : 'down'}-fill wm-phone-arrow`}></i>
+                      </button>
 
-                  {/* Floating dropdown */}
-                  {showPhoneDropdown && (
-                    <div className="wm-phone-dropdown">
-                      <ul className="wm-phone-list">
-                        {ALLOWED_COUNTRIES.map(c => {
-                          const isSelected = form.phoneCountryCode === c.code
-                          return (
-                            <li key={c.code}>
-                              <button
-                                type="button"
-                                className={`wm-phone-item ${isSelected ? 'active' : ''}`}
-                                onClick={() => {
-                                  setForm(f => ({ ...f, phoneCountryCode: c.code, phoneDialCode: c.dial }))
-                                  setShowPhoneDropdown(false)
-                                }}
-                              >
-                                <span className="wm-phone-item-flag">{getCountryFlag(c.code)}</span>
-                                <span className="wm-phone-item-text">{c.name} ({c.dial})</span>
-                              </button>
-                            </li>
-                          )
-                        })}
-                      </ul>
+                      {/* Manual editable dial prefix — '+' is constant, digits are editable */}
+                      <span className={`wm-phone-prefix ${!isValidDial && dialDigits.length > 0 ? 'wm-invalid-dial' : ''}`}>
+                        <span className="plus-symbol">+</span>
+                        <input
+                          type="text"
+                          className="wm-dial-input"
+                          value={dialDigits}
+                          onChange={handleDialDigitsChange}
+                          placeholder="1"
+                          maxLength={4}
+                          title="Type country dial code"
+                        />
+                      </span>
+
+                      {/* Editable digits only */}
+                      <input
+                        type="tel"
+                        className="wm-phone-digits"
+                        placeholder="Phone number digits"
+                        value={form.phoneDigits}
+                        onChange={e => setForm(f => ({ ...f, phoneDigits: e.target.value }))}
+                        required
+                      />
+
+                      {/* Floating dropdown */}
+                      {showPhoneDropdown && (
+                        <div className="wm-phone-dropdown">
+                          <ul className="wm-phone-list">
+                            {ALLOWED_COUNTRIES.map(c => {
+                              const isSelected = form.phoneCountryCode === c.code
+                              return (
+                                <li key={c.code}>
+                                  <button
+                                    type="button"
+                                    className={`wm-phone-item ${isSelected ? 'active' : ''}`}
+                                    onClick={() => {
+                                      setForm(f => ({ ...f, phoneCountryCode: c.code, phoneDialCode: c.dial }))
+                                      setShowPhoneDropdown(false)
+                                    }}
+                                  >
+                                    <span className="wm-phone-item-flag">{getCountryFlag(c.code)}</span>
+                                    <span className="wm-phone-item-text">{c.name} ({c.dial})</span>
+                                  </button>
+                                </li>
+                              )
+                            })}
+                          </ul>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              )}
+                    {!isValidDial && dialDigits.length > 0 && (
+                      <small className="wm-hint text-danger mt-1 d-block">
+                        <i className="bi bi-exclamation-triangle me-1"></i>Country code +{dialDigits} is not in the allowed list.
+                      </small>
+                    )}
+                  </div>
+                )
+              })()}
 
               {form.contactMethod === 'Telegram' && (
                 <input

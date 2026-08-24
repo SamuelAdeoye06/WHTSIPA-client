@@ -246,12 +246,27 @@ function BookingPhoneField({ countryCode, setCountryCode, dialCode, setDialCode,
   }, [])
 
   const selectedCountry = ALLOWED_COUNTRIES.find(c => c.code === countryCode) || ALLOWED_COUNTRIES[0]
+  const fullDial = dialCode || selectedCountry.dial || '+1'
+  const dialDigits = fullDial.replace(/^\+/, '')
+
+  const handleDialDigitsChange = (e) => {
+    const typed = e.target.value.replace(/\D/g, '')
+    const newFullDial = '+' + typed
+    setDialCode(newFullDial)
+
+    const match = ALLOWED_COUNTRIES.find(c => c.dial === newFullDial)
+    if (match) {
+      setCountryCode(match.code)
+    }
+  }
+
+  const isValidDial = ALLOWED_COUNTRIES.some(c => c.dial === fullDial)
 
   return (
     <div className="bc-field">
       <label className="bc-label" htmlFor="bc-phone">Phone Number *</label>
       <div className="bc-phone-wrap" ref={dropdownRef} style={{ position: 'relative' }}>
-        {/* Custom Country Selector Button — Flag + Caret arrow as in reference image */}
+        {/* Country Selector Button — Flag + Caret arrow */}
         <button
           type="button"
           className={`bc-phone-btn ${showDropdown ? 'is-active' : ''}`}
@@ -262,8 +277,19 @@ function BookingPhoneField({ countryCode, setCountryCode, dialCode, setDialCode,
           <i className={`bi bi-caret-${showDropdown ? 'up' : 'down'}-fill country-arrow-icon`}></i>
         </button>
 
-        {/* Locked dial prefix badge */}
-        <span className="bc-phone-prefix">{dialCode || selectedCountry.dial}</span>
+        {/* Editable dial prefix — '+' is constant, digits are editable */}
+        <span className={`bc-phone-prefix ${!isValidDial && dialDigits.length > 0 ? 'bc-invalid-dial' : ''}`}>
+          <span className="plus-symbol">+</span>
+          <input
+            type="text"
+            className="bc-dial-input"
+            value={dialDigits}
+            onChange={handleDialDigitsChange}
+            placeholder="1"
+            maxLength={4}
+            title="Type country dial code"
+          />
+        </span>
 
         {/* Editable phone digits */}
         <input
@@ -303,6 +329,9 @@ function BookingPhoneField({ countryCode, setCountryCode, dialCode, setDialCode,
           </div>
         )}
       </div>
+      {!isValidDial && dialDigits.length > 0 && (
+        <span className="bc-error"><i className="bi bi-exclamation-circle me-1"></i>Country code +{dialDigits} is not in the allowed list.</span>
+      )}
       {error && <span className="bc-error"><i className="bi bi-exclamation-circle me-1"></i>{error}</span>}
     </div>
   )
