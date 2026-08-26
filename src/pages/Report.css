@@ -1376,99 +1376,129 @@ textarea.cyber-input { resize: vertical; min-height: 120px; }
   color: #1d4ed8;
 }
 
-/* Dark mode explicit theme overrides — applied to dark cards, dark modal, dark pages */
-.theme-dark .custom-country-dropdown-menu,
-.page-dark .custom-country-dropdown-menu,
-.dark-theme .custom-country-dropdown-menu,
-.site-dark .custom-country-dropdown-menu,
-.site-dark .phone-country-dropdown-menu,
-.card-glass .custom-country-dropdown-menu,
-.card-glass .phone-country-dropdown-menu,
-.card-dark .custom-country-dropdown-menu,
-.card-dark .phone-country-dropdown-menu {
-  background-color: #0b172a !important;
-  border-color: rgba(120, 214, 255, 0.3) !important;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6) !important;
+/* ── Custom Sleek Scrollbar for Country Dropdowns ── */
+.custom-country-list,
+.phone-country-dropdown-menu {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+.custom-country-list::-webkit-scrollbar,
+.phone-country-dropdown-menu::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-country-list::-webkit-scrollbar-track,
+.phone-country-dropdown-menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-country-list::-webkit-scrollbar-thumb,
+.phone-country-dropdown-menu::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 6px;
+}
+.custom-country-list::-webkit-scrollbar-thumb:hover,
+.phone-country-dropdown-menu::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
-.theme-dark .custom-country-search-wrap,
-.page-dark .custom-country-search-wrap,
-.dark-theme .custom-country-search-wrap,
+/* ── Dark Mode Overrides (ONLY on genuinely dark pages/modals) ── */
+.site-dark .custom-country-dropdown-menu,
+.site-dark .phone-country-dropdown-menu,
+.theme-dark .custom-country-dropdown-menu,
+.theme-dark .phone-country-dropdown-menu,
+.dark-theme .custom-country-dropdown-menu,
+.dark-theme .phone-country-dropdown-menu,
+.page-dark .custom-country-dropdown-menu,
+.page-dark .phone-country-dropdown-menu {
+  background-color: #0b172a !important;
+  border-color: rgba(120, 214, 255, 0.3) !important;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6) !important;
+}
+
 .site-dark .custom-country-search-wrap,
-.card-glass .custom-country-search-wrap,
-.card-dark .custom-country-search-wrap {
+.theme-dark .custom-country-search-wrap,
+.dark-theme .custom-country-search-wrap,
+.page-dark .custom-country-search-wrap {
   border-bottom: 1px solid rgba(120, 214, 255, 0.2) !important;
   background-color: #0b172a !important;
 }
 
-.theme-dark .custom-country-search-icon,
-.page-dark .custom-country-search-icon,
-.dark-theme .custom-country-search-icon,
 .site-dark .custom-country-search-icon,
-.card-glass .custom-country-search-icon,
-.card-dark .custom-country-search-icon {
+.theme-dark .custom-country-search-icon,
+.dark-theme .custom-country-search-icon,
+.page-dark .custom-country-search-icon {
   color: #38bdf8 !important;
 }
 
-.theme-dark .custom-country-search,
-.page-dark .custom-country-search,
-.dark-theme .custom-country-search,
 .site-dark .custom-country-search,
-.card-glass .custom-country-search,
-.card-dark .custom-country-search {
+.theme-dark .custom-country-search,
+.dark-theme .custom-country-search,
+.page-dark .custom-country-search {
   background-color: rgba(255, 255, 255, 0.08) !important;
   border: 1px solid rgba(120, 214, 255, 0.25) !important;
   color: #f0f4ff !important;
 }
 
-.theme-dark .custom-country-search:focus,
-.page-dark .custom-country-search:focus,
-.dark-theme .custom-country-search:focus,
 .site-dark .custom-country-search:focus,
-.card-glass .custom-country-search:focus,
-.card-dark .custom-country-search:focus {
+.theme-dark .custom-country-search:focus,
+.dark-theme .custom-country-search:focus,
+.page-dark .custom-country-search:focus {
   background-color: rgba(255, 255, 255, 0.12) !important;
   border-color: #22f0ff !important;
   color: #ffffff !important;
   box-shadow: 0 0 0 2px rgba(34, 240, 255, 0.2) !important;
 }
 
-.theme-dark .custom-country-search::placeholder,
-.page-dark .custom-country-search::placeholder,
-.dark-theme .custom-country-search::placeholder,
 .site-dark .custom-country-search::placeholder,
-.card-glass .custom-country-search::placeholder,
-.card-dark .custom-country-search::placeholder {
+.theme-dark .custom-country-search::placeholder,
+.dark-theme .custom-country-search::placeholder,
+.page-dark .custom-country-search::placeholder {
   color: rgba(233, 243, 255, 0.45) !important;
 }
 
-.theme-dark .custom-country-dropdown-item,
-.page-dark .custom-country-dropdown-item,
-.dark-theme .custom-country-dropdown-item,
 .site-dark .custom-country-dropdown-item,
-.card-glass .custom-country-dropdown-item,
-.card-dark .custom-country-dropdown-item {
+.theme-dark .custom-country-dropdown-item,
+.dark-theme .custom-country-dropdown-item,
+.page-dark .custom-country-dropdown-item {
   color: #e2e8f0 !important;
 }
 
-.theme-dark .custom-country-dropdown-item:hover,
-.page-dark .custom-country-dropdown-item:hover,
-.dark-theme .custom-country-dropdown-item:hover,
 .site-dark .custom-country-dropdown-item:hover,
-.card-glass .custom-country-dropdown-item:hover,
-.card-dark .custom-country-dropdown-item:hover {
+.theme-dark .custom-country-dropdown-item:hover,
+.dark-theme .custom-country-dropdown-item:hover,
+.page-dark .custom-country-dropdown-item:hover {
   background-color: rgba(34, 240, 255, 0.1) !important;
   color: #38bdf8 !important;
 }
 
-.theme-dark .custom-country-dropdown-item.active,
-.page-dark .custom-country-dropdown-item.active,
-.dark-theme .custom-country-dropdown-item.active,
 .site-dark .custom-country-dropdown-item.active,
-.card-glass .custom-country-dropdown-item.active,
-.card-dark .custom-country-dropdown-item.active {
+.theme-dark .custom-country-dropdown-item.active,
+.dark-theme .custom-country-dropdown-item.active,
+.page-dark .custom-country-dropdown-item.active {
   background-color: rgba(34, 240, 255, 0.2) !important;
   color: #38bdf8 !important;
+}
+
+/* Dark mode scrollbar */
+.site-dark .custom-country-list,
+.site-dark .phone-country-dropdown-menu,
+.theme-dark .custom-country-list,
+.dark-theme .custom-country-list,
+.page-dark .custom-country-list {
+  scrollbar-color: rgba(34, 211, 238, 0.35) transparent !important;
+}
+.site-dark .custom-country-list::-webkit-scrollbar-thumb,
+.site-dark .phone-country-dropdown-menu::-webkit-scrollbar-thumb,
+.theme-dark .custom-country-list::-webkit-scrollbar-thumb,
+.dark-theme .custom-country-list::-webkit-scrollbar-thumb,
+.page-dark .custom-country-list::-webkit-scrollbar-thumb {
+  background: rgba(34, 211, 238, 0.35) !important;
+}
+.site-dark .custom-country-list::-webkit-scrollbar-thumb:hover,
+.site-dark .phone-country-dropdown-menu::-webkit-scrollbar-thumb:hover,
+.theme-dark .custom-country-list::-webkit-scrollbar-thumb:hover,
+.dark-theme .custom-country-list::-webkit-scrollbar-thumb:hover,
+.page-dark .custom-country-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(34, 211, 238, 0.6) !important;
 }
 
 
