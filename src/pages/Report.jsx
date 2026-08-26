@@ -9,8 +9,8 @@ import { useNavigate } from 'react-router-dom'
 import api from '../services/api'
 import { openLiveChat, onAgentJoined } from '../utils/tidio'
 import { genTicketId } from '../utils/ticketId'
-import ChatSessionHistory from '../components/ChatSessionHistory'
 import { getCountryFlag } from '../utils/countryUtils'
+import { useCountries } from '../context/CountriesContext'
 import CountrySelectField from '../components/CountrySelectField'
 
 /* ── Incident types (Updated per spec) ── */
@@ -24,39 +24,6 @@ const INCIDENT_TYPES = [
   'Deepfake / AI-Generated Scam',
   'Stalking or Harassment',
   'Other (please specify)',
-]
-
-/* ── Allowed countries (client spec) ── */
-const ALLOWED_COUNTRIES = [
-  { code: 'US', name: 'United States',          dial: '+1'   },
-  { code: 'CA', name: 'Canada',                 dial: '+1'   },
-  { code: 'GB', name: 'United Kingdom',         dial: '+44'  },
-  { code: 'AU', name: 'Australia',              dial: '+61'  },
-  { code: 'NZ', name: 'New Zealand',            dial: '+64'  },
-  { code: 'DE', name: 'Germany',                dial: '+49'  },
-  { code: 'FR', name: 'France',                 dial: '+33'  },
-  { code: 'NL', name: 'Netherlands',            dial: '+31'  },
-  { code: 'SE', name: 'Sweden',                 dial: '+46'  },
-  { code: 'NO', name: 'Norway',                 dial: '+47'  },
-  { code: 'DK', name: 'Denmark',                dial: '+45'  },
-  { code: 'FI', name: 'Finland',                dial: '+358' },
-  { code: 'CH', name: 'Switzerland',            dial: '+41'  },
-  { code: 'SG', name: 'Singapore',              dial: '+65'  },
-  { code: 'JP', name: 'Japan',                  dial: '+81'  },
-  { code: 'KR', name: 'South Korea',            dial: '+82'  },
-  { code: 'AE', name: 'United Arab Emirates',   dial: '+971' },
-  { code: 'QA', name: 'Qatar',                  dial: '+974' },
-  { code: 'IL', name: 'Israel',                 dial: '+972' },
-  { code: 'AT', name: 'Austria',                dial: '+43'  },
-  { code: 'BE', name: 'Belgium',                dial: '+32'  },
-  { code: 'IT', name: 'Italy',                  dial: '+39'  },
-  { code: 'ES', name: 'Spain',                  dial: '+34'  },
-  { code: 'PL', name: 'Poland',                 dial: '+48'  },
-  { code: 'PT', name: 'Portugal',               dial: '+351' },
-  { code: 'IE', name: 'Ireland',                dial: '+353' },
-  { code: 'GR', name: 'Greece',                 dial: '+30'  },
-  { code: 'CZ', name: 'Czechia',               dial: '+420' },
-  { code: 'NG', name: 'Nigeria (Dev)',          dial: '+234' },
 ]
 
 /* ── Currency mapping per country code ── */
@@ -275,21 +242,25 @@ const getFriendlyCode = (code) => {
 }
 
 /* ── Reusable Phone Field with Country Code Dropdown ── */
-function PhoneCountryField({ formik, fieldName, phoneDialFieldName, phoneCodeFieldName, countryFieldName = 'country', isRequired }) {
+function PhoneCountryField({ formik, fieldName, phoneCodeFieldName, phoneDialFieldName, isRequired = false, countryFieldName = 'country' }) {
   const [showDropdown, setShowDropdown] = useState(false)
+  const [search, setSearch] = useState('')
   const dropdownRef = useRef(null)
+  const { allCountries, matchCountrySearch } = useCountries()
 
   useEffect(() => {
     const handler = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target))
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setShowDropdown(false)
+        setSearch('')
+      }
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
   const selectedCode = formik.values[phoneCodeFieldName] || 'US'
-  const selectedCountry = ALLOWED_COUNTRIES.find(c => c.code === selectedCode) || ALLOWED_COUNTRIES[0]
+  const selectedCountry = allCountries.find(c => c.code === selectedCode) || allCountries[0]
 
   // Full dial prefix in formik state, e.g. "+234"
   const fullDial = formik.values[phoneDialFieldName] || selectedCountry?.dial || '+1'
@@ -302,7 +273,7 @@ function PhoneCountryField({ formik, fieldName, phoneDialFieldName, phoneCodeFie
     const newFullDial = '+' + typed
     formik.setFieldValue(phoneDialFieldName, newFullDial)
 
-    const match = ALLOWED_COUNTRIES.find(c => c.dial === newFullDial)
+    const match = allCountries.find(c => c.dial === newFullDial)
     if (match) {
       formik.setFieldValue(phoneCodeFieldName, match.code)
       formik.setFieldValue(countryFieldName, match.code)
@@ -312,8 +283,10 @@ function PhoneCountryField({ formik, fieldName, phoneDialFieldName, phoneCodeFie
     }
   }
 
-  // Check if current dial code is in ALLOWED_COUNTRIES
-  const isValidDial = ALLOWED_COUNTRIES.some(c => c.dial === fullDial)
+  // Check if current dial code is in allCountries
+  const isValidDial = allCountries.some(c => c.dial === fullDial)
+
+  const filteredCountries = allCountries.filter(c => matchCountrySearch(c, search))
 
   return (
     <div className="phone-country-field-wrap">
@@ -362,35 +335,54 @@ function PhoneCountryField({ formik, fieldName, phoneDialFieldName, phoneCodeFie
         {/* Country dropdown list — populated with ALLOWED_COUNTRIES */}
         {showDropdown && (
           <div className="phone-country-dropdown-menu">
-            <ul className="list-unstyled mb-0">
-              {ALLOWED_COUNTRIES.map(c => {
-                const isSelected = selectedCode === c.code
-                const cleanName = c.name.replace(' (Dev)', '')
-                return (
-                  <li key={c.code}>
-                    <button
-                      type="button"
-                      className={`phone-country-dropdown-item ${isSelected ? 'active' : ''}`}
-                      onClick={() => {
-                        formik.setFieldValue(phoneCodeFieldName, c.code)
-                        formik.setFieldValue(phoneDialFieldName, c.dial)
-                        formik.setFieldValue(countryFieldName, c.code)
-                        if (countryFieldName === 'country' && formik.values.financialLossCurrency !== undefined) {
-                          formik.setFieldValue('financialLossCurrency', COUNTRY_CURRENCIES[c.code] || 'USD $')
-                        }
-                        setShowDropdown(false)
-                      }}
-                    >
-                      <span className="country-flag-emoji me-2">{getCountryFlag(c.code)}</span>
-                      <span className="country-option-text">{cleanName} ({c.dial})</span>
-                    </button>
-                  </li>
-                )
-              })}
+            <div className="custom-country-search-wrap">
+              <i className="bi bi-search custom-country-search-icon"></i>
+              <input
+                type="text"
+                className="form-control form-control-sm custom-country-search"
+                placeholder="Search country or code (+234, NG)..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <ul className="list-unstyled mb-0 custom-country-list">
+              {filteredCountries.length === 0 ? (
+                <li className="p-3 text-muted-cyber text-center" style={{ fontSize: '0.82rem' }}>
+                  No country matches
+                </li>
+              ) : (
+                filteredCountries.map(c => {
+                  const isSelected = selectedCode === c.code
+                  const cleanName = c.name.replace(' (Dev)', '')
+                  return (
+                    <li key={c.code}>
+                      <button
+                        type="button"
+                        className={`phone-country-dropdown-item ${isSelected ? 'active' : ''}`}
+                        onClick={() => {
+                          formik.setFieldValue(phoneCodeFieldName, c.code)
+                          formik.setFieldValue(phoneDialFieldName, c.dial)
+                          formik.setFieldValue(countryFieldName, c.code)
+                          if (countryFieldName === 'country' && formik.values.financialLossCurrency !== undefined) {
+                            formik.setFieldValue('financialLossCurrency', COUNTRY_CURRENCIES[c.code] || 'USD $')
+                          }
+                          setShowDropdown(false)
+                          setSearch('')
+                        }}
+                      >
+                        <span className="country-flag-emoji me-2">{getCountryFlag(c.code)}</span>
+                        <span className="country-option-text">{cleanName} ({c.dial})</span>
+                      </button>
+                    </li>
+                  )
+                })
+              )}
             </ul>
           </div>
         )}
       </div>
+
 
       {/* Validation warning if dial code typed is not allowed */}
       {!isValidDial && dialDigits.length > 0 && (
@@ -759,6 +751,7 @@ export default function Report() {
 
   const { user } = useAuth()
   const navigate = useNavigate()
+  const { allCountries } = useCountries()
 
   /* ── 1. Formik & Yup Validation: Personal Form ── */
   const personalFormik = useFormik({
@@ -989,7 +982,7 @@ export default function Report() {
     // (i.e. user hasn't already picked a country manually in a saved draft)
     detectCountry().then(code => {
       if (!code) return
-      const match = ALLOWED_COUNTRIES.find(c => c.code === code)
+      const match = allCountries.find(c => c.code === code)
       if (!match) return
 
       const personalCountry = personalDraftValues?.country
@@ -1008,9 +1001,8 @@ export default function Report() {
         publicFormik.setFieldValue('phoneCountryDial', match.dial)
       }
     })
-
     isLoadedRef.current = true
-  }, [])
+  }, [allCountries])
 
   /* ── 5. Auto-Save Drafts on change ── */
   useEffect(() => {
@@ -1313,7 +1305,7 @@ export default function Report() {
                           value={personalFormik.values.country}
                           onChange={(code) => {
                             personalFormik.setFieldValue('country', code)
-                            const match = ALLOWED_COUNTRIES.find(c => c.code === code)
+                            const match = allCountries.find(c => c.code === code)
                             if (match) {
                               personalFormik.setFieldValue('phoneCountryCode', match.code)
                               personalFormik.setFieldValue('phoneCountryDial', match.dial)
@@ -1562,7 +1554,7 @@ export default function Report() {
                             onChange={personalFormik.handleChange}
                             onBlur={personalFormik.handleBlur}
                           >
-                            {ALLOWED_COUNTRIES.map(c => {
+                            {allCountries.map(c => {
                               const cur = COUNTRY_CURRENCIES[c.code] || 'USD $'
                               return (
                                 <option key={c.code} value={cur}>
@@ -1723,7 +1715,7 @@ export default function Report() {
                           value={publicFormik.values.country}
                           onChange={(code) => {
                             publicFormik.setFieldValue('country', code)
-                            const match = ALLOWED_COUNTRIES.find(c => c.code === code)
+                            const match = allCountries.find(c => c.code === code)
                             if (match) {
                               publicFormik.setFieldValue('phoneCountryCode', match.code)
                               publicFormik.setFieldValue('phoneCountryDial', match.dial)

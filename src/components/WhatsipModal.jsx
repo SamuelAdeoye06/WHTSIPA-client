@@ -14,47 +14,8 @@ import { openLiveChat, onAgentJoined } from '../utils/tidio'
 import { genTicketId } from '../utils/ticketId'
 import ChatSessionHistory from './ChatSessionHistory'
 import './WhatsipModal.css'
-
-/* ── Allowed countries — kept in sync with other forms ── */
-const ALLOWED_COUNTRIES = [
-  { code: 'US', name: 'United States',        dial: '+1'   },
-  { code: 'CA', name: 'Canada',               dial: '+1'   },
-  { code: 'GB', name: 'United Kingdom',       dial: '+44'  },
-  { code: 'AU', name: 'Australia',            dial: '+61'  },
-  { code: 'NZ', name: 'New Zealand',          dial: '+64'  },
-  { code: 'DE', name: 'Germany',              dial: '+49'  },
-  { code: 'FR', name: 'France',              dial: '+33'  },
-  { code: 'NL', name: 'Netherlands',          dial: '+31'  },
-  { code: 'SE', name: 'Sweden',               dial: '+46'  },
-  { code: 'NO', name: 'Norway',               dial: '+47'  },
-  { code: 'DK', name: 'Denmark',              dial: '+45'  },
-  { code: 'FI', name: 'Finland',              dial: '+358' },
-  { code: 'CH', name: 'Switzerland',          dial: '+41'  },
-  { code: 'SG', name: 'Singapore',            dial: '+65'  },
-  { code: 'JP', name: 'Japan',                dial: '+81'  },
-  { code: 'KR', name: 'South Korea',          dial: '+82'  },
-  { code: 'AE', name: 'United Arab Emirates', dial: '+971' },
-  { code: 'QA', name: 'Qatar',               dial: '+974' },
-  { code: 'IL', name: 'Israel',               dial: '+972' },
-  { code: 'AT', name: 'Austria',              dial: '+43'  },
-  { code: 'BE', name: 'Belgium',              dial: '+32'  },
-  { code: 'IT', name: 'Italy',                dial: '+39'  },
-  { code: 'ES', name: 'Spain',                dial: '+34'  },
-  { code: 'PL', name: 'Poland',               dial: '+48'  },
-  { code: 'PT', name: 'Portugal',             dial: '+351' },
-  { code: 'IE', name: 'Ireland',              dial: '+353' },
-  { code: 'GR', name: 'Greece',               dial: '+30'  },
-  { code: 'CZ', name: 'Czechia',             dial: '+420' },
-  { code: 'NG', name: 'Nigeria',              dial: '+234' },
-]
-
-/* ── Flag emoji from 2-letter country code ── */
-const getCountryFlag = (code) => {
-  if (!code || code.length !== 2) return '🌐'
-  return String.fromCodePoint(
-    ...code.toUpperCase().split('').map(c => 0x1F1E6 + c.charCodeAt(0) - 65)
-  )
-}
+import { getCountryFlag } from '../utils/countryUtils'
+import { useCountries } from '../context/CountriesContext'
 
 /* ── IP → country detection ── */
 async function detectCountry() {
@@ -454,6 +415,7 @@ function ToolsLiveChat({ ticketId, threatTitle, onClose, onBack, user, userName,
 export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const { allCountries, matchCountrySearch } = useCountries()
   const [ticketId] = useState(genTicketId)
   const [step, setStep] = useState('main')
   const [loading, setLoading] = useState(false)
@@ -470,8 +432,8 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
     if (user) {
       setForm(f => ({
         ...f,
-        name: f.name || (user.firstName || user.name || ''),
-        email: f.email || user.email || '',
+        name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.name || '',
+        email: user.email || '',
       }))
     }
   }, [user])
@@ -480,24 +442,28 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
   useEffect(() => {
     detectCountry().then(code => {
       if (!code) return
-      const match = ALLOWED_COUNTRIES.find(c => c.code === code)
+      const match = allCountries.find(c => c.code === code)
       if (match) {
         setForm(f => ({ ...f, phoneCountryCode: match.code, phoneDialCode: match.dial }))
       }
     })
-  }, [])
+  }, [allCountries])
 
-  // Phone dropdown ref for outside-click close
+  // Phone dropdown ref & search state
   const phoneDropdownRef = useRef(null)
   const [showPhoneDropdown, setShowPhoneDropdown] = useState(false)
+  const [phoneSearch, setPhoneSearch] = useState('')
   useEffect(() => {
     const handler = (e) => {
-      if (phoneDropdownRef.current && !phoneDropdownRef.current.contains(e.target))
+      if (phoneDropdownRef.current && !phoneDropdownRef.current.contains(e.target)) {
         setShowPhoneDropdown(false)
+        setPhoneSearch('')
+      }
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [])
+
 
   const waMessage = encodeURIComponent(
     `Hello WHTSIPA Tools Team,\n\nTicket ID: ${ticketId}\nTool Request: ${threatTitle || 'General Security Tools'}\nI need assistance.\n\n— ${user?.email || 'Guest'}`
@@ -865,12 +831,12 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
               {form.contactMethod === 'WhatsApp' && (() => {
                 const fullDial = form.phoneDialCode || '+1'
                 const dialDigits = fullDial.replace(/^\+/, '')
-                const isValidDial = ALLOWED_COUNTRIES.some(c => c.dial === fullDial)
+                const isValidDial = allCountries.some(c => c.dial === fullDial)
 
                 const handleDialDigitsChange = (e) => {
                   const typed = e.target.value.replace(/\D/g, '')
                   const newFullDial = '+' + typed
-                  const match = ALLOWED_COUNTRIES.find(c => c.dial === newFullDial)
+                  const match = allCountries.find(c => c.dial === newFullDial)
                   if (match) {
                     setForm(f => ({ ...f, phoneCountryCode: match.code, phoneDialCode: match.dial }))
                   } else {
@@ -917,30 +883,53 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
                       />
 
                       {/* Floating dropdown */}
-                      {showPhoneDropdown && (
-                        <div className="wm-phone-dropdown">
-                          <ul className="wm-phone-list">
-                            {ALLOWED_COUNTRIES.map(c => {
-                              const isSelected = form.phoneCountryCode === c.code
-                              return (
-                                <li key={c.code}>
-                                  <button
-                                    type="button"
-                                    className={`wm-phone-item ${isSelected ? 'active' : ''}`}
-                                    onClick={() => {
-                                      setForm(f => ({ ...f, phoneCountryCode: c.code, phoneDialCode: c.dial }))
-                                      setShowPhoneDropdown(false)
-                                    }}
-                                  >
-                                    <span className="wm-phone-item-flag">{getCountryFlag(c.code)}</span>
-                                    <span className="wm-phone-item-text">{c.name} ({c.dial})</span>
-                                  </button>
+                      {showPhoneDropdown && (() => {
+                        const filtered = allCountries.filter(c => matchCountrySearch(c, phoneSearch))
+
+                        return (
+                          <div className="wm-phone-dropdown">
+                            <div className="custom-country-search-wrap">
+                              <i className="bi bi-search custom-country-search-icon"></i>
+                              <input
+                                type="text"
+                                className="form-control form-control-sm custom-country-search"
+                                placeholder="Search country or code (+234, NG)..."
+                                value={phoneSearch}
+                                onChange={(e) => setPhoneSearch(e.target.value)}
+                                autoFocus
+                              />
+                            </div>
+                            <ul className="wm-phone-list custom-country-list">
+                              {filtered.length === 0 ? (
+                                <li className="p-3 text-muted-cyber text-center" style={{ fontSize: '0.82rem' }}>
+                                  No country matches
                                 </li>
-                              )
-                            })}
-                          </ul>
-                        </div>
-                      )}
+                              ) : (
+                                filtered.map(c => {
+                                  const isSelected = form.phoneCountryCode === c.code
+                                  return (
+                                    <li key={c.code}>
+                                      <button
+                                        type="button"
+                                        className={`wm-phone-item ${isSelected ? 'active' : ''}`}
+                                        onClick={() => {
+                                          setForm(f => ({ ...f, phoneCountryCode: c.code, phoneDialCode: c.dial }))
+                                          setShowPhoneDropdown(false)
+                                          setPhoneSearch('')
+                                        }}
+                                      >
+                                        <span className="wm-phone-item-flag">{getCountryFlag(c.code)}</span>
+                                        <span className="wm-phone-item-text">{c.name} ({c.dial})</span>
+                                      </button>
+                                    </li>
+                                  )
+                                })
+                              )}
+                            </ul>
+                          </div>
+                        )
+                      })()}
+
                     </div>
                     {!isValidDial && dialDigits.length > 0 && (
                       <small className="wm-hint text-danger mt-1 d-block">

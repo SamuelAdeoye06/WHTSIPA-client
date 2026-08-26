@@ -6,46 +6,9 @@ import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
 import logoWhts from '../assets/media/logo-whts.jpg'
 import { getCountryFlag } from '../utils/countryUtils'
+import { useCountries } from '../context/CountriesContext'
 import CountrySelectField from '../components/CountrySelectField'
 
-/* ── Allowed countries (client spec) ── */
-const ALLOWED_COUNTRIES = [
-  { code: 'US', name: 'United States',          dial: '+1'   },
-  { code: 'CA', name: 'Canada',                 dial: '+1'   },
-  { code: 'GB', name: 'United Kingdom',         dial: '+44'  },
-  { code: 'AU', name: 'Australia',              dial: '+61'  },
-  { code: 'NZ', name: 'New Zealand',            dial: '+64'  },
-  { code: 'DE', name: 'Germany',                dial: '+49'  },
-  { code: 'FR', name: 'France',                 dial: '+33'  },
-  { code: 'NL', name: 'Netherlands',            dial: '+31'  },
-  { code: 'SE', name: 'Sweden',                 dial: '+46'  },
-  { code: 'NO', name: 'Norway',                 dial: '+47'  },
-  { code: 'DK', name: 'Denmark',                dial: '+45'  },
-  { code: 'FI', name: 'Finland',                dial: '+358' },
-  { code: 'CH', name: 'Switzerland',            dial: '+41'  },
-  { code: 'SG', name: 'Singapore',              dial: '+65'  },
-  { code: 'JP', name: 'Japan',                  dial: '+81'  },
-  { code: 'KR', name: 'South Korea',            dial: '+82'  },
-  { code: 'AE', name: 'United Arab Emirates',   dial: '+971' },
-  { code: 'QA', name: 'Qatar',                  dial: '+974' },
-  { code: 'IL', name: 'Israel',                 dial: '+972' },
-  { code: 'AT', name: 'Austria',                dial: '+43'  },
-  { code: 'BE', name: 'Belgium',                dial: '+32'  },
-  { code: 'IT', name: 'Italy',                  dial: '+39'  },
-  { code: 'ES', name: 'Spain',                  dial: '+34'  },
-  { code: 'PL', name: 'Poland',                 dial: '+48'  },
-  { code: 'PT', name: 'Portugal',               dial: '+351' },
-  { code: 'IE', name: 'Ireland',                dial: '+353' },
-  { code: 'GR', name: 'Greece',                 dial: '+30'  },
-  { code: 'CZ', name: 'Czechia',               dial: '+420' },
-  // DEV ONLY — remove before final delivery to client
-  { code: 'NG', name: 'Nigeria (Dev)',          dial: '+234' },
-]
-
-/* ── Blocked country codes ── */
-const BLOCKED_CODES = new Set([
-  'CM','CI','TZ','UG','DZ','SN','MA','ZM','RW','GH','ZA','KE'
-])
 
 const getFriendlyCode = (code) => {
   const mapping = {
@@ -84,19 +47,23 @@ async function detectCountry() {
 /* ── SignUp Phone Field with Country Dropdown & Editable Dial Code ── */
 function SignUpPhoneField({ form, setForm, errors, setErrors, handleBlur }) {
   const [showDropdown, setShowDropdown] = useState(false)
+  const [search, setSearch] = useState('')
   const dropdownRef = useRef(null)
+  const { signupCountries, matchCountrySearch } = useCountries()
 
   useEffect(() => {
     const handler = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target))
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setShowDropdown(false)
+        setSearch('')
+      }
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
   const selectedCode = form.phoneCountryCode || form.country || 'US'
-  const selectedCountry = ALLOWED_COUNTRIES.find(c => c.code === selectedCode) || ALLOWED_COUNTRIES[0]
+  const selectedCountry = signupCountries.find(c => c.code === selectedCode) || signupCountries[0]
 
   const fullDial = form.phoneDialCode || selectedCountry?.dial || '+1'
   const dialDigits = fullDial.replace(/^\+/, '')
@@ -104,7 +71,7 @@ function SignUpPhoneField({ form, setForm, errors, setErrors, handleBlur }) {
   const handleDialDigitsChange = (e) => {
     const typed = e.target.value.replace(/\D/g, '')
     const newFullDial = '+' + typed
-    const match = ALLOWED_COUNTRIES.find(c => c.dial === newFullDial)
+    const match = signupCountries.find(c => c.dial === newFullDial)
 
     setForm(p => ({
       ...p,
@@ -126,7 +93,9 @@ function SignUpPhoneField({ form, setForm, errors, setErrors, handleBlur }) {
     setErrors(p => ({ ...p, phone: '' }))
   }
 
-  const isValidDial = ALLOWED_COUNTRIES.some(c => c.dial === fullDial)
+  const isValidDial = signupCountries.some(c => c.dial === fullDial)
+
+  const filteredCountries = signupCountries.filter(c => matchCountrySearch(c, search))
 
   return (
     <div className="phone-country-field-wrap mb-0">
@@ -174,37 +143,56 @@ function SignUpPhoneField({ form, setForm, errors, setErrors, handleBlur }) {
         {/* Country dropdown list */}
         {showDropdown && (
           <div className="phone-country-dropdown-menu">
-            <ul className="list-unstyled mb-0">
-              {ALLOWED_COUNTRIES.map(c => {
-                const isSelected = selectedCode === c.code
-                const cleanName = c.name.replace(' (Dev)', '')
-                return (
-                  <li key={c.code}>
-                    <button
-                      type="button"
-                      className={`phone-country-dropdown-item ${isSelected ? 'active' : ''}`}
-                      onClick={() => {
-                        setForm(p => ({
-                          ...p,
-                          phoneCountryCode: c.code,
-                          phoneDialCode: c.dial,
-                          country: c.code,
-                          phone: `${c.dial} ${p.phoneDigits || ''}`
-                        }))
-                        setErrors(p => ({ ...p, country: '', phone: '' }))
-                        setShowDropdown(false)
-                      }}
-                    >
-                      <span className="country-flag-emoji me-2">{getCountryFlag(c.code)}</span>
-                      <span className="country-option-text">{cleanName} ({c.dial})</span>
-                    </button>
-                  </li>
-                )
-              })}
+            <div className="custom-country-search-wrap">
+              <i className="bi bi-search custom-country-search-icon"></i>
+              <input
+                type="text"
+                className="form-control form-control-sm custom-country-search"
+                placeholder="Search country or code (+234, NG)..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <ul className="list-unstyled mb-0 custom-country-list">
+              {filteredCountries.length === 0 ? (
+                <li className="p-3 text-muted-cyber text-center" style={{ fontSize: '0.82rem' }}>
+                  No country matches
+                </li>
+              ) : (
+                filteredCountries.map(c => {
+                  const isSelected = selectedCode === c.code
+                  const cleanName = c.name.replace(' (Dev)', '')
+                  return (
+                    <li key={c.code}>
+                      <button
+                        type="button"
+                        className={`phone-country-dropdown-item ${isSelected ? 'active' : ''}`}
+                        onClick={() => {
+                          setForm(p => ({
+                            ...p,
+                            phoneCountryCode: c.code,
+                            phoneDialCode: c.dial,
+                            country: c.code,
+                            phone: `${c.dial} ${p.phoneDigits || ''}`
+                          }))
+                          setErrors(p => ({ ...p, country: '', phone: '' }))
+                          setShowDropdown(false)
+                          setSearch('')
+                        }}
+                      >
+                        <span className="country-flag-emoji me-2">{getCountryFlag(c.code)}</span>
+                        <span className="country-option-text">{cleanName} ({c.dial})</span>
+                      </button>
+                    </li>
+                  )
+                })
+              )}
             </ul>
           </div>
         )}
       </div>
+
 
       {!isValidDial && dialDigits.length > 0 && (
         <div className="auth-field-error">
@@ -227,6 +215,7 @@ export default function SignUp() {
   const navigate  = useNavigate()
   const location  = useLocation()
   const { register } = useAuth()
+  const { signupCountries } = useCountries()
 
   const [form, setForm] = useState({
     firstName: '', lastName: '', email: '',
@@ -234,54 +223,33 @@ export default function SignUp() {
     password: '', confirmPassword: ''
   })
 
-  const [countrySearch, setCountrySearch]   = useState('')
-  const [showDropdown,  setShowDropdown]    = useState(false)
   const [showPassword,  setShowPassword]    = useState(false)
   const [showConfirm,   setShowConfirm]     = useState(false)
   const [errors,        setErrors]          = useState({})
   const [submitError,   setSubmitError]     = useState('')
   const [loading,       setLoading]         = useState(false)
   const [blocked,       setBlocked]         = useState(false)
-  const dropdownRef = useRef(null)
 
   /* ── Auto-detect country on mount ── */
   useEffect(() => {
     detectCountry().then(code => {
       if (!code) return
-      if (BLOCKED_CODES.has(code)) { setBlocked(true); return }
-      const match = ALLOWED_COUNTRIES.find(c => c.code === code)
-      if (match) setForm(p => ({
+      // Check against admin-configured signup list
+      const match = signupCountries.find(c => c.code === code)
+      if (!match) { setBlocked(true); return }
+      setForm(p => ({
         ...p,
         country: match.code,
         phoneCountryCode: match.code,
         phoneDialCode: match.dial
       }))
     })
-  }, [])
-
-
-  /* ── Close dropdown on outside click ── */
-  useEffect(() => {
-    const handler = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target))
-        setShowDropdown(false)
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [])
+  }, [signupCountries])
 
   const set = (key) => (e) => {
     setForm(p => ({ ...p, [key]: e.target.value }))
     setErrors(p => ({ ...p, [key]: '' }))
   }
-
-  /* ── Selected country object ── */
-  const selectedCountry = ALLOWED_COUNTRIES.find(c => c.code === form.country)
-
-  /* ── Filtered country list ── */
-  const filteredCountries = ALLOWED_COUNTRIES.filter(c =>
-    c.name.toLowerCase().includes(countrySearch.toLowerCase())
-  )
 
   /* ── Password strength ── */
   const getStrength = (pw) => {
@@ -500,7 +468,7 @@ export default function SignUp() {
                   value={form.country}
                   onChange={(code) => {
                     setForm(p => {
-                      const match = ALLOWED_COUNTRIES.find(c => c.code === code)
+                      const match = signupCountries.find(c => c.code === code)
                       const dial = match ? match.dial : (p.phoneDialCode || '+1')
                       return {
                         ...p,

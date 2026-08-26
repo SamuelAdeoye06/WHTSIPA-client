@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { getCountryFlag, ALLOWED_COUNTRIES } from '../utils/countryUtils'
+import { getCountryFlag } from '../utils/countryUtils'
+import { useCountries } from '../context/CountriesContext'
 
 export default function CountrySelectField({
   value,
@@ -17,20 +18,21 @@ export default function CountrySelectField({
   const [showDropdown, setShowDropdown] = useState(false)
   const [search, setSearch] = useState('')
   const dropdownRef = useRef(null)
+  const { allCountries, matchCountrySearch } = useCountries()
 
   useEffect(() => {
     const handler = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target))
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setShowDropdown(false)
+        setSearch('')
+      }
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
-  const selectedCountry = ALLOWED_COUNTRIES.find(c => c.code === value)
-  const filtered = ALLOWED_COUNTRIES.filter(c =>
-    c.name.toLowerCase().includes(search.toLowerCase())
-  )
+  const selectedCountry = allCountries.find(c => c.code === value)
+  const filtered = allCountries.filter(c => matchCountrySearch(c, search))
 
   const themeClass = theme !== 'auto' ? `theme-${theme}` : ''
 
@@ -53,7 +55,7 @@ export default function CountrySelectField({
             {selectedCountry ? getCountryFlag(selectedCountry.code) : '🌐'}
           </span>
           <span className="country-select-label">
-            {selectedCountry ? selectedCountry.name.replace(' (Dev)', '') : placeholder}
+            {selectedCountry ? `${selectedCountry.name.replace(' (Dev)', '')} (${selectedCountry.dial})` : placeholder}
           </span>
           <i className={`bi bi-caret-${showDropdown ? 'up' : 'down'}-fill country-arrow-icon ms-auto`}></i>
         </button>
@@ -65,7 +67,7 @@ export default function CountrySelectField({
               <input
                 type="text"
                 className="form-control form-control-sm custom-country-search"
-                placeholder="Search country..."
+                placeholder="Search country or code (+234, NG)..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 autoFocus
@@ -92,7 +94,7 @@ export default function CountrySelectField({
                         }}
                       >
                         <span className="country-flag-emoji me-2">{getCountryFlag(c.code)}</span>
-                        <span className="country-option-text">{cleanName}</span>
+                        <span className="country-option-text">{cleanName} ({c.dial})</span>
                       </button>
                     </li>
                   )
@@ -102,6 +104,7 @@ export default function CountrySelectField({
           </div>
         )}
       </div>
+
       {isInvalid && errorMsg && (
         <div className="cyber-error-msg mt-1">
           <i className="bi bi-exclamation-triangle-fill me-1"></i>

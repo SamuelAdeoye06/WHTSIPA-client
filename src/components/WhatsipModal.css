@@ -840,6 +840,44 @@
   scrollbar-color: rgba(34, 211, 238, 0.2) transparent;
 }
 
+/* Search bar in dark modal dropdown */
+.wm-phone-dropdown .custom-country-search-wrap {
+  position: relative;
+  padding: 0.5rem;
+  background-color: #0f2040 !important;
+  border-bottom: 1px solid rgba(120, 214, 255, 0.2) !important;
+}
+
+.wm-phone-dropdown .custom-country-search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #38bdf8 !important;
+  font-size: 0.8rem;
+  pointer-events: none;
+}
+
+.wm-phone-dropdown .custom-country-search {
+  padding-left: 2rem !important;
+  font-size: 0.85rem !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(120, 214, 255, 0.25) !important;
+  color: #f0f4ff !important;
+  border-radius: 6px !important;
+}
+
+.wm-phone-dropdown .custom-country-search:focus {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  border-color: #22f0ff !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 2px rgba(34, 240, 255, 0.2) !important;
+}
+
+.wm-phone-dropdown .custom-country-search::placeholder {
+  color: rgba(233, 243, 255, 0.45) !important;
+}
+
 /* List reset */
 .wm-phone-list {
   list-style: none;

@@ -705,3 +705,75 @@
   border-radius: 20px !important;
   box-shadow: 0 16px 48px rgba(15, 23, 42, 0.25) !important;
 }
+
+/* ══════════════════════════════════════════════════════════
+   UNIVERSAL COUNTRY DROPDOWN SEARCH THEME MATCHING
+   Light page/card -> light search bar
+   Dark page/card/modal -> dark search bar
+   ══════════════════════════════════════════════════════════ */
+.site-dark .custom-country-search-wrap,
+.theme-dark .custom-country-search-wrap,
+.dark-theme .custom-country-search-wrap,
+.page-dark .custom-country-search-wrap,
+.card-glass .custom-country-search-wrap,
+.card-dark .custom-country-search-wrap,
+.wm-modal .custom-country-search-wrap,
+.modal-dark .custom-country-search-wrap,
+[data-theme="dark"] .custom-country-search-wrap {
+  background-color: #0b172a !important;
+  border-bottom: 1px solid rgba(120, 214, 255, 0.2) !important;
+}
+
+.site-dark .custom-country-search,
+.theme-dark .custom-country-search,
+.dark-theme .custom-country-search,
+.page-dark .custom-country-search,
+.card-glass .custom-country-search,
+.card-dark .custom-country-search,
+.wm-modal .custom-country-search,
+.modal-dark .custom-country-search,
+[data-theme="dark"] .custom-country-search {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(120, 214, 255, 0.25) !important;
+  color: #f0f4ff !important;
+}
+
+.site-dark .custom-country-search:focus,
+.theme-dark .custom-country-search:focus,
+.dark-theme .custom-country-search:focus,
+.page-dark .custom-country-search:focus,
+.card-glass .custom-country-search:focus,
+.card-dark .custom-country-search:focus,
+.wm-modal .custom-country-search:focus,
+.modal-dark .custom-country-search:focus,
+[data-theme="dark"] .custom-country-search:focus {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  border-color: #22f0ff !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 2px rgba(34, 240, 255, 0.2) !important;
+}
+
+.site-dark .custom-country-search::placeholder,
+.theme-dark .custom-country-search::placeholder,
+.dark-theme .custom-country-search::placeholder,
+.page-dark .custom-country-search::placeholder,
+.card-glass .custom-country-search::placeholder,
+.card-dark .custom-country-search::placeholder,
+.wm-modal .custom-country-search::placeholder,
+.modal-dark .custom-country-search::placeholder,
+[data-theme="dark"] .custom-country-search::placeholder {
+  color: rgba(233, 243, 255, 0.45) !important;
+}
+
+.site-dark .custom-country-search-icon,
+.theme-dark .custom-country-search-icon,
+.dark-theme .custom-country-search-icon,
+.page-dark .custom-country-search-icon,
+.card-glass .custom-country-search-icon,
+.card-dark .custom-country-search-icon,
+.wm-modal .custom-country-search-icon,
+.modal-dark .custom-country-search-icon,
+[data-theme="dark"] .custom-country-search-icon {
+  color: #38bdf8 !important;
+}
+

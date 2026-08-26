@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { to: '/admin/bookings',         label: 'Call Bookings',    icon: 'bi-telephone-fill' },
   { to: '/admin/contact-messages', label: 'Contact Messages', icon: 'bi-envelope-fill' },
   { to: '/admin/users',            label: 'Users',            icon: 'bi-people-fill' },
+  { to: '/admin/countries',        label: 'Countries',        icon: 'bi-globe2' },
   { to: '/admin/settings',         label: 'Settings',         icon: 'bi-gear-fill' },
 ]
 
