@@ -9,6 +9,7 @@ import anonymousPoster from '../assets/media/anonymous-image.png'
 import shadowBrokersPoster from '../assets/media/shadow-brokers-image.png'
 import apt29Poster from '../assets/media/apt29-image.png'
 import api from '../services/api'
+import ReactionButtons from '../components/ReactionButtons'
 
 
 
@@ -105,7 +106,7 @@ const THREAT_COLORS = {
   'HIGH':    { bg: '#fffbeb', border: '#fde68a', text: '#d97706' },
 }
 
-function OfficialPlayer({ official }) {
+function OfficialPlayer({ official, reactionData, onReactionChange }) {
   const videoRef = useRef(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [muted, setMuted] = useState(true)
@@ -323,7 +324,15 @@ function OfficialPlayer({ official }) {
             ))}
           </div>
         </div>
-        <div className="official-caption-since">{official.since}</div>
+        <div className="d-flex align-items-center justify-content-between mt-3 pt-2" style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+          <div className="official-caption-since mb-0">{official.since}</div>
+          <ReactionButtons
+            entityId={official.id.toLowerCase()}
+            theme="light"
+            serverData={reactionData}
+            onReactionChange={onReactionChange}
+          />
+        </div>
       </div>
     </div>
   )
@@ -633,6 +642,29 @@ function CombinedVideo() {
 }
 
 export default function AboutOfficials() {
+  const [reactions, setReactions] = useState({})
+
+  useEffect(() => {
+    let clientId = localStorage.getItem('whts_client_id')
+    if (!clientId) {
+      clientId = 'client_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36)
+      localStorage.setItem('whts_client_id', clientId)
+    }
+
+    api.get(`/reactions?clientId=${encodeURIComponent(clientId)}`)
+      .then(({ data }) => {
+        if (data) setReactions(data)
+      })
+      .catch(err => console.error('Failed to load reactions:', err))
+  }, [])
+
+  const handleReactionChange = (entityId, updatedData) => {
+    setReactions(prev => ({
+      ...prev,
+      [entityId]: updatedData
+    }))
+  }
+
   return (
     <div className="page-light">
       <header className="about-hero" style={{ paddingTop: '0.5rem' }}>
@@ -658,11 +690,20 @@ export default function AboutOfficials() {
       <section className="section-pad-lg pb-0" style={{ background: '#ffffff' }}>
         <div className="container">
           <div className="row g-5">
-            {OFFICIALS.map(official => (
-              <div key={official.id} className="col-12 col-lg-6">
-                <OfficialPlayer official={official} />
-              </div>
-            ))}
+            {OFFICIALS.map(official => {
+              const entityKey = official.id.toLowerCase()
+              const entityReaction = reactions[entityKey]
+
+              return (
+                <div key={official.id} className="col-12 col-lg-6">
+                  <OfficialPlayer
+                    official={official}
+                    reactionData={entityReaction}
+                    onReactionChange={handleReactionChange}
+                  />
+                </div>
+              )
+            })}
           </div>
         </div>
 

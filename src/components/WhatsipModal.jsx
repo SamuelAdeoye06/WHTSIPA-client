@@ -830,19 +830,6 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
               {/* Contact value input — hidden until a method is selected */}
               {form.contactMethod === 'WhatsApp' && (() => {
                 const fullDial = form.phoneDialCode || '+1'
-                const dialDigits = fullDial.replace(/^\+/, '')
-                const isValidDial = allCountries.some(c => c.dial === fullDial)
-
-                const handleDialDigitsChange = (e) => {
-                  const typed = e.target.value.replace(/\D/g, '')
-                  const newFullDial = '+' + typed
-                  const match = allCountries.find(c => c.dial === newFullDial)
-                  if (match) {
-                    setForm(f => ({ ...f, phoneCountryCode: match.code, phoneDialCode: match.dial }))
-                  } else {
-                    setForm(f => ({ ...f, phoneDialCode: newFullDial }))
-                  }
-                }
 
                 return (
                   <div>
@@ -858,18 +845,9 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
                         <i className={`bi bi-caret-${showPhoneDropdown ? 'up' : 'down'}-fill wm-phone-arrow`}></i>
                       </button>
 
-                      {/* Manual editable dial prefix — '+' is constant, digits are editable */}
-                      <span className={`wm-phone-prefix ${!isValidDial && dialDigits.length > 0 ? 'wm-invalid-dial' : ''}`}>
-                        <span className="plus-symbol">+</span>
-                        <input
-                          type="text"
-                          className="wm-dial-input"
-                          value={dialDigits}
-                          onChange={handleDialDigitsChange}
-                          placeholder="1"
-                          maxLength={4}
-                          title="Type country dial code"
-                        />
+                      {/* Autofilled dial prefix — non-editable badge */}
+                      <span className="wm-phone-prefix" title={`Country code: ${fullDial}`}>
+                        <span>{fullDial}</span>
                       </span>
 
                       {/* Editable digits only */}
@@ -931,11 +909,6 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
                       })()}
 
                     </div>
-                    {!isValidDial && dialDigits.length > 0 && (
-                      <small className="wm-hint text-danger mt-1 d-block">
-                        <i className="bi bi-exclamation-triangle me-1"></i>Country code +{dialDigits} is not in the allowed list.
-                      </small>
-                    )}
                   </div>
                 )
               })()}

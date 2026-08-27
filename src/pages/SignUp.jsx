@@ -66,22 +66,6 @@ function SignUpPhoneField({ form, setForm, errors, setErrors, handleBlur }) {
   const selectedCountry = signupCountries.find(c => c.code === selectedCode) || signupCountries[0]
 
   const fullDial = form.phoneDialCode || selectedCountry?.dial || '+1'
-  const dialDigits = fullDial.replace(/^\+/, '')
-
-  const handleDialDigitsChange = (e) => {
-    const typed = e.target.value.replace(/\D/g, '')
-    const newFullDial = '+' + typed
-    const match = signupCountries.find(c => c.dial === newFullDial)
-
-    setForm(p => ({
-      ...p,
-      phoneDialCode: newFullDial,
-      phoneCountryCode: match ? match.code : p.phoneCountryCode,
-      country: match ? match.code : p.country,
-      phone: `${newFullDial} ${p.phoneDigits || ''}`
-    }))
-    setErrors(p => ({ ...p, phone: '' }))
-  }
 
   const handleDigitsChange = (e) => {
     const digits = e.target.value
@@ -92,8 +76,6 @@ function SignUpPhoneField({ form, setForm, errors, setErrors, handleBlur }) {
     }))
     setErrors(p => ({ ...p, phone: '' }))
   }
-
-  const isValidDial = signupCountries.some(c => c.dial === fullDial)
 
   const filteredCountries = signupCountries.filter(c => matchCountrySearch(c, search))
 
@@ -114,18 +96,9 @@ function SignUpPhoneField({ form, setForm, errors, setErrors, handleBlur }) {
           <i className={`bi bi-caret-${showDropdown ? 'up' : 'down'}-fill country-arrow-icon`}></i>
         </button>
 
-        {/* Editable dial prefix — '+' is constant, digits are editable */}
-        <div className={`phone-plus-prefix input-group-text ${!isValidDial && dialDigits.length > 0 ? 'is-invalid-dial' : ''}`}>
-          <span className="plus-symbol">+</span>
-          <input
-            type="text"
-            className="phone-dial-input"
-            value={dialDigits}
-            onChange={handleDialDigitsChange}
-            placeholder="1"
-            maxLength={4}
-            title="Type country dial code"
-          />
+        {/* Autofilled dial prefix — non-editable badge */}
+        <div className="phone-plus-prefix input-group-text" title={`Country code: ${fullDial}`}>
+          <span>{fullDial}</span>
         </div>
 
         {/* Phone number digits */}

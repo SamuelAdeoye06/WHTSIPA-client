@@ -1,6 +1,9 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import '../styles/cyber.css'
 import './About.css'
+import api from '../services/api'
+import ReactionButtons from '../components/ReactionButtons'
 
 import agencyDescFtc from '../assets/media/agency-desc-ftc.jpeg'
 import agencyDescUsps from '../assets/media/agency-desc-usps.jpeg'
@@ -39,6 +42,29 @@ const GOV_AGENCIES = [
 ]
 
 export default function About() {
+  const [reactions, setReactions] = useState({})
+
+  useEffect(() => {
+    let clientId = localStorage.getItem('whts_client_id')
+    if (!clientId) {
+      clientId = 'client_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36)
+      localStorage.setItem('whts_client_id', clientId)
+    }
+
+    api.get(`/reactions?clientId=${encodeURIComponent(clientId)}`)
+      .then(({ data }) => {
+        if (data) setReactions(data)
+      })
+      .catch(err => console.error('Failed to load reactions:', err))
+  }, [])
+
+  const handleReactionChange = (entityId, updatedData) => {
+    setReactions(prev => ({
+      ...prev,
+      [entityId]: updatedData
+    }))
+  }
+
   return (
     <div className="page-light">
       <>
@@ -123,20 +149,33 @@ export default function About() {
               </p>
             </div>
             <div className="row g-4">
-              {GOV_AGENCIES.map(agency => (
-                <div key={agency.abbr} className="col-12 col-md-6 col-lg-4">
-                  <div className="official-card">
-                    <div className="official-img-wrap">
-                      <img src={agency.img} alt={agency.name} className="official-img" />
-                    </div>
-                    <div className="official-label-light">
-                      <div className="official-label-abbr-light">{agency.abbr}</div>
-                      <div className="official-label-name-light">{agency.name}</div>
-                      <div className="official-label-role-light">{agency.role}</div>
+              {GOV_AGENCIES.map(agency => {
+                const entityKey = agency.abbr.toLowerCase()
+                const entityReaction = reactions[entityKey]
+
+                return (
+                  <div key={agency.abbr} className="col-12 col-md-6 col-lg-4">
+                    <div className="official-card">
+                      <div className="official-img-wrap">
+                        <img src={agency.img} alt={agency.name} className="official-img" />
+                      </div>
+                      <div className="official-label-light d-flex align-items-center justify-content-between gap-2">
+                        <div style={{ minWidth: 0, flex: '1 1 auto' }}>
+                          <div className="official-label-abbr-light">{agency.abbr}</div>
+                          <div className="official-label-name-light">{agency.name}</div>
+                          <div className="official-label-role-light">{agency.role}</div>
+                        </div>
+                        <ReactionButtons
+                          entityId={entityKey}
+                          theme="light"
+                          serverData={entityReaction}
+                          onReactionChange={handleReactionChange}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
             <div className="text-center mt-4">
               <Link className="btn btn-outline-primary px-4" to="/about-officials" style={{ borderRadius: 12, fontWeight: 600 }}>

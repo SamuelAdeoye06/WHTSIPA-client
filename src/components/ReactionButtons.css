@@ -1,0 +1,102 @@
+/* ══════════════════════════════════════════════════════════
+   REACTION BUTTONS (LIKE & DISLIKE) — ABOUT & OFFICIALS
+   ══════════════════════════════════════════════════════════ */
+
+.reaction-buttons-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  user-select: none;
+}
+
+.reaction-btn-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0.2rem 0.4rem;
+  cursor: pointer;
+  outline: none !important;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  min-width: 38px;
+}
+
+.reaction-btn-col:hover {
+  transform: translateY(-2px);
+}
+
+.reaction-btn-col:active {
+  transform: scale(0.92);
+}
+
+/* Icon */
+.reaction-btn-icon {
+  font-size: 1.35rem;
+  line-height: 1;
+  color: #94a3b8; /* Inactive subtle slate */
+  transition: color 0.2s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.reaction-btn-col:hover .reaction-btn-icon {
+  color: #3b82f6;
+}
+
+/* Active State (Blue like reference image) */
+.reaction-btn-col.is-active .reaction-btn-icon {
+  color: #1d4ed8 !important; /* Rich vibrant blue */
+  filter: drop-shadow(0 2px 6px rgba(29, 78, 216, 0.35));
+  transform: scale(1.12);
+}
+
+/* Count Number */
+.reaction-btn-count {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-top: 0.25rem;
+  line-height: 1;
+  font-family: inherit;
+  letter-spacing: -0.2px;
+}
+
+.reaction-btn-col.is-active .reaction-btn-count {
+  color: #1d4ed8;
+}
+
+/* ── Dark Theme (About Officials / Threats mode) ── */
+.reaction-buttons-dark .reaction-btn-icon {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.reaction-buttons-dark .reaction-btn-col:hover .reaction-btn-icon {
+  color: #38bdf8;
+}
+
+.reaction-buttons-dark .reaction-btn-col.is-active .reaction-btn-icon {
+  color: #38bdf8 !important;
+  filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.5));
+}
+
+.reaction-buttons-dark .reaction-btn-count {
+  color: #e2e8f0;
+}
+
+.reaction-buttons-dark .reaction-btn-col.is-active .reaction-btn-count {
+  color: #38bdf8;
+}
+
+/* Responsive alignment */
+@media (max-width: 576px) {
+  .reaction-buttons-group {
+    gap: 0.75rem;
+  }
+  .reaction-btn-icon {
+    font-size: 1.25rem;
+  }
+  .reaction-btn-count {
+    font-size: 0.78rem;
+  }
+}
+

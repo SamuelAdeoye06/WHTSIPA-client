@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { to: '/admin/contact-messages', label: 'Contact Messages', icon: 'bi-envelope-fill' },
   { to: '/admin/users',            label: 'Users',            icon: 'bi-people-fill' },
   { to: '/admin/countries',        label: 'Countries',        icon: 'bi-globe2' },
+  { to: '/admin/reactions',        label: 'Reactions & Likes', icon: 'bi-hand-thumbs-up-fill' },
   { to: '/admin/settings',         label: 'Settings',         icon: 'bi-gear-fill' },
 ]
 

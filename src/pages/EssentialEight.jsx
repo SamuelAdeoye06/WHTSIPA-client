@@ -220,20 +220,6 @@ function BookingPhoneField({ countryCode, setCountryCode, dialCode, setDialCode,
 
   const selectedCountry = allCountries.find(c => c.code === countryCode) || allCountries[0]
   const fullDial = dialCode || selectedCountry.dial || '+1'
-  const dialDigits = fullDial.replace(/^\+/, '')
-
-  const handleDialDigitsChange = (e) => {
-    const typed = e.target.value.replace(/\D/g, '')
-    const newFullDial = '+' + typed
-    setDialCode(newFullDial)
-
-    const match = allCountries.find(c => c.dial === newFullDial)
-    if (match) {
-      setCountryCode(match.code)
-    }
-  }
-
-  const isValidDial = allCountries.some(c => c.dial === fullDial)
 
   const filteredCountries = allCountries.filter(c => matchCountrySearch(c, search))
 
@@ -252,18 +238,9 @@ function BookingPhoneField({ countryCode, setCountryCode, dialCode, setDialCode,
           <i className={`bi bi-caret-${showDropdown ? 'up' : 'down'}-fill country-arrow-icon`}></i>
         </button>
 
-        {/* Editable dial prefix — '+' is constant, digits are editable */}
-        <span className={`bc-phone-prefix ${!isValidDial && dialDigits.length > 0 ? 'bc-invalid-dial' : ''}`}>
-          <span className="plus-symbol">+</span>
-          <input
-            type="text"
-            className="bc-dial-input"
-            value={dialDigits}
-            onChange={handleDialDigitsChange}
-            placeholder="1"
-            maxLength={4}
-            title="Type country dial code"
-          />
+        {/* Autofilled dial prefix — non-editable badge */}
+        <span className="bc-phone-prefix" title={`Country code: ${fullDial}`}>
+          <span>{fullDial}</span>
         </span>
 
         {/* Editable phone digits */}
@@ -323,9 +300,6 @@ function BookingPhoneField({ countryCode, setCountryCode, dialCode, setDialCode,
         )}
       </div>
 
-      {!isValidDial && dialDigits.length > 0 && (
-        <span className="bc-error"><i className="bi bi-exclamation-circle me-1"></i>Country code +{dialDigits} is not in the allowed list.</span>
-      )}
       {error && <span className="bc-error"><i className="bi bi-exclamation-circle me-1"></i>{error}</span>}
     </div>
   )

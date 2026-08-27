@@ -741,13 +741,13 @@
   transform: rotate(180deg);
 }
 
-/* Editable dial prefix container with constant '+' and editable digits */
+/* Autofilled dial prefix badge — non-editable */
 .wm-field .wm-phone-prefix,
 .wm-phone-prefix {
   display: inline-flex !important;
   align-items: center !important;
-  gap: 1px !important;
-  padding: 0 0.55rem !important;
+  justify-content: center !important;
+  padding: 0 0.75rem !important;
   background: rgba(255, 255, 255, 0.05) !important;
   border: none !important;
   border-right: 1px solid rgba(120, 214, 255, 0.18) !important;
@@ -758,36 +758,7 @@
   letter-spacing: 0.4px;
   flex: 0 0 auto !important;
   flex-shrink: 0 !important;
-  width: auto !important;
-}
-
-.wm-phone-prefix.wm-invalid-dial {
-  background: rgba(239, 68, 68, 0.15) !important;
-  color: #f87171 !important;
-  border-right-color: rgba(239, 68, 68, 0.4) !important;
-}
-
-.wm-field .wm-dial-input,
-.wm-row .wm-dial-input,
-.wm-dial-input {
-  border: none !important;
-  background: transparent !important;
-  color: inherit !important;
-  font-weight: 700 !important;
-  font-size: 0.85rem !important;
-  width: 36px !important;
-  min-width: 36px !important;
-  max-width: 36px !important;
-  flex: 0 0 36px !important;
-  padding: 0.55rem 0.1rem !important;
-  outline: none !important;
-  box-shadow: none !important;
-  letter-spacing: 0.4px;
-}
-
-.wm-dial-input:focus {
-  outline: none !important;
-  box-shadow: none !important;
+  user-select: none;
 }
 
 /* Editable phone digits */

@@ -34,6 +34,7 @@ import AdminContactMessages from './pages/admin/AdminContactMessages'
 import AdminContactMessageDetail from './pages/admin/AdminContactMessageDetail'
 import AdminUsers from './pages/admin/AdminUsers'
 import AdminCountries from './pages/admin/AdminCountries'
+import AdminReactions from './pages/admin/AdminReactions'
 import AdminSettings from './pages/admin/AdminSettings'
 import PrivacyTerms from './pages/PrivacyTerms'
 import './styles/cyber.css'
@@ -114,6 +115,7 @@ function Layout() {
             <Route path="contact-messages/:id"    element={<AdminContactMessageDetail />} />
             <Route path="users"                   element={<AdminUsers />} />
             <Route path="countries"               element={<AdminCountries />} />
+            <Route path="reactions"               element={<AdminReactions />} />
             <Route path="settings"                element={<AdminSettings />} />
           </Route>
 

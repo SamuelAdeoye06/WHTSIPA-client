@@ -12,6 +12,7 @@ import { genTicketId } from '../utils/ticketId'
 import { getCountryFlag } from '../utils/countryUtils'
 import { useCountries } from '../context/CountriesContext'
 import CountrySelectField from '../components/CountrySelectField'
+import ChatSessionHistory from '../components/ChatSessionHistory'
 
 /* ── Incident types (Updated per spec) ── */
 const INCIDENT_TYPES = [
@@ -264,27 +265,6 @@ function PhoneCountryField({ formik, fieldName, phoneCodeFieldName, phoneDialFie
 
   // Full dial prefix in formik state, e.g. "+234"
   const fullDial = formik.values[phoneDialFieldName] || selectedCountry?.dial || '+1'
-  // Digits after '+' for the editable input, e.g. "234"
-  const dialDigits = fullDial.replace(/^\+/, '')
-
-  // Handle manual typing in the country dial code input
-  const handleDialDigitsChange = (e) => {
-    const typed = e.target.value.replace(/\D/g, '') // allow digits only
-    const newFullDial = '+' + typed
-    formik.setFieldValue(phoneDialFieldName, newFullDial)
-
-    const match = allCountries.find(c => c.dial === newFullDial)
-    if (match) {
-      formik.setFieldValue(phoneCodeFieldName, match.code)
-      formik.setFieldValue(countryFieldName, match.code)
-      if (countryFieldName === 'country' && formik.values.financialLossCurrency !== undefined) {
-        formik.setFieldValue('financialLossCurrency', COUNTRY_CURRENCIES[match.code] || 'USD $')
-      }
-    }
-  }
-
-  // Check if current dial code is in allCountries
-  const isValidDial = allCountries.some(c => c.dial === fullDial)
 
   const filteredCountries = allCountries.filter(c => matchCountrySearch(c, search))
 
@@ -306,18 +286,9 @@ function PhoneCountryField({ formik, fieldName, phoneCodeFieldName, phoneDialFie
           <i className={`bi bi-caret-${showDropdown ? 'up' : 'down'}-fill country-arrow-icon`}></i>
         </button>
 
-        {/* Manual editable dial prefix — '+' is constant, digits are editable */}
-        <div className={`phone-plus-prefix input-group-text ${!isValidDial && dialDigits.length > 0 ? 'is-invalid-dial' : ''}`}>
-          <span className="plus-symbol">+</span>
-          <input
-            type="text"
-            className="phone-dial-input"
-            value={dialDigits}
-            onChange={handleDialDigitsChange}
-            placeholder="1"
-            maxLength={4}
-            title="Type country dial code"
-          />
+        {/* Autofilled dial prefix — non-editable badge */}
+        <div className="phone-plus-prefix input-group-text" title={`Country code: ${fullDial}`}>
+          <span>{fullDial}</span>
         </div>
 
         {/* Editable phone number digits */}
@@ -382,15 +353,6 @@ function PhoneCountryField({ formik, fieldName, phoneCodeFieldName, phoneDialFie
           </div>
         )}
       </div>
-
-
-      {/* Validation warning if dial code typed is not allowed */}
-      {!isValidDial && dialDigits.length > 0 && (
-        <div className="cyber-error-msg">
-          <i className="bi bi-exclamation-triangle-fill me-1"></i>
-          Country code +{dialDigits} is invalid or not in the allowed countries list.
-        </div>
-      )}
 
       {formik.touched[fieldName] && formik.errors[fieldName] && (
         <div className="cyber-error-msg">
