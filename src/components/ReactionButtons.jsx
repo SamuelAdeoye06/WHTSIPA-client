@@ -1,16 +1,9 @@
 import { useState, useEffect } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
 import { formatReactionCount } from '../utils/numberFormatter'
 import './ReactionButtons.css'
-
-function getClientId() {
-  let id = localStorage.getItem('whts_client_id')
-  if (!id) {
-    id = 'client_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36)
-    localStorage.setItem('whts_client_id', id)
-  }
-  return id
-}
 
 export default function ReactionButtons({
   entityId,
@@ -21,6 +14,10 @@ export default function ReactionButtons({
   onReactionChange = null,
   className = '',
 }) {
+  const { user } = useAuth()
+  const navigate = useNavigate()
+  const location = useLocation()
+
   const [likes, setLikes] = useState(initialLikes)
   const [dislikes, setDislikes] = useState(initialDislikes)
   const [userReaction, setUserReaction] = useState(null)
@@ -38,7 +35,16 @@ export default function ReactionButtons({
   const handleAction = async (action) => {
     if (loading || !entityId) return
 
-    const clientId = getClientId()
+    // If user is not logged in, seamlessly redirect to sign-in with return state
+    if (!user) {
+      navigate('/signin', {
+        state: {
+          from: location.pathname + (location.search || '')
+        }
+      })
+      return
+    }
+
     const prevReaction = userReaction
     const prevLikes = likes
     const prevDislikes = dislikes
@@ -76,7 +82,6 @@ export default function ReactionButtons({
     try {
       const { data } = await api.post(`/reactions/${entityId.toLowerCase()}`, {
         action,
-        clientId,
       })
 
       if (data) {
@@ -89,6 +94,14 @@ export default function ReactionButtons({
       }
     } catch (err) {
       console.error(`Error submitting ${action} for ${entityId}:`, err)
+      // If 401 unauthenticated, redirect to signin
+      if (err.response?.status === 401) {
+        navigate('/signin', {
+          state: {
+            from: location.pathname + (location.search || '')
+          }
+        })
+      }
       // Rollback on error
       setUserReaction(prevReaction)
       setLikes(prevLikes)
@@ -105,7 +118,7 @@ export default function ReactionButtons({
         type="button"
         className={`reaction-btn-col ${userReaction === 'like' ? 'is-active' : ''}`}
         onClick={() => handleAction('like')}
-        title={userReaction === 'like' ? 'Unlike' : 'Like'}
+        title={user ? (userReaction === 'like' ? 'Unlike' : 'Like') : 'Sign in to like'}
         aria-label={`Like (${likes})`}
       >
         <i className={`bi ${userReaction === 'like' ? 'bi-hand-thumbs-up-fill' : 'bi-hand-thumbs-up'} reaction-btn-icon`}></i>
@@ -117,7 +130,7 @@ export default function ReactionButtons({
         type="button"
         className={`reaction-btn-col ${userReaction === 'dislike' ? 'is-active' : ''}`}
         onClick={() => handleAction('dislike')}
-        title={userReaction === 'dislike' ? 'Remove dislike' : 'Dislike'}
+        title={user ? (userReaction === 'dislike' ? 'Remove dislike' : 'Dislike') : 'Sign in to dislike'}
         aria-label={`Dislike (${dislikes})`}
       >
         <i className={`bi ${userReaction === 'dislike' ? 'bi-hand-thumbs-down-fill' : 'bi-hand-thumbs-down'} reaction-btn-icon`}></i>
@@ -126,4 +139,3 @@ export default function ReactionButtons({
     </div>
   )
 }
-

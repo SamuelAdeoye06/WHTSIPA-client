@@ -9,6 +9,7 @@ import anonymousPoster from '../assets/media/anonymous-image.png'
 import shadowBrokersPoster from '../assets/media/shadow-brokers-image.png'
 import apt29Poster from '../assets/media/apt29-image.png'
 import api from '../services/api'
+import { useAuth } from '../context/AuthContext'
 import ReactionButtons from '../components/ReactionButtons'
 
 
@@ -642,21 +643,17 @@ function CombinedVideo() {
 }
 
 export default function AboutOfficials() {
+  const { user } = useAuth()
   const [reactions, setReactions] = useState({})
 
   useEffect(() => {
-    let clientId = localStorage.getItem('whts_client_id')
-    if (!clientId) {
-      clientId = 'client_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36)
-      localStorage.setItem('whts_client_id', clientId)
-    }
-
-    api.get(`/reactions?clientId=${encodeURIComponent(clientId)}`)
+    const url = user?._id ? `/reactions?userId=${encodeURIComponent(user._id)}` : '/reactions'
+    api.get(url)
       .then(({ data }) => {
         if (data) setReactions(data)
       })
       .catch(err => console.error('Failed to load reactions:', err))
-  }, [])
+  }, [user])
 
   const handleReactionChange = (entityId, updatedData) => {
     setReactions(prev => ({
