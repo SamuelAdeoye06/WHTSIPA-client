@@ -1,21 +1,3 @@
-/**
- * All video URLs currently point to a personal Cloudinary account
- * (cloud_name: dqch0tjrm) used during development. Once the client sets
- * up their own Cloudinary account, migrate like this:
- *
- *   1. Log into the NEW account's dashboard → Media Library
- *   2. Use "Upload" → "Fetch from URL" (or the Admin API's fetch/remote-upload)
- *      and paste each ORIGINAL_URL below directly — Cloudinary pulls the
- *      file from the old account for you, no manual download/reupload needed
- *   3. Copy the new secure_url Cloudinary gives you back
- *   4. Paste it in as the new value below — every component importing from
- *      this file picks up the change automatically, nothing else to touch
- *
- * Keep the `vc_h264` transformation on every video — it forces H.264 codec
- * output, which is what makes these play reliably across browsers
- * (Safari especially is picky about other codecs in MP4 containers).
- */
-
 export const CLOUDINARY_VIDEOS = {
   // theEquation:   'https://res.cloudinary.com/dqch0tjrm/video/upload/vc_h264/v1780406757/the-equation_vs2zsc.mp4',
   // lazarus:       'https://res.cloudinary.com/dqch0tjrm/video/upload/vc_h264/v1780248016/lazarus_nhudt2.mp4',
