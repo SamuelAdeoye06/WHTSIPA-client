@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import api from '../../services/api'
 import StatusPill from './components/StatusPill'
 import ConfirmDialog from './components/ConfirmDialog'
+import SendEmailDialog from './components/SendEmailDialog'
 import { exportRecordAsPDF } from '../../utils/pdfExport'
 import './AdminShared.css'
 
@@ -36,6 +37,8 @@ export default function AdminReportDetail() {
   const [savingStatus, setSavingStatus] = useState(false)
   const [confirmOpen, setConfirmOpen]   = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [sendEmailOpen, setSendEmailOpen] = useState(false)
+  const [sendingEmail, setSendingEmail]   = useState(false)
 
   useEffect(() => {
     api.get('/reports/all')
@@ -87,6 +90,18 @@ export default function AdminReportDetail() {
     )
   }
 
+  const handleSendEmail = async (to) => {
+    setSendingEmail(true)
+    try {
+      await api.post('/admin/send-email', { recordType: 'report', recordId: id, to })
+      setSendEmailOpen(false)
+    } catch (err) {
+      alert(err.response?.data?.message || 'Could not send this email. Please try again.')
+    } finally {
+      setSendingEmail(false)
+    }
+  }
+
   if (loading) return <div className="admin-page-loading">Loading report…</div>
   if (error)   return <div className="admin-page-error">{error}</div>
   if (!report) return null
@@ -108,6 +123,9 @@ export default function AdminReportDetail() {
           </select>
           <button className="admin-btn admin-btn-ghost" onClick={handleExportPDF}>
             <i className="bi bi-file-earmark-pdf"></i> Download PDF
+          </button>
+          <button className="admin-btn admin-btn-ghost" onClick={() => setSendEmailOpen(true)}>
+            <i className="bi bi-envelope"></i> Send to Email
           </button>
           <button className="admin-btn admin-btn-danger" onClick={() => setConfirmOpen(true)}>
             <i className="bi bi-trash"></i> Delete Permanently
@@ -155,6 +173,14 @@ export default function AdminReportDetail() {
         loading={deleting}
         onCancel={() => setConfirmOpen(false)}
         onConfirm={handleDelete}
+      />
+
+      <SendEmailDialog
+        open={sendEmailOpen}
+        recordLabel="Report"
+        loading={sendingEmail}
+        onCancel={() => setSendEmailOpen(false)}
+        onConfirm={handleSendEmail}
       />
     </div>
   )

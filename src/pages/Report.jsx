@@ -7,6 +7,7 @@ import './Report.css'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import api from '../services/api'
+import { uploadEvidenceFiles } from '../utils/uploadFiles'
 import { openLiveChat, onAgentJoined } from '../utils/tidio'
 import { genTicketId } from '../utils/ticketId'
 import { getCountryFlag } from '../utils/countryUtils'
@@ -878,6 +879,20 @@ export default function Report() {
     setLoading(true)
     setError('')
     try {
+      // Upload real files first — evidenceFiles must be actual Cloudinary
+      // URLs the admin panel can later view/download, not just filenames.
+      let evidenceUrls = []
+      if (files.length > 0) {
+        try {
+          evidenceUrls = await uploadEvidenceFiles(files)
+        } catch (uploadErr) {
+          console.error('Evidence upload failed:', uploadErr)
+          setError('Could not upload your evidence files. Please try again, or submit without attachments.')
+          setLoading(false)
+          return
+        }
+      }
+
       const payload = {
         reportType,
         fullName: reportType === 'personal' ? values.fullName : (values.fullName || 'Anonymous'),
@@ -898,7 +913,7 @@ export default function Report() {
         socialHandles: reportType === 'public' ? values.socialHandles : undefined,
         linksImposterDetails: reportType === 'public' ? values.linksImposterDetails : undefined,
         effectsOfIncident: reportType === 'public' ? values.effectsOfIncident : undefined,
-        evidenceFiles: files.map(f => f.name),
+        evidenceFiles: evidenceUrls,
       }
 
       await api.post('/reports/submit', payload)

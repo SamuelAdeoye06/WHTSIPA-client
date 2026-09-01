@@ -12,6 +12,7 @@ import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
 import { openLiveChat, onAgentJoined } from '../utils/tidio'
 import { genTicketId } from '../utils/ticketId'
+import { uploadEvidenceFiles } from '../utils/uploadFiles'
 import ChatSessionHistory from './ChatSessionHistory'
 import './WhatsipModal.css'
 import { getCountryFlag } from '../utils/countryUtils'
@@ -695,7 +696,20 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
       setLoading(true)
       setError('')
       try {
-        const fileNames = form.evidence ? Array.from(form.evidence).map(f => f.name) : []
+        // Upload real files first — evidenceFiles must be actual Cloudinary
+        // URLs the admin panel can later view/download, not just filenames.
+        let evidenceUrls = []
+        const evidenceList = form.evidence ? Array.from(form.evidence) : []
+        if (evidenceList.length > 0) {
+          try {
+            evidenceUrls = await uploadEvidenceFiles(evidenceList)
+          } catch (uploadErr) {
+            console.error('Evidence upload failed:', uploadErr)
+            setError('Could not upload your evidence files. Please try again, or submit without attachments.')
+            setLoading(false)
+            return
+          }
+        }
         await api.post('/tickets/create', {
           ticketId,
           type: isReport ? 'report' : isHire ? 'hire' : 'request',
@@ -711,7 +725,7 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
             ? `${form.phoneDialCode}${form.phoneDigits}`
             : form.phone,
           contactMethod: form.contactMethod,
-          evidenceFiles: fileNames
+          evidenceFiles: evidenceUrls
         })
         setStep('success')
       } catch (err) {

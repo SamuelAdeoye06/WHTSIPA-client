@@ -24,6 +24,10 @@ export default function AdminSettings() {
   const [pwMsg, setPwMsg]         = useState('')
   const [pwErr, setPwErr]         = useState('')
 
+  const [notifSaving, setNotifSaving] = useState(false)
+  const [notifMsg, setNotifMsg]       = useState('')
+  const [notifErr, setNotifErr]       = useState('')
+
   useEffect(() => {
     api.get('/config')
       .then(({ data }) => setConfig(data))
@@ -76,6 +80,21 @@ export default function AdminSettings() {
     }
   }
 
+  const handleSaveNotificationEmail = async (e) => {
+    e.preventDefault()
+    setNotifSaving(true)
+    setNotifMsg('')
+    setNotifErr('')
+    try {
+      await api.put('/config', { notificationEmail: config.notificationEmail || '' })
+      setNotifMsg('Saved.')
+    } catch (err) {
+      setNotifErr(err.response?.data?.message || 'Could not save this address.')
+    } finally {
+      setNotifSaving(false)
+    }
+  }
+
   if (loading) return <div className="admin-page-loading">Loading settings…</div>
 
   return (
@@ -83,6 +102,40 @@ export default function AdminSettings() {
       <div className="admin-page-header">
         <h1 className="admin-page-title">Settings</h1>
         <p className="admin-page-sub">Public contact links and your admin account.</p>
+      </div>
+
+      {/* ── Notification bell settings ── */}
+      <div className="admin-card" style={{ marginBottom: '1.5rem' }}>
+        <div className="admin-card-header">
+          <h3><i className="bi bi-bell"></i> Notifications</h3>
+        </div>
+        <form onSubmit={handleSaveNotificationEmail} className="admin-detail-grid">
+          <div className="admin-detail-field-full">
+            <label className="admin-detail-field-label" htmlFor="notificationEmail">
+              Notification Email
+            </label>
+            <input
+              id="notificationEmail"
+              type="email"
+              className="admin-search-input"
+              style={{ width: '100%' }}
+              placeholder={`Defaults to ${config?.supportEmail || 'the site inbox'} if left blank`}
+              value={config?.notificationEmail || ''}
+              onChange={e => setConfig(prev => ({ ...prev, notificationEmail: e.target.value }))}
+            />
+            <div style={{ fontSize: '0.78rem', color: '#9ca3af', marginTop: '0.3rem' }}>
+              Where "new submission" alerts (reports, contact messages, bookings) get sent.
+              These alerts never include the submitted content itself — just a heads-up and a link into the panel.
+            </div>
+          </div>
+          <div className="admin-detail-field-full" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <button type="submit" className="admin-btn admin-btn-primary" disabled={notifSaving}>
+              {notifSaving ? 'Saving…' : 'Save'}
+            </button>
+            {notifMsg && <span style={{ color: '#15803d', fontSize: '0.88rem' }}>{notifMsg}</span>}
+            {notifErr && <span style={{ color: '#dc2626', fontSize: '0.88rem' }}>{notifErr}</span>}
+          </div>
+        </form>
       </div>
 
       {/* ── Public contact / social links ── */}

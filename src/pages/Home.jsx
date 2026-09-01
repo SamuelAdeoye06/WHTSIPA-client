@@ -4,8 +4,9 @@ import '../styles/cyber.css'
 import './Home.css'
 
 import heroImage from '../assets/media/hero-image.png'
+import { CLOUDINARY_VIDEOS } from '../data/cloudinaryMedia'
 
-const heroVideo = 'https://res.cloudinary.com/dqch0tjrm/video/upload/v1782308519/hero-video-comp_zzd0se.mp4'
+const heroVideo = CLOUDINARY_VIDEOS.heroVideo
 
 function useCounter(target, duration = 1400, trigger) {
   const [count, setCount] = useState(0)

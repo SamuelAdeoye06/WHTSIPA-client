@@ -8,6 +8,7 @@ import virusPoster from '../assets/media/virus-image.png'
 import anonymousPoster from '../assets/media/anonymous-image.png'
 import shadowBrokersPoster from '../assets/media/shadow-brokers-image.png'
 import apt29Poster from '../assets/media/apt29-image.png'
+import { CLOUDINARY_VIDEOS } from '../data/cloudinaryMedia'
 import api from '../services/api'
 import { useAuth } from '../context/AuthContext'
 import ReactionButtons from '../components/ReactionButtons'
@@ -26,7 +27,7 @@ const OFFICIALS = [
     description: 'Considered the most sophisticated cyber-espionage group ever discovered. Linked to the NSA\'s Tailored Access Operations unit, the Equation Group pioneered firmware-level implants and zero-day exploits that remain unmatched in complexity.',
     capabilities: ['Firmware-level persistence', 'Zero-day exploit development', 'Air-gap bridging', 'Custom malware frameworks'],
     threat: 'EXTREME',
-    videoUrl: 'https://res.cloudinary.com/dqch0tjrm/video/upload/vc_h264/v1780406757/the-equation_vs2zsc.mp4', 
+    videoUrl: CLOUDINARY_VIDEOS.theEquation,
     poster: theEquationPoster,
     color: '#3b82f6',
   },
@@ -40,7 +41,7 @@ const OFFICIALS = [
     description: 'A state-sponsored advanced persistent threat group for some of the largest financial cyber heists in history, including $81M Bangladesh Bank and widespread cryptocurrency claims.',
     capabilities: ['Financial system targeting', 'Cryptocurrency theft', 'Destructive wiper attacks', 'Supply chain compromise'],
     threat: 'EXTREME',
-    videoUrl: 'https://res.cloudinary.com/dqch0tjrm/video/upload/vc_h264/v1780248016/lazarus_nhudt2.mp4',
+    videoUrl: CLOUDINARY_VIDEOS.lazarus,
     poster: lazarusPoster,
     color: '#a855f7',
   },
@@ -54,7 +55,7 @@ const OFFICIALS = [
     description: 'A Russian intelligence-linked advanced persistent threat group for the SolarWinds supply chain attack, the DNC breach, and ongoing espionage campaigns against governments, think tanks,and COVID-19 vaccine researchers.',
     capabilities: ['Supply chain attacks', 'Long-term stealth persistence', 'Government espionage', 'Cloud infrastructure abuse'],
     threat: 'EXTREME',
-    videoUrl: 'https://res.cloudinary.com/dqch0tjrm/video/upload/vc_h264/v1780492583/apt29_lwnncf.mp4',
+    videoUrl: CLOUDINARY_VIDEOS.apt29,
     poster: apt29Poster,
     color: '#22c55e',
   },
@@ -68,7 +69,7 @@ const OFFICIALS = [
     description: 'A mysterious threat that leaked classified NSA hacking tools including EternalBlue — the exploit that powered the WannaCry and NotPetya attacks affecting hundreds of thousands of systems worldwide.',
     capabilities: ['Classified exploit leaking', 'NSA tool exfiltration', 'Zero-day brokering', 'Critical infrastructure targeting'],
     threat: 'EXTREME',
-    videoUrl: 'https://res.cloudinary.com/dqch0tjrm/video/upload/vc_h264/v1780463969/shadow-brokers_ga6tmk.mp4',
+    videoUrl: CLOUDINARY_VIDEOS.shadowBrokers,
     poster: shadowBrokersPoster,
     color: '#f59e0b',
   },
@@ -82,7 +83,7 @@ const OFFICIALS = [
     description: 'A prolific malware development and distribution network for some of the most destructive ransomware and banking trojans deployed globally. Known for constant evolution to evade detection.',
     capabilities: ['Ransomware development', 'Banking trojan deployment', 'Botnet operations', 'Cryptomining malware'],
     threat: 'HIGH',
-    videoUrl: 'https://res.cloudinary.com/dqch0tjrm/video/upload/vc_h264/v1780384928/virus_aol82c.mp4',
+    videoUrl: CLOUDINARY_VIDEOS.virus,
     poster: virusPoster,
     color: '#ef4444',
   },
@@ -96,7 +97,7 @@ const OFFICIALS = [
     description: 'A decentralized international hacktivist collective known for coordinated cyber attacks against governments, corporations, and institutions perceived as corrupt. Operates through social media coordination with no central leadership.',
     capabilities: ['DDoS campaigns', 'Data exfiltration', 'Website defacement', 'Doxxing operations'],
     threat: 'HIGH',
-    videoUrl: 'https://res.cloudinary.com/dqch0tjrm/video/upload/vc_h264/v1780406450/anonymous_mtu7vb.mp4',
+    videoUrl: CLOUDINARY_VIDEOS.anonymous,
     poster: anonymousPoster,
     color: '#6b7280',
   },
@@ -531,7 +532,7 @@ function CombinedVideo() {
             <video
               ref={videoRef}
               className="combined-video-el"
-              src="https://res.cloudinary.com/dqch0tjrm/video/upload/v1781208116/the-hackers_vdy1uk.mp4"
+              src={CLOUDINARY_VIDEOS.theHackers}
               playsInline
               preload="metadata"
               crossOrigin="anonymous"

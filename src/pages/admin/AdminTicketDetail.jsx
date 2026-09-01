@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import api from '../../services/api'
 import StatusPill from './components/StatusPill'
 import ConfirmDialog from './components/ConfirmDialog'
+import SendEmailDialog from './components/SendEmailDialog'
 import { exportRecordAsPDF } from '../../utils/pdfExport'
 import './AdminShared.css'
 
@@ -39,6 +40,8 @@ export default function AdminTicketDetail() {
   const [confirmOpen, setConfirmOpen]   = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [closingMsg, setClosingMsg] = useState('')
+  const [sendEmailOpen, setSendEmailOpen] = useState(false)
+  const [sendingEmail, setSendingEmail]   = useState(false)
 
   useEffect(() => {
     api.get('/tickets/all')
@@ -88,6 +91,18 @@ export default function AdminTicketDetail() {
     exportRecordAsPDF(`Ticket — ${ticket.ticketId}`, fields, `ticket-${ticket.ticketId}`)
   }
 
+  const handleSendEmail = async (to) => {
+    setSendingEmail(true)
+    try {
+      await api.post('/admin/send-email', { recordType: 'ticket', recordId: id, to })
+      setSendEmailOpen(false)
+    } catch (err) {
+      alert(err.response?.data?.message || 'Could not send this email. Please try again.')
+    } finally {
+      setSendingEmail(false)
+    }
+  }
+
   if (loading) return <div className="admin-page-loading">Loading ticket…</div>
   if (error)   return <div className="admin-page-error">{error}</div>
   if (!ticket) return null
@@ -117,6 +132,9 @@ export default function AdminTicketDetail() {
           </div>
           <button className="admin-btn admin-btn-ghost" onClick={handleExportPDF}>
             <i className="bi bi-file-earmark-pdf"></i> Download PDF
+          </button>
+          <button className="admin-btn admin-btn-ghost" onClick={() => setSendEmailOpen(true)}>
+            <i className="bi bi-envelope"></i> Send to Email
           </button>
           <button className="admin-btn admin-btn-danger" onClick={() => setConfirmOpen(true)}>
             <i className="bi bi-trash"></i> Delete Permanently
@@ -181,6 +199,14 @@ export default function AdminTicketDetail() {
         loading={deleting}
         onCancel={() => setConfirmOpen(false)}
         onConfirm={handleDelete}
+      />
+
+      <SendEmailDialog
+        open={sendEmailOpen}
+        recordLabel="Ticket"
+        loading={sendingEmail}
+        onCancel={() => setSendEmailOpen(false)}
+        onConfirm={handleSendEmail}
       />
     </div>
   )

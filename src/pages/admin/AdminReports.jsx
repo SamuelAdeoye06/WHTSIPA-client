@@ -11,6 +11,9 @@ export default function AdminReports() {
   const [error, setError]     = useState('')
   const [search, setSearch]   = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  // Public and Personal reports are kept as two entirely separate lists,
+  // not merged with a "scope" column — matching the client's spec.
+  const [activeTab, setActiveTab] = useState('personal')
 
   useEffect(() => {
     api.get('/reports/all')
@@ -19,8 +22,10 @@ export default function AdminReports() {
       .finally(() => setLoading(false))
   }, [])
 
+  const scoped = useMemo(() => reports.filter(r => r.reportType === activeTab), [reports, activeTab])
+
   const filtered = useMemo(() => {
-    return reports.filter(r => {
+    return scoped.filter(r => {
       if (statusFilter !== 'all' && r.status !== statusFilter) return false
       if (!search.trim()) return true
       const q = search.toLowerCase()
@@ -31,13 +36,31 @@ export default function AdminReports() {
         r.targetedName?.toLowerCase().includes(q)
       )
     })
-  }, [reports, search, statusFilter])
+  }, [scoped, search, statusFilter])
+
+  const personalCount = useMemo(() => reports.filter(r => r.reportType === 'personal').length, [reports])
+  const publicCount   = useMemo(() => reports.filter(r => r.reportType === 'public').length, [reports])
 
   return (
     <div>
       <div className="admin-page-header">
         <h1 className="admin-page-title">Reports</h1>
         <p className="admin-page-sub">Cybercrime reports submitted through the Report page.</p>
+      </div>
+
+      <div className="admin-tabs">
+        <button
+          className={`admin-tab-btn${activeTab === 'personal' ? ' admin-tab-btn-active' : ''}`}
+          onClick={() => setActiveTab('personal')}
+        >
+          Personal Reports <span className="admin-tab-count">{personalCount}</span>
+        </button>
+        <button
+          className={`admin-tab-btn${activeTab === 'public' ? ' admin-tab-btn-active' : ''}`}
+          onClick={() => setActiveTab('public')}
+        >
+          Public Reports <span className="admin-tab-count">{publicCount}</span>
+        </button>
       </div>
 
       <div className="admin-card">
@@ -61,7 +84,7 @@ export default function AdminReports() {
         ) : error ? (
           <div className="admin-page-error">{error}</div>
         ) : filtered.length === 0 ? (
-          <div className="admin-table-empty">No reports match your filters.</div>
+          <div className="admin-table-empty">No {activeTab} reports match your filters.</div>
         ) : (
           <>
             {/* Desktop Table View */}
@@ -71,7 +94,6 @@ export default function AdminReports() {
                   <tr>
                     <th>Reporter</th>
                     <th>Incident Type</th>
-                    <th>Type</th>
                     <th>Submitted</th>
                     <th>Status</th>
                   </tr>
@@ -81,7 +103,6 @@ export default function AdminReports() {
                     <tr key={r._id} className="admin-table-row-clickable" onClick={() => navigate(`/admin/reports/${r._id}`)}>
                       <td>{r.fullName || r.user?.firstName || 'Anonymous'}</td>
                       <td>{r.incidentType}</td>
-                      <td style={{ textTransform: 'capitalize' }}>{r.reportType}</td>
                       <td>{new Date(r.createdAt).toLocaleDateString()}</td>
                       <td><StatusPill status={r.status} /></td>
                     </tr>
@@ -105,11 +126,6 @@ export default function AdminReports() {
                   </div>
                   <div className="admin-mobile-card-body">
                     <strong>Incident:</strong> {r.incidentType || 'Not specified'}
-                    {r.reportType && (
-                      <div style={{ marginTop: '0.2rem', textTransform: 'capitalize', color: '#64748b', fontSize: '0.78rem' }}>
-                        Scope: {r.reportType} report
-                      </div>
-                    )}
                   </div>
                   <div className="admin-mobile-card-footer">
                     <span>{new Date(r.createdAt).toLocaleDateString()}</span>
