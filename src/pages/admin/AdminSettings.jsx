@@ -119,7 +119,7 @@ export default function AdminSettings() {
               type="email"
               className="admin-search-input"
               style={{ width: '100%' }}
-              placeholder={`Defaults to ${config?.supportEmail || 'the site inbox'} if left blank`}
+              placeholder="Defaults to the acsw@wehelptrackscammersipaddress.com if left blank"
               value={config?.notificationEmail || ''}
               onChange={e => setConfig(prev => ({ ...prev, notificationEmail: e.target.value }))}
             />

@@ -67,7 +67,7 @@ export default function CountrySelectField({
               <input
                 type="text"
                 className="form-control form-control-sm custom-country-search"
-                placeholder="Search country or code (+234, NG)..."
+                placeholder="Search country or code (+61, AUS)..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 autoFocus
