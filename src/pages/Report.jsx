@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useId } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
@@ -369,7 +369,7 @@ function PhoneCountryField({ formik, fieldName, phoneCodeFieldName, phoneDialFie
 
 /* ── File upload component ── */
 function FileUpload({ files, onChange }) {
-  const inputId = useId()
+  const inputRef = useRef(null)
 
   const handleDrop = (e) => {
     e.preventDefault()
@@ -387,9 +387,9 @@ function FileUpload({ files, onChange }) {
       className="file-drop-zone"
       onDragOver={e => e.preventDefault()}
       onDrop={handleDrop}
-      onClick={() => document.getElementById(inputId).click()}
+      onClick={() => inputRef.current?.click()}
     >
-      <input id={inputId} type="file" multiple accept={ACCEPT_ATTR} hidden
+      <input ref={inputRef} type="file" multiple accept={ACCEPT_ATTR} hidden
         onChange={e => {
           onChange(prev => [...prev, ...Array.from(e.target.files)].slice(0, MAX_FILES))
           e.target.value = '' // allow re-selecting the same file after removing it

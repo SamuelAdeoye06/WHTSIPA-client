@@ -166,16 +166,18 @@ export default function AdminSettings() {
         <div className="admin-card-header">
           <h3><i className="bi bi-headset"></i> Threats Page Channels</h3>
         </div>
-        <p style={{ fontSize: '0.85rem', color: '#6b7280', marginTop: '-0.5rem', marginBottom: '1rem' }}>
-          The "Other Ways to Reach Us" section on the Threats page. Keep a roster of workers here and switch
-          who's live any time — the page's look never changes, only whose number/handle/email is shown.
-        </p>
-        <WorkerListEditor
-          context="threats"
-          workers={config?.threatsPageWorkers || []}
-          activeWorkerId={config?.activeThreatsWorkerId}
-          onConfigUpdate={setConfig}
-        />
+        <div className="admin-card-body">
+          <p className="admin-card-body-hint">
+            The "Other Ways to Reach Us" section on the Threats page. Keep a roster of workers here and switch
+            who's live any time — the page's look never changes, only whose number/handle/email is shown.
+          </p>
+          <WorkerListEditor
+            context="threats"
+            workers={config?.threatsPageWorkers || []}
+            activeWorkerId={config?.activeThreatsWorkerId}
+            onConfigUpdate={setConfig}
+          />
+        </div>
       </div>
 
       {/* ── Contact page channels ── */}
@@ -183,16 +185,18 @@ export default function AdminSettings() {
         <div className="admin-card-header">
           <h3><i className="bi bi-chat-dots"></i> Contact Page Channels</h3>
         </div>
-        <p style={{ fontSize: '0.85rem', color: '#6b7280', marginTop: '-0.5rem', marginBottom: '1rem' }}>
-          The support channels and live-chat handoff on the Contact page. Same idea as Threats above —
-          one roster, one active worker shown to visitors at a time.
-        </p>
-        <WorkerListEditor
-          context="contact"
-          workers={config?.contactPageWorkers || []}
-          activeWorkerId={config?.activeContactWorkerId}
-          onConfigUpdate={setConfig}
-        />
+        <div className="admin-card-body">
+          <p className="admin-card-body-hint">
+            The support channels and live-chat handoff on the Contact page. Same idea as Threats above —
+            one roster, one active worker shown to visitors at a time.
+          </p>
+          <WorkerListEditor
+            context="contact"
+            workers={config?.contactPageWorkers || []}
+            activeWorkerId={config?.activeContactWorkerId}
+            onConfigUpdate={setConfig}
+          />
+        </div>
       </div>
 
       {/* ── Public contact / social links, grouped by page ── */}
@@ -200,14 +204,14 @@ export default function AdminSettings() {
         <div className="admin-card-header">
           <h3>Other Public Links</h3>
         </div>
-        <form onSubmit={handleSaveLinks}>
-          {LINK_GROUPS.map(group => (
-            <div key={group.heading} style={{ marginBottom: '1.5rem' }}>
+        <form onSubmit={handleSaveLinks} className="admin-card-body">
+          {LINK_GROUPS.map((group, i) => (
+            <div key={group.heading} style={{ marginBottom: i === LINK_GROUPS.length - 1 ? '1.5rem' : '2rem' }}>
               <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.15rem' }}>
                 {group.heading}
               </h4>
-              <p style={{ fontSize: '0.8rem', color: '#9ca3af', marginBottom: '0.75rem' }}>{group.hint}</p>
-              <div className="admin-detail-grid">
+              <p style={{ fontSize: '0.8rem', color: '#9ca3af', marginBottom: '0.9rem' }}>{group.hint}</p>
+              <div className="admin-detail-grid" style={{ padding: 0, gap: '1rem 1.5rem' }}>
                 {group.fields.map(([key, label, placeholder]) => (
                   <div key={key}>
                     <label className="admin-detail-field-label" htmlFor={key}>{label}</label>
