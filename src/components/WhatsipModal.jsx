@@ -950,7 +950,10 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
               <label>Evidence Upload <span className="wm-optional">(optional)</span></label>
               <input type="file" multiple accept={ACCEPT_ATTR} className="wm-file-input"
                 onChange={e => {
-                  setForm(f => ({ ...f, evidence: [...f.evidence, ...Array.from(e.target.files)].slice(0, MAX_FILES) }))
+                  // Capture the selection NOW, before e.target.value = '' below
+                  // clears it out from under the deferred state updater.
+                  const picked = Array.from(e.target.files)
+                  setForm(f => ({ ...f, evidence: [...f.evidence, ...picked].slice(0, MAX_FILES) }))
                   e.target.value = '' // allow re-selecting the same file after removing it
                 }} />
               <small className="wm-hint">Screenshots, transaction records, emails, etc. · {LIMIT_HINT} · Secure &amp; encrypted.</small>

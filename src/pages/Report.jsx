@@ -387,20 +387,15 @@ function FileUpload({ files, onChange }) {
       className="file-drop-zone"
       onDragOver={e => e.preventDefault()}
       onDrop={handleDrop}
-      onClick={() => {
-        console.log('[FileUpload] drop-zone clicked. inputRef.current:', inputRef.current)
-        inputRef.current?.click()
-      }}
+      onClick={() => inputRef.current?.click()}
     >
       <input ref={inputRef} type="file" multiple accept={ACCEPT_ATTR} hidden
         onChange={e => {
-          // TEMPORARY DEBUG LOGGING — remove once the file-select issue is confirmed fixed.
-          console.log('[FileUpload] onChange fired. Files selected:', e.target.files?.length, Array.from(e.target.files || []).map(f => f.name))
-          onChange(prev => {
-            const next = [...prev, ...Array.from(e.target.files)].slice(0, MAX_FILES)
-            console.log('[FileUpload] files state updating to:', next.map(f => f.name))
-            return next
-          })
+          // Capture the selection NOW — React may not run the state updater
+          // below until later, by which point e.target.value = '' (further
+          // down) will have already cleared e.target.files out from under us.
+          const picked = Array.from(e.target.files)
+          onChange(prev => [...prev, ...picked].slice(0, MAX_FILES))
           e.target.value = '' // allow re-selecting the same file after removing it
         }} />
       <i className="bi bi-cloud-upload" style={{ fontSize: '1.8rem', color: '#1d4ed8', opacity: 0.7 }}></i>
