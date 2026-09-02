@@ -75,6 +75,80 @@
   flex-wrap: nowrap;
 }
 
+/* ── Worker list editor (Threats/Contact page channels) ── */
+.worker-list { display: flex; flex-direction: column; gap: 0.75rem; }
+.worker-empty { color: #9ca3af; font-size: 0.88rem; padding: 0.5rem 0; }
+
+.worker-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 0.9rem 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.worker-card-active { border-color: #0d9488; background: #f0fdfa; }
+
+.worker-card-main { min-width: 0; }
+.worker-card-name {
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.worker-live-pill {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: #0d9488;
+  color: #fff;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+}
+.worker-card-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin-top: 0.35rem;
+  font-size: 0.82rem;
+  color: #6b7280;
+}
+.worker-card-details i { margin-right: 0.3rem; }
+
+.worker-card-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.worker-form { width: 100%; }
+.worker-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+}
+.worker-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+.worker-form-preview {
+  font-size: 0.76rem;
+  color: #0d9488;
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 640px) {
+  .worker-form-grid { grid-template-columns: 1fr; }
+}
+
 /* ── Status pills ── */
 .admin-pill {
   display: inline-block;

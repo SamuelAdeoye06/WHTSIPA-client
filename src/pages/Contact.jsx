@@ -9,11 +9,16 @@ import './Report.css'   /* shared livechat modal styles */
 import { openLiveChat, onAgentJoined } from '../utils/tidio'
 import { genTicketId } from '../utils/ticketId'
 import { useToast } from '../context/ToastContext'
+import { formatPhoneDisplay } from '../utils/phoneFormat'
 
 /* ── Contact channel constants ── */
-const WA_NUMBER       = '16502184673'
-const TG_HANDLE       = 'Wehelptrackscammersipaddress'
-const SUPPORT_EMAIL   = 'wehelptrackscammersipaddress@mail.com'
+// Fallback defaults — overwritten from the admin-configured active worker
+// for the Contact page once /api/config resolves (see useEffect below).
+// Declared with `let` (not `const`) so SITE_CHAT_FLOW's closures, which
+// read these by reference, pick up the live value once it's fetched.
+let WA_NUMBER       = '16502184673'
+let TG_HANDLE       = 'Wehelptrackscammersipaddress'
+let SUPPORT_EMAIL   = 'wehelptrackscammersipaddress@mail.com'
 const OFFICIAL_SITE   = 'https://wehelptrackscammersipaddress.com'
 
 /* ══════════════════════════════════════════════════════════
@@ -493,9 +498,24 @@ export default function Contact() {
   const [submitted, setSubmitted] = useState(false)
   const [loading,   setLoading]   = useState(false)
   const [showChat,  setShowChat]  = useState(false)
+  const [, forceChannelsRefresh]  = useState(0)
   const set = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }))
 
   const wordCount = form.message.trim().split(/\s+/).filter(Boolean).length
+
+  // Pull the currently-active worker for this page from the admin config.
+  // WA_NUMBER/TG_HANDLE/SUPPORT_EMAIL stay as sensible defaults if the
+  // fetch fails or no worker's been configured yet.
+  useEffect(() => {
+    api.get('/config').then(({ data }) => {
+      const worker = data?.contactPageWorkers?.find(w => w._id === data.activeContactWorkerId)
+      if (!worker) return
+      if (worker.whatsapp)       WA_NUMBER     = worker.whatsapp
+      if (worker.telegramHandle) TG_HANDLE     = worker.telegramHandle
+      if (worker.email)          SUPPORT_EMAIL = worker.email
+      forceChannelsRefresh(n => n + 1) // re-render so waLink/tgLink/emailLink pick up the new values
+    }).catch(() => { /* keep defaults */ })
+  }, [])
 
   // Restore a saved draft (left behind by an auth redirect) and prefill from the signed-in user
   useEffect(() => {
@@ -709,7 +729,7 @@ export default function Contact() {
                       </div>
                       <div className="contact-channel-text">
                         <div className="fw-bold small" style={{ color: '#0f172a' }}>WhatsApp</div>
-                        <div style={{ color: '#4a5568', fontSize: '0.82rem' }}>+1 (650) 218-4673 · 24/7 fastest response</div>
+                        <div style={{ color: '#4a5568', fontSize: '0.82rem' }}>{formatPhoneDisplay(WA_NUMBER)} · 24/7 fastest response</div>
                       </div>
                       <i className="bi bi-arrow-right contact-channel-arrow"></i>
                     </a>
@@ -727,7 +747,7 @@ export default function Contact() {
                       </div>
                       <div className="contact-channel-text">
                         <div className="fw-bold small" style={{ color: '#0f172a' }}>Telegram</div>
-                        <div style={{ color: '#4a5568', fontSize: '0.82rem', wordBreak: 'break-all' }}>@Wehelptrackscammersipaddress</div>
+                        <div style={{ color: '#4a5568', fontSize: '0.82rem', wordBreak: 'break-all' }}>@{TG_HANDLE}</div>
                       </div>
                       <i className="bi bi-arrow-right contact-channel-arrow"></i>
                     </a>
@@ -743,7 +763,7 @@ export default function Contact() {
                       </div>
                       <div className="contact-channel-text">
                         <div className="fw-bold small" style={{ color: '#0f172a' }}>Email Us</div>
-                        <div style={{ color: '#4a5568', fontSize: '0.82rem', wordBreak: 'break-all' }}>wehelptrackscammersipaddress@mail.com</div>
+                        <div style={{ color: '#4a5568', fontSize: '0.82rem', wordBreak: 'break-all' }}>{SUPPORT_EMAIL}</div>
                       </div>
                       <i className="bi bi-arrow-right contact-channel-arrow"></i>
                     </a>

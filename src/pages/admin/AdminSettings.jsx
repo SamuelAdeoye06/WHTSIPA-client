@@ -1,16 +1,39 @@
 import { useState, useEffect } from 'react'
 import api from '../../services/api'
+import WorkerListEditor from './components/WorkerListEditor'
 import './AdminShared.css'
 
-const LINK_FIELDS = [
-  ['callbackNumber',           'Callback Number',                'e.g. +1 (650) 221-7654'],
-  ['supportEmail',             'Support Email',                  'e.g. support@whtsipa.com'],
-  ['whatsappLink',             'WhatsApp Link',                  'https://wa.me/...'],
-  ['telegramCommunityLink',    'Telegram — Community',           'https://t.me/...'],
-  ['whtsipaToolsTelegramLink', 'Telegram — Tools',                'https://t.me/...'],
-  ['findUsTelegramLink',       'Telegram — Find Us',              'https://t.me/...'],
-  ['facebookCommunityLink',    'Facebook Community',             'https://facebook.com/...'],
+/* Grouped by page/context so it's obvious in the admin UI which part of
+   the site each field actually affects. Fields here are simple single
+   values (one per site) — the Threats/Contact worker lists below are
+   handled separately since each can hold multiple entries. */
+const LINK_GROUPS = [
+  {
+    heading: 'Navbar / Community Links',
+    hint: 'Shown site-wide in the footer.',
+    fields: [
+      ['whatsappLink',          'WhatsApp Link',        'https://wa.me/...'],
+      ['telegramCommunityLink', 'Telegram — Community',  'https://t.me/...'],
+      ['facebookCommunityLink', 'Facebook Community',    'https://facebook.com/...'],
+    ],
+  },
+  {
+    heading: 'About Officials Page',
+    hint: 'The "Find Us" Telegram link on the About Officials page.',
+    fields: [
+      ['findUsTelegramLink', 'Telegram — Find Us', 'https://t.me/...'],
+    ],
+  },
+  {
+    heading: 'Essential Eight Page',
+    hint: 'The callback number shown on the Essential Eight page.',
+    fields: [
+      ['callbackNumber', 'Callback Number', 'e.g. +1 (650) 221-7654'],
+    ],
+  },
 ]
+
+const ALL_LINK_KEYS = LINK_GROUPS.flatMap(g => g.fields.map(([key]) => key))
 
 export default function AdminSettings() {
   const [config, setConfig]   = useState(null)
@@ -45,7 +68,7 @@ export default function AdminSettings() {
     setSaveMsg('')
     setSaveErr('')
     try {
-      const payload = Object.fromEntries(LINK_FIELDS.map(([key]) => [key, config[key] || '']))
+      const payload = Object.fromEntries(ALL_LINK_KEYS.map(key => [key, config[key] || '']))
       await api.put('/config', payload)
       setSaveMsg('Settings saved.')
     } catch (err) {
@@ -101,7 +124,7 @@ export default function AdminSettings() {
     <div>
       <div className="admin-page-header">
         <h1 className="admin-page-title">Settings</h1>
-        <p className="admin-page-sub">Public contact links and your admin account.</p>
+        <p className="admin-page-sub">Public contact links, page channels, and your admin account.</p>
       </div>
 
       {/* ── Notification bell settings ── */}
@@ -119,7 +142,7 @@ export default function AdminSettings() {
               type="email"
               className="admin-search-input"
               style={{ width: '100%' }}
-              placeholder="Defaults to the acsw@wehelptrackscammersipaddress.com if left blank"
+              placeholder="Defaults to the server's MAIL_USER address if left blank"
               value={config?.notificationEmail || ''}
               onChange={e => setConfig(prev => ({ ...prev, notificationEmail: e.target.value }))}
             />
@@ -138,26 +161,70 @@ export default function AdminSettings() {
         </form>
       </div>
 
-      {/* ── Public contact / social links ── */}
+      {/* ── Threats page channels ── */}
       <div className="admin-card" style={{ marginBottom: '1.5rem' }}>
         <div className="admin-card-header">
-          <h3>Public Contact &amp; Social Links</h3>
+          <h3><i className="bi bi-headset"></i> Threats Page Channels</h3>
         </div>
-        <form onSubmit={handleSaveLinks} className="admin-detail-grid">
-          {LINK_FIELDS.map(([key, label, placeholder]) => (
-            <div key={key}>
-              <label className="admin-detail-field-label" htmlFor={key}>{label}</label>
-              <input
-                id={key}
-                className="admin-search-input"
-                style={{ width: '100%' }}
-                placeholder={placeholder}
-                value={config?.[key] || ''}
-                onChange={handleFieldChange(key)}
-              />
+        <p style={{ fontSize: '0.85rem', color: '#6b7280', marginTop: '-0.5rem', marginBottom: '1rem' }}>
+          The "Other Ways to Reach Us" section on the Threats page. Keep a roster of workers here and switch
+          who's live any time — the page's look never changes, only whose number/handle/email is shown.
+        </p>
+        <WorkerListEditor
+          context="threats"
+          workers={config?.threatsPageWorkers || []}
+          activeWorkerId={config?.activeThreatsWorkerId}
+          onConfigUpdate={setConfig}
+        />
+      </div>
+
+      {/* ── Contact page channels ── */}
+      <div className="admin-card" style={{ marginBottom: '1.5rem' }}>
+        <div className="admin-card-header">
+          <h3><i className="bi bi-chat-dots"></i> Contact Page Channels</h3>
+        </div>
+        <p style={{ fontSize: '0.85rem', color: '#6b7280', marginTop: '-0.5rem', marginBottom: '1rem' }}>
+          The support channels and live-chat handoff on the Contact page. Same idea as Threats above —
+          one roster, one active worker shown to visitors at a time.
+        </p>
+        <WorkerListEditor
+          context="contact"
+          workers={config?.contactPageWorkers || []}
+          activeWorkerId={config?.activeContactWorkerId}
+          onConfigUpdate={setConfig}
+        />
+      </div>
+
+      {/* ── Public contact / social links, grouped by page ── */}
+      <div className="admin-card" style={{ marginBottom: '1.5rem' }}>
+        <div className="admin-card-header">
+          <h3>Other Public Links</h3>
+        </div>
+        <form onSubmit={handleSaveLinks}>
+          {LINK_GROUPS.map(group => (
+            <div key={group.heading} style={{ marginBottom: '1.5rem' }}>
+              <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.15rem' }}>
+                {group.heading}
+              </h4>
+              <p style={{ fontSize: '0.8rem', color: '#9ca3af', marginBottom: '0.75rem' }}>{group.hint}</p>
+              <div className="admin-detail-grid">
+                {group.fields.map(([key, label, placeholder]) => (
+                  <div key={key}>
+                    <label className="admin-detail-field-label" htmlFor={key}>{label}</label>
+                    <input
+                      id={key}
+                      className="admin-search-input"
+                      style={{ width: '100%' }}
+                      placeholder={placeholder}
+                      value={config?.[key] || ''}
+                      onChange={handleFieldChange(key)}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
-          <div className="admin-detail-field-full" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <button type="submit" className="admin-btn admin-btn-primary" disabled={saving}>
               {saving ? 'Saving…' : 'Save Changes'}
             </button>

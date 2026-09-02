@@ -12,6 +12,7 @@ import { openLiveChat, onAgentJoined } from '../utils/tidio'
 import { genTicketId } from '../utils/ticketId'
 import api from '../services/api'
 import { useAuth } from '../context/AuthContext'
+import { formatPhoneDisplay } from '../utils/phoneFormat'
 
 /* ─────────────────────────────────────────────────────────
    ADMIN-CONFIGURABLE CONTACT DETAILS — Threats page only
@@ -722,6 +723,30 @@ export default function Threats() {
   const [activeModal,     setActiveModal]     = useState(null)
   const [modalThreat,     setModalThreat]     = useState('')
   const [showThreatChat,  setShowThreatChat]  = useState(false)
+  const [contacts,        setContacts]        = useState(THREATS_CONTACTS)
+
+  // Pull the currently-active worker for this page from the admin config.
+  // Falls back to the hardcoded THREATS_CONTACTS defaults above if the
+  // fetch fails or no worker has been configured yet — the page never
+  // renders with missing contact details.
+  useEffect(() => {
+    api.get('/config').then(({ data }) => {
+      const worker = data?.threatsPageWorkers?.find(w => w._id === data.activeThreatsWorkerId)
+      if (!worker) return
+      setContacts(prev => ({
+        ...prev,
+        whatsapp: worker.whatsapp
+          ? { number: formatPhoneDisplay(worker.whatsapp), url: `https://wa.me/${worker.whatsapp}` }
+          : prev.whatsapp,
+        telegram: worker.telegramHandle
+          ? { handle: `@${worker.telegramHandle}`, url: `https://t.me/${worker.telegramHandle}` }
+          : prev.telegram,
+        email: worker.email
+          ? { address: worker.email, url: `mailto:${worker.email}` }
+          : prev.email,
+      }))
+    }).catch(() => { /* keep defaults */ })
+  }, [])
 
   // After a redirected sign-in/sign-up, reopen the modal the user was using
   // (Request Tool, Hire, Report, Contact) with the same threat context.
@@ -1293,7 +1318,7 @@ export default function Threats() {
 
             {/* WhatsApp */}
             <a
-              href={THREATS_CONTACTS.whatsapp.url}
+              href={contacts.whatsapp.url}
               target="_blank"
               rel="noopener noreferrer"
               className="threats-contact-card"
@@ -1303,14 +1328,14 @@ export default function Threats() {
               </div>
               <div className="tcc-body">
                 <div className="tcc-name">WhatsApp</div>
-                <div className="tcc-detail">{THREATS_CONTACTS.whatsapp.number} · 24/7 fastest response</div>
+                <div className="tcc-detail">{contacts.whatsapp.number} · 24/7 fastest response</div>
               </div>
               <i className="bi bi-arrow-right tcc-arrow"></i>
             </a>
 
             {/* Telegram */}
             <a
-              href={THREATS_CONTACTS.telegram.url}
+              href={contacts.telegram.url}
               target="_blank"
               rel="noopener noreferrer"
               className="threats-contact-card"
@@ -1320,14 +1345,14 @@ export default function Threats() {
               </div>
               <div className="tcc-body">
                 <div className="tcc-name">Telegram</div>
-                <div className="tcc-detail">{THREATS_CONTACTS.telegram.handle}</div>
+                <div className="tcc-detail">{contacts.telegram.handle}</div>
               </div>
               <i className="bi bi-arrow-right tcc-arrow"></i>
             </a>
 
             {/* Email */}
             <a
-              href={THREATS_CONTACTS.email.url}
+              href={contacts.email.url}
               className="threats-contact-card"
             >
               <div className="tcc-icon tcc-icon-email">
@@ -1335,7 +1360,7 @@ export default function Threats() {
               </div>
               <div className="tcc-body">
                 <div className="tcc-name">Email Us</div>
-                <div className="tcc-detail">{THREATS_CONTACTS.email.address}</div>
+                <div className="tcc-detail">{contacts.email.address}</div>
               </div>
               <i className="bi bi-arrow-right tcc-arrow"></i>
             </a>
