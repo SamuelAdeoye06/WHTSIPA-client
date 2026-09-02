@@ -273,6 +273,51 @@
 }
 .wm-hint { font-size: 0.72rem; color: rgba(233,243,255,0.4); }
 
+.wm-evidence-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+.wm-evidence-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.4rem 0.25rem 0.6rem;
+  border-radius: 8px;
+  background: rgba(34, 240, 255, 0.1);
+  border: 1px solid rgba(34, 240, 255, 0.25);
+  font-size: 0.75rem;
+  color: rgba(233, 243, 255, 0.85);
+  max-width: 220px;
+  white-space: nowrap;
+}
+.wm-evidence-chip-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+}
+.wm-evidence-chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  color: inherit;
+  opacity: 0.75;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.wm-evidence-chip-remove:hover {
+  opacity: 1;
+  background: rgba(239, 68, 68, 0.35);
+}
+.wm-evidence-chip-remove i { font-size: 0.7rem; }
+
 /* Success */
 .wm-success { text-align: center; padding: 0.5rem; }
 .wm-success-icon { font-size: 3rem; color: #22c55e; margin-bottom: 0.75rem; }

@@ -8,6 +8,7 @@ import './Contact.css'
 import './Report.css'   /* shared livechat modal styles */
 import { openLiveChat, onAgentJoined } from '../utils/tidio'
 import { genTicketId } from '../utils/ticketId'
+import { useToast } from '../context/ToastContext'
 
 /* ── Contact channel constants ── */
 const WA_NUMBER       = '16502184673'
@@ -487,10 +488,10 @@ export default function Contact() {
   const navigate  = useNavigate()
   const location  = useLocation()
   const { user }  = useAuth()
+  const { showToast } = useToast()
   const [form,      setForm]      = useState({ name: '', email: '', subject: '', message: '' })
   const [submitted, setSubmitted] = useState(false)
   const [loading,   setLoading]   = useState(false)
-  const [error,     setError]     = useState('')
   const [showChat,  setShowChat]  = useState(false)
   const set = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }))
 
@@ -526,10 +527,9 @@ export default function Contact() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setError('')
 
     if (wordCount < 25) {
-      setError('Please provide at least 25 words in your message.')
+      showToast('Please provide at least 25 words in your message.', 'error')
       return
     }
 
@@ -546,7 +546,7 @@ export default function Contact() {
       localStorage.removeItem('whts_contact_draft')
       setSubmitted(true)
     } catch (err) {
-      setError(err.response?.data?.message || 'Something went wrong. Please try again.')
+      showToast(err.response?.data?.message || 'Something went wrong. Please try again.', 'error')
     } finally {
       setLoading(false)
     }
@@ -615,12 +615,6 @@ export default function Contact() {
               ) : (
                 <div className="contact-form-card p-4 p-md-5" id="contact">
                   <h3 className="fw-bold mb-4" style={{ color: '#0f172a' }}>Send us a Message</h3>
-                  {error && (
-                    <div className="alert alert-danger d-flex align-items-center gap-2 mb-3" style={{ borderRadius: 10 }}>
-                      <i className="bi bi-exclamation-circle-fill"></i>
-                      <span>{error}</span>
-                    </div>
-                  )}
                   <form onSubmit={handleSubmit}>
                     <div className="row g-3">
                       <div className="col-12 col-sm-6">

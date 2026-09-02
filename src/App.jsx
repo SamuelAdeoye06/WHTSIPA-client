@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, useLocation, matchPath, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import { ToastProvider } from './context/ToastContext'
 import { hideDefaultBubble, autoHideOnClose, setTidioVisitor } from './utils/tidio'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
@@ -130,9 +131,11 @@ function Layout() {
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <Layout />
-      </AuthProvider>
+      <ToastProvider>
+        <AuthProvider>
+          <Layout />
+        </AuthProvider>
+      </ToastProvider>
     </BrowserRouter>
   )
 }

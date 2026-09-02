@@ -104,7 +104,7 @@ export default function AdminUsers() {
           <>
             {/* Desktop Table View */}
             <div className="admin-table-wrap admin-desktop-table">
-              <table className="admin-table">
+              <table className="admin-table admin-users-table">
                 <thead>
                   <tr>
                     <th>Name</th>
@@ -122,9 +122,9 @@ export default function AdminUsers() {
                     const isSelf = currentAdmin && u._id === currentAdmin.id
                     return (
                       <tr key={u._id}>
-                        <td>{u.firstName} {u.lastName}</td>
-                        <td>{u.email}</td>
-                        <td>{u.country}</td>
+                        <td className="admin-table-truncate" style={{ maxWidth: 140 }} title={`${u.firstName} ${u.lastName}`}>{u.firstName} {u.lastName}</td>
+                        <td className="admin-table-truncate" style={{ maxWidth: 190 }} title={u.email}>{u.email}</td>
+                        <td className="admin-table-truncate" style={{ maxWidth: 100 }} title={u.country}>{u.country}</td>
                         <td style={{ textTransform: 'capitalize' }}>{u.role}</td>
                         <td>{u.isVerified ? <span className="admin-pill admin-pill-resolved">Verified</span> : <span className="admin-pill admin-pill-open">Unverified</span>}</td>
                         <td>
@@ -137,7 +137,7 @@ export default function AdminUsers() {
                           {isSelf ? (
                             <span style={{ color: '#9ca3af', fontSize: '0.8rem' }}>—</span>
                           ) : (
-                            <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                            <div className="admin-users-actions">
                               {u.isRestricted ? (
                                 <button
                                   className="admin-btn admin-btn-ghost admin-btn-sm"

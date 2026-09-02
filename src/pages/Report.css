@@ -159,22 +159,58 @@ textarea.cyber-input { resize: vertical; min-height: 120px; }
 .file-chip {
   display: inline-flex;
   align-items: center;
-  padding: 0.25rem 0.6rem;
+  gap: 0.35rem;
+  padding: 0.25rem 0.4rem 0.25rem 0.6rem;
   border-radius: 8px;
   background: rgba(34, 240, 255, 0.1);
   border: 1px solid rgba(34, 240, 255, 0.25);
   font-size: 0.75rem;
   color: rgba(233, 243, 255, 0.85);
-  max-width: 180px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.file-chip span,
+.file-chip {
   white-space: nowrap;
 }
+
+.file-chip-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+}
+
+.file-chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  color: inherit;
+  opacity: 0.75;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.file-chip-remove:hover {
+  opacity: 1;
+  background: rgba(239, 68, 68, 0.35);
+}
+.file-chip-remove i { font-size: 0.7rem; }
 
 .page-light .file-chip {
   background: #eef2ff;
   border-color: #c7d2fe;
   color: #07104a;
+}
+.page-light .file-chip-remove {
+  background: rgba(7, 16, 74, 0.08);
+}
+.page-light .file-chip-remove:hover {
+  background: rgba(239, 68, 68, 0.2);
 }
 
 /* ── Recovery tabs ── */

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useId } from 'react'
 import { Link } from 'react-router-dom'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
@@ -13,6 +13,8 @@ import { genTicketId } from '../utils/ticketId'
 import { getCountryFlag } from '../utils/countryUtils'
 import { useCountries } from '../context/CountriesContext'
 import CountrySelectField from '../components/CountrySelectField'
+import { useToast } from '../context/ToastContext'
+import { MAX_FILES, MAX_FILE_SIZE_MB, ACCEPT_ATTR, LIMIT_HINT } from '../utils/uploadLimits'
 import ChatSessionHistory from '../components/ChatSessionHistory'
 
 /* ── Incident types (Updated per spec) ── */
@@ -367,10 +369,17 @@ function PhoneCountryField({ formik, fieldName, phoneCodeFieldName, phoneDialFie
 
 /* ── File upload component ── */
 function FileUpload({ files, onChange }) {
+  const inputId = useId()
+
   const handleDrop = (e) => {
     e.preventDefault()
     const dropped = Array.from(e.dataTransfer.files)
-    onChange(prev => [...prev, ...dropped].slice(0, 5))
+    onChange(prev => [...prev, ...dropped].slice(0, MAX_FILES))
+  }
+
+  const removeFile = (e, index) => {
+    e.stopPropagation() // don't trigger the drop-zone's onClick (re-opens the file picker)
+    onChange(prev => prev.filter((_, i) => i !== index))
   }
 
   return (
@@ -378,18 +387,30 @@ function FileUpload({ files, onChange }) {
       className="file-drop-zone"
       onDragOver={e => e.preventDefault()}
       onDrop={handleDrop}
-      onClick={() => document.getElementById('fileInput').click()}
+      onClick={() => document.getElementById(inputId).click()}
     >
-      <input id="fileInput" type="file" multiple accept="image/*,.pdf,.doc,.docx" hidden
-        onChange={e => onChange(prev => [...prev, ...Array.from(e.target.files)].slice(0, 5))} />
+      <input id={inputId} type="file" multiple accept={ACCEPT_ATTR} hidden
+        onChange={e => {
+          onChange(prev => [...prev, ...Array.from(e.target.files)].slice(0, MAX_FILES))
+          e.target.value = '' // allow re-selecting the same file after removing it
+        }} />
       <i className="bi bi-cloud-upload" style={{ fontSize: '1.8rem', color: '#1d4ed8', opacity: 0.7 }}></i>
       <div className="fw-bold mt-2" style={{ fontSize: '0.9rem' }}>Drag & drop evidence files here</div>
-      <div className="text-muted-cyber small mt-1">or click to browse · Images, PDF, DOC · Max 5 files</div>
+      <div className="text-muted-cyber small mt-1">or click to browse · {LIMIT_HINT}</div>
       {files.length > 0 && (
         <div className="mt-3 d-flex flex-wrap gap-2 justify-content-center">
           {files.map((f, i) => (
             <span key={i} className="file-chip">
-              <i className="bi bi-paperclip me-1"></i>{f.name}
+              <i className="bi bi-paperclip"></i>
+              <span className="file-chip-name">{f.name}</span>
+              <button
+                type="button"
+                className="file-chip-remove"
+                onClick={e => removeFile(e, i)}
+                aria-label={`Remove ${f.name}`}
+              >
+                <i className="bi bi-x"></i>
+              </button>
             </span>
           ))}
         </div>
@@ -703,11 +724,11 @@ function LiveChatModal({ isOpen, onClose, userName, user, setReportType, isHuman
 }
 
 export default function Report() {
+  const { showToast } = useToast()
   const [reportType, setReportType]     = useState('personal') // 'personal' | 'public'
   const [files, setFiles]               = useState([])
   const [submitted, setSubmitted]       = useState(false)
   const [loading, setLoading]           = useState(false)
-  const [error, setError]               = useState('')
   const [showLiveChat, setShowLiveChat] = useState(false)
   const [activeRecovery, setActiveRecovery] = useState(null)
   const isLoadedRef = useRef(false)
@@ -877,7 +898,6 @@ export default function Report() {
     }
 
     setLoading(true)
-    setError('')
     try {
       // Upload real files first — evidenceFiles must be actual Cloudinary
       // URLs the admin panel can later view/download, not just filenames.
@@ -887,7 +907,7 @@ export default function Report() {
           evidenceUrls = await uploadEvidenceFiles(files)
         } catch (uploadErr) {
           console.error('Evidence upload failed:', uploadErr)
-          setError('Could not upload your evidence files. Please try again, or submit without attachments.')
+          showToast('Could not upload your evidence files. Please try again, or submit without attachments.', 'error')
           setLoading(false)
           return
         }
@@ -924,7 +944,7 @@ export default function Report() {
       setSubmitted(true)
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (err) {
-      setError(err.response?.data?.message || 'Submission failed. Please try again.')
+      showToast(err.response?.data?.message || 'Submission failed. Please try again.', 'error')
     } finally {
       setLoading(false)
     }
@@ -1221,13 +1241,6 @@ export default function Report() {
                 <p className="report-form-subtitle mb-4">
                   Please complete the form below. Note that all fields marked with an astelish (*) are required.
                 </p>
-
-                {error && (
-                  <div className="alert alert-danger d-flex align-items-center mb-4" role="alert" style={{ borderRadius: '12px', fontSize: '0.88rem' }}>
-                    <i className="bi bi-exclamation-octagon-fill me-2"></i>
-                    <div>{error}</div>
-                  </div>
-                )}
 
                 {/* 👤 PERSONAL REPORT FORM */}
                 {reportType === 'personal' && (

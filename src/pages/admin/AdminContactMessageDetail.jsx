@@ -4,12 +4,14 @@ import api from '../../services/api'
 import StatusPill from './components/StatusPill'
 import ConfirmDialog from './components/ConfirmDialog'
 import SendEmailDialog from './components/SendEmailDialog'
+import { useToast } from '../../context/ToastContext'
 import { exportRecordAsPDF } from '../../utils/pdfExport'
 import './AdminShared.css'
 
 export default function AdminContactMessageDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { showToast } = useToast()
   const [message, setMessage] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError]     = useState('')
@@ -43,7 +45,7 @@ export default function AdminContactMessageDetail() {
       const { data } = await api.patch(`/contact/${id}/status`, { status })
       setMessage(prev => ({ ...prev, status: data.status }))
     } catch {
-      alert('Could not update status. Please try again.')
+      showToast('Could not update status. Please try again.', 'error')
     } finally {
       setSavingStatus(false)
     }
@@ -55,7 +57,7 @@ export default function AdminContactMessageDetail() {
       await api.delete(`/contact/${id}`)
       navigate('/admin/contact-messages', { replace: true })
     } catch {
-      alert('Could not delete this message. Please try again.')
+      showToast('Could not delete this message. Please try again.', 'error')
       setDeleting(false)
     }
   }
@@ -79,8 +81,9 @@ export default function AdminContactMessageDetail() {
     try {
       await api.post('/admin/send-email', { recordType: 'contact', recordId: id, to })
       setSendEmailOpen(false)
+      showToast('Email sent.', 'success')
     } catch (err) {
-      alert(err.response?.data?.message || 'Could not send this email. Please try again.')
+      showToast(err.response?.data?.message || 'Could not send this email. Please try again.', 'error')
     } finally {
       setSendingEmail(false)
     }

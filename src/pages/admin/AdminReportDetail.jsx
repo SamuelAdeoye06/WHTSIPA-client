@@ -4,6 +4,7 @@ import api from '../../services/api'
 import StatusPill from './components/StatusPill'
 import ConfirmDialog from './components/ConfirmDialog'
 import SendEmailDialog from './components/SendEmailDialog'
+import { useToast } from '../../context/ToastContext'
 import { exportRecordAsPDF } from '../../utils/pdfExport'
 import './AdminShared.css'
 
@@ -31,6 +32,7 @@ const FIELD_LABELS = [
 export default function AdminReportDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { showToast } = useToast()
   const [report, setReport]   = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError]     = useState('')
@@ -58,7 +60,7 @@ export default function AdminReportDetail() {
       const { data } = await api.patch(`/reports/${id}/status`, { status })
       setReport(prev => ({ ...prev, status: data.status }))
     } catch {
-      alert('Could not update status. Please try again.')
+      showToast('Could not update status. Please try again.', 'error')
     } finally {
       setSavingStatus(false)
     }
@@ -70,7 +72,7 @@ export default function AdminReportDetail() {
       await api.delete(`/reports/${id}`)
       navigate('/admin/reports', { replace: true })
     } catch {
-      alert('Could not delete this report. Please try again.')
+      showToast('Could not delete this report. Please try again.', 'error')
       setDeleting(false)
     }
   }
@@ -95,8 +97,9 @@ export default function AdminReportDetail() {
     try {
       await api.post('/admin/send-email', { recordType: 'report', recordId: id, to })
       setSendEmailOpen(false)
+      showToast('Email sent.', 'success')
     } catch (err) {
-      alert(err.response?.data?.message || 'Could not send this email. Please try again.')
+      showToast(err.response?.data?.message || 'Could not send this email. Please try again.', 'error')
     } finally {
       setSendingEmail(false)
     }

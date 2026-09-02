@@ -49,6 +49,32 @@
 .admin-table-row-clickable:hover { background: #f8fafc; }
 .admin-table-empty { padding: 3rem 1.4rem; text-align: center; color: #9ca3af; }
 
+/* Reusable cell truncation — long unbroken strings (emails especially) don't
+   wrap, so without this a single long value can force the whole table wider
+   than its container and trigger horizontal scroll. max-width is set inline
+   per-cell since the right width varies by column. */
+.admin-table-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Users table: tighter columns + compact actions so 8 columns fit
+   without horizontal scroll on typical desktop widths ── */
+.admin-users-table th,
+.admin-users-table td {
+  padding: 0.7rem 0.9rem;
+}
+.admin-users-table th:last-child,
+.admin-users-table td:last-child {
+  padding-right: 1.4rem;
+}
+.admin-users-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: nowrap;
+}
+
 /* ── Status pills ── */
 .admin-pill {
   display: inline-block;

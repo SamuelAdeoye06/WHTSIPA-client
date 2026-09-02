@@ -4,6 +4,7 @@ import api from '../../services/api'
 import StatusPill from './components/StatusPill'
 import ConfirmDialog from './components/ConfirmDialog'
 import SendEmailDialog from './components/SendEmailDialog'
+import { useToast } from '../../context/ToastContext'
 import { exportRecordAsPDF } from '../../utils/pdfExport'
 import './AdminShared.css'
 
@@ -19,6 +20,7 @@ const FIELD_LABELS = [
 export default function AdminBookingDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { showToast } = useToast()
   const [booking, setBooking] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError]     = useState('')
@@ -46,7 +48,7 @@ export default function AdminBookingDetail() {
       const { data } = await api.patch(`/booking/${id}/status`, { status })
       setBooking(prev => ({ ...prev, status: data.status }))
     } catch {
-      alert('Could not update status. Please try again.')
+      showToast('Could not update status. Please try again.', 'error')
     } finally {
       setSavingStatus(false)
     }
@@ -58,7 +60,7 @@ export default function AdminBookingDetail() {
       await api.delete(`/booking/${id}`)
       navigate('/admin/bookings', { replace: true })
     } catch {
-      alert('Could not delete this booking. Please try again.')
+      showToast('Could not delete this booking. Please try again.', 'error')
       setDeleting(false)
     }
   }
@@ -76,8 +78,9 @@ export default function AdminBookingDetail() {
     try {
       await api.post('/admin/send-email', { recordType: 'booking', recordId: id, to })
       setSendEmailOpen(false)
+      showToast('Email sent.', 'success')
     } catch (err) {
-      alert(err.response?.data?.message || 'Could not send this email. Please try again.')
+      showToast(err.response?.data?.message || 'Could not send this email. Please try again.', 'error')
     } finally {
       setSendingEmail(false)
     }

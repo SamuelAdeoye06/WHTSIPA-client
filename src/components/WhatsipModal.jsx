@@ -17,6 +17,8 @@ import ChatSessionHistory from './ChatSessionHistory'
 import './WhatsipModal.css'
 import { getCountryFlag } from '../utils/countryUtils'
 import { useCountries } from '../context/CountriesContext'
+import { useToast } from '../context/ToastContext'
+import { MAX_FILES, ACCEPT_ATTR, LIMIT_HINT } from '../utils/uploadLimits'
 
 /* ── IP → country detection ── */
 async function detectCountry() {
@@ -420,13 +422,13 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
   const [ticketId] = useState(genTicketId)
   const [step, setStep] = useState('main')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const { showToast } = useToast()
   const [form, setForm] = useState({
     summary: '', services: [], duration: 'One-Time Assistance',
     goals: '', name: '', email: '', phone: '',
     phoneCountryCode: 'US', phoneDialCode: '+1', phoneDigits: '',
     contactMethod: '',
-    evidence: null,
+    evidence: [],
   })
 
   useEffect(() => {
@@ -694,18 +696,17 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
     const handleSubmit = async (e) => {
       e.preventDefault()
       setLoading(true)
-      setError('')
       try {
         // Upload real files first — evidenceFiles must be actual Cloudinary
         // URLs the admin panel can later view/download, not just filenames.
         let evidenceUrls = []
-        const evidenceList = form.evidence ? Array.from(form.evidence) : []
+        const evidenceList = form.evidence || []
         if (evidenceList.length > 0) {
           try {
             evidenceUrls = await uploadEvidenceFiles(evidenceList)
           } catch (uploadErr) {
             console.error('Evidence upload failed:', uploadErr)
-            setError('Could not upload your evidence files. Please try again, or submit without attachments.')
+            showToast('Could not upload your evidence files. Please try again, or submit without attachments.', 'error')
             setLoading(false)
             return
           }
@@ -729,7 +730,7 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
         })
         setStep('success')
       } catch (err) {
-        setError(err.response?.data?.message || 'Failed to submit request. Please try again.')
+        showToast(err.response?.data?.message || 'Failed to submit request. Please try again.', 'error')
       } finally {
         setLoading(false)
       }
@@ -771,12 +772,6 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
           </div>
 
           <form className="wm-form" onSubmit={handleSubmit}>
-            {error && (
-              <div className="alert alert-danger d-flex align-items-center gap-2 mb-3" style={{ borderRadius: 10, fontSize: '0.85rem', padding: '0.5rem 0.75rem' }}>
-                <i className="bi bi-exclamation-circle-fill"></i>
-                <span>{error}</span>
-              </div>
-            )}
             <div className="wm-field">
               <label>Incident / Case Summary <span className="wm-required">*</span></label>
               <textarea rows={3} placeholder="Briefly describe the issue or threat you're experiencing..."
@@ -953,9 +948,30 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
 
             <div className="wm-field">
               <label>Evidence Upload <span className="wm-optional">(optional)</span></label>
-              <input type="file" multiple accept="image/*,.pdf,.txt,.doc,.docx" className="wm-file-input"
-                onChange={e => setForm(f => ({ ...f, evidence: e.target.files }))} />
-              <small className="wm-hint">Screenshots, transaction records, emails, etc. Secure &amp; encrypted.</small>
+              <input type="file" multiple accept={ACCEPT_ATTR} className="wm-file-input"
+                onChange={e => {
+                  setForm(f => ({ ...f, evidence: [...f.evidence, ...Array.from(e.target.files)].slice(0, MAX_FILES) }))
+                  e.target.value = '' // allow re-selecting the same file after removing it
+                }} />
+              <small className="wm-hint">Screenshots, transaction records, emails, etc. · {LIMIT_HINT} · Secure &amp; encrypted.</small>
+              {form.evidence.length > 0 && (
+                <div className="wm-evidence-chips">
+                  {form.evidence.map((f, i) => (
+                    <span key={i} className="wm-evidence-chip">
+                      <i className="bi bi-paperclip"></i>
+                      <span className="wm-evidence-chip-name">{f.name}</span>
+                      <button
+                        type="button"
+                        className="wm-evidence-chip-remove"
+                        onClick={() => setForm(fm => ({ ...fm, evidence: fm.evidence.filter((_, idx) => idx !== i) }))}
+                        aria-label={`Remove ${f.name}`}
+                      >
+                        <i className="bi bi-x"></i>
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
 
             <button type="submit" className="btn btn-alert w-100 mt-2" disabled={loading}>
