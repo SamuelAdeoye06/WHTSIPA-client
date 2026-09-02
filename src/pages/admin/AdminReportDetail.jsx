@@ -4,6 +4,7 @@ import api from '../../services/api'
 import StatusPill from './components/StatusPill'
 import ConfirmDialog from './components/ConfirmDialog'
 import SendEmailDialog from './components/SendEmailDialog'
+import AttachmentViewer from './components/AttachmentViewer'
 import { useToast } from '../../context/ToastContext'
 import { exportRecordAsPDF } from '../../utils/pdfExport'
 import './AdminShared.css'
@@ -153,9 +154,9 @@ export default function AdminReportDetail() {
           {report.evidenceFiles?.length > 0 && (
             <div className="admin-detail-field-full">
               <div className="admin-detail-field-label">Evidence Files</div>
-              <div className="admin-detail-field-value">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.3rem' }}>
                 {report.evidenceFiles.map((f, i) => (
-                  <div key={i}><a href={f} target="_blank" rel="noopener noreferrer">{f}</a></div>
+                  <AttachmentViewer key={i} url={f} />
                 ))}
               </div>
             </div>
