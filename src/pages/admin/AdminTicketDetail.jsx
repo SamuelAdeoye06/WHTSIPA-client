@@ -45,6 +45,11 @@ export default function AdminTicketDetail() {
   const [closingMsg, setClosingMsg] = useState('')
   const [sendEmailOpen, setSendEmailOpen] = useState(false)
   const [sendingEmail, setSendingEmail]   = useState(false)
+  const [notificationEmail, setNotificationEmail] = useState('')
+
+  useEffect(() => {
+    api.get('/config').then(({ data }) => setNotificationEmail(data?.notificationEmail || '')).catch(() => {})
+  }, [])
 
   useEffect(() => {
     api.get('/tickets/all')
@@ -208,6 +213,7 @@ export default function AdminTicketDetail() {
       <SendEmailDialog
         open={sendEmailOpen}
         recordLabel="Ticket"
+        defaultEmail={notificationEmail}
         loading={sendingEmail}
         onCancel={() => setSendEmailOpen(false)}
         onConfirm={handleSendEmail}

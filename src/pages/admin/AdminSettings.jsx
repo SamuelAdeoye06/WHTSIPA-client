@@ -31,6 +31,13 @@ const LINK_GROUPS = [
       ['callbackNumber', 'Callback Number', 'e.g. +1 (650) 221-7654'],
     ],
   },
+  {
+    heading: 'Request Security Tools (Threats page)',
+    hint: 'The Telegram link used in the "Request Security Tools" modal — the AI chat handoff and the "Join Telegram Support Channel" card.',
+    fields: [
+      ['toolsTelegramLink', 'Telegram — Tools Support', 'https://t.me/...'],
+    ],
+  },
 ]
 
 const ALL_LINK_KEYS = LINK_GROUPS.flatMap(g => g.fields.map(([key]) => key))
@@ -194,6 +201,25 @@ export default function AdminSettings() {
             context="contact"
             workers={config?.contactPageWorkers || []}
             activeWorkerId={config?.activeContactWorkerId}
+            onConfigUpdate={setConfig}
+          />
+        </div>
+      </div>
+
+      {/* ── Hire Our Team / Reach Us Instantly channels ── */}
+      <div className="admin-card" style={{ marginBottom: '1.5rem' }}>
+        <div className="admin-card-header">
+          <h3><i className="bi bi-person-badge"></i> Hire Our Team Channels</h3>
+        </div>
+        <div className="admin-card-body">
+          <p className="admin-card-body-hint">
+            The "Connect With Our Experts" / "Reach Us Instantly" quick-connect menu shown when a visitor
+            clicks "Hire Our Team" on the Threats page. Same roster-and-active-worker model as above.
+          </p>
+          <WorkerListEditor
+            context="hire"
+            workers={config?.hirePageWorkers || []}
+            activeWorkerId={config?.activeHirePageWorkerId}
             onConfigUpdate={setConfig}
           />
         </div>

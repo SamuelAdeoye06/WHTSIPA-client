@@ -20,6 +20,11 @@ export default function AdminContactMessageDetail() {
   const [deleting, setDeleting] = useState(false)
   const [sendEmailOpen, setSendEmailOpen] = useState(false)
   const [sendingEmail, setSendingEmail]   = useState(false)
+  const [notificationEmail, setNotificationEmail] = useState('')
+
+  useEffect(() => {
+    api.get('/config').then(({ data }) => setNotificationEmail(data?.notificationEmail || '')).catch(() => {})
+  }, [])
 
   useEffect(() => {
     api.get('/contact/all')
@@ -158,6 +163,7 @@ export default function AdminContactMessageDetail() {
       <SendEmailDialog
         open={sendEmailOpen}
         recordLabel="Message"
+        defaultEmail={notificationEmail}
         loading={sendingEmail}
         onCancel={() => setSendEmailOpen(false)}
         onConfirm={handleSendEmail}

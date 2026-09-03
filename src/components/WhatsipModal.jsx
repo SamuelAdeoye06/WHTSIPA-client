@@ -42,7 +42,12 @@ async function detectCountry() {
 }
 
 
-/* ── Contact details ── */
+/* ── Contact details ──
+   Fallback defaults only — overwritten from the admin-configured active
+   worker (hire channels) and toolsTelegramLink once /api/config resolves,
+   via component state inside WhatsipModal (see useEffect below). Kept as
+   plain constants here so ToolsLiveChat and any other pre-fetch render has
+   sane values immediately. */
 const WHATSAPP_NUMBER   = '19293816441'
 const TELEGRAM_USERNAME = 'WHTSIPA_DigitalTools'
 const SUPPORT_EMAIL     = 'support@whtsipa.com'
@@ -200,7 +205,7 @@ const TOOLS_FLOW = {
 /* ══════════════════════════════════════════
    TOOLS LIVE CHAT COMPONENT
    ══════════════════════════════════════════ */
-function ToolsLiveChat({ ticketId, threatTitle, onClose, onBack, user, userName, waLink, isHumanAgent = false }) {
+function ToolsLiveChat({ ticketId, threatTitle, onClose, onBack, user, userName, waLink, toolsTelegramLink, isHumanAgent = false }) {
   const [currentNode, setCurrentNode] = useState('main')
   // isHuman only becomes true when Tidio confirms an actual human agent connected (connect_human action).
   // Clicking "Open Telegram Now" does NOT flip this flag — the user left to Telegram, no in-app agent.
@@ -291,10 +296,10 @@ function ToolsLiveChat({ ticketId, threatTitle, onClose, onBack, user, userName,
       setTimeout(() => {
         setIsTyping(false)
         if (opt.action === 'open_tg') {
-          window.open(TG_CHANNEL_LINK, '_blank')
+          window.open(toolsTelegramLink || TG_CHANNEL_LINK, '_blank')
           setMessages(prev => [...prev, {
             sender: 'agent',
-            text: `Redirecting you to Telegram (@WHTSIPA_DigitalTools) now. \n\nYour Ticket ID is: ${ticketId} \u2014 please share it with the representative for faster assistance.\n\nℹ️ Note: You\'re now on Telegram. Our AI assistant here remains available if you have further questions.`,
+            text: `Redirecting you to Telegram now. \n\nYour Ticket ID is: ${ticketId} \u2014 please share it with the representative for faster assistance.\n\nℹ️ Note: You\'re now on Telegram. Our AI assistant here remains available if you have further questions.`,
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           }])
           // Do NOT set isHuman = true here — no Tidio agent has confirmed an in-app connection.
@@ -423,6 +428,31 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
   const [step, setStep] = useState('main')
   const [loading, setLoading] = useState(false)
   const { showToast } = useToast()
+
+  // Admin-configured "Hire Our Team" channels + Request Tools Telegram link.
+  // Start with the hardcoded fallbacks above; overwritten once /api/config
+  // resolves. Since this modal mounts fresh each time it's opened, plain
+  // component state is enough here — no stale-closure concerns like a
+  // persistent page component would have.
+  const [channels, setChannels] = useState({
+    whatsapp: WHATSAPP_NUMBER,
+    telegramHandle: TELEGRAM_USERNAME,
+    email: SUPPORT_EMAIL,
+    toolsTelegramLink: TG_CHANNEL_LINK,
+  })
+
+  useEffect(() => {
+    api.get('/config').then(({ data }) => {
+      const worker = data?.hirePageWorkers?.find(w => w._id === data.activeHirePageWorkerId)
+      setChannels(prev => ({
+        whatsapp: worker?.whatsapp || prev.whatsapp,
+        telegramHandle: worker?.telegramHandle || prev.telegramHandle,
+        email: worker?.email || prev.email,
+        toolsTelegramLink: data?.toolsTelegramLink || prev.toolsTelegramLink,
+      }))
+    }).catch(() => { /* keep defaults */ })
+  }, [])
+
   const [form, setForm] = useState({
     summary: '', services: [], duration: 'One-Time Assistance',
     goals: '', name: '', email: '', phone: '',
@@ -471,9 +501,9 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
   const waMessage = encodeURIComponent(
     `Hello WHTSIPA Tools Team,\n\nTicket ID: ${ticketId}\nTool Request: ${threatTitle || 'General Security Tools'}\nI need assistance.\n\n— ${user?.email || 'Guest'}`
   )
-  const waLink   = `https://wa.me/${WHATSAPP_NUMBER}?text=${waMessage}`
-  const tgLink   = `https://t.me/${TELEGRAM_USERNAME}`
-  const mailLink = `mailto:${SUPPORT_EMAIL}?subject=WHTSIPA%20Support%20%7C%20${ticketId}&body=Ticket%3A%20${ticketId}`
+  const waLink   = `https://wa.me/${channels.whatsapp}?text=${waMessage}`
+  const tgLink   = `https://t.me/${channels.telegramHandle}`
+  const mailLink = `mailto:${channels.email}?subject=WHTSIPA%20Support%20%7C%20${ticketId}&body=Ticket%3A%20${ticketId}`
 
   /* Auth gate */
   if (!user && mode !== 'recovery') {
@@ -575,7 +605,7 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
               <i className="bi bi-telegram"></i><span><strong>Telegram</strong><small>Instant messaging support</small></span><i className="bi bi-arrow-right ms-auto"></i>
             </a>
             <a href={mailLink} className="wm-channel-btn wm-email">
-              <i className="bi bi-envelope"></i><span><strong>Email Us</strong><small>{SUPPORT_EMAIL}</small></span><i className="bi bi-arrow-right ms-auto"></i>
+              <i className="bi bi-envelope"></i><span><strong>Email Us</strong><small>{channels.email}</small></span><i className="bi bi-arrow-right ms-auto"></i>
             </a>
             {mode === 'hire' && (
               <button className="wm-channel-btn wm-form" onClick={() => setStep('form')}>
@@ -625,14 +655,14 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
               <i className="bi bi-arrow-right wm-roc-arrow"></i>
             </button>
 
-            <a href={TG_CHANNEL_LINK} target="_blank" rel="noopener noreferrer" className="wm-request-option-card wm-roc-tg text-decoration-none">
+            <a href={channels.toolsTelegramLink} target="_blank" rel="noopener noreferrer" className="wm-request-option-card wm-roc-tg text-decoration-none">
               <div className="wm-roc-icon wm-roc-tg-icon"><i className="bi bi-telegram"></i></div>
               <div className="wm-roc-body">
                 <div className="wm-roc-title">
                   <span>Telegram Chat</span>
                   <span className="wm-roc-badge wm-roc-badge-tg">Immediate</span>
                 </div>
-                <div className="wm-roc-username"><i className="bi bi-at me-1"></i>WHTSIPA_DigitalTools</div>
+                <div className="wm-roc-username"><i className="bi bi-at me-1"></i>{channels.toolsTelegramLink.replace(/^https?:\/\/t\.me\//, '')}</div>
                 <div className="wm-roc-desc">Immediate response available on our Telegram</div>
               </div>
               <i className="bi bi-arrow-right wm-roc-arrow"></i>
@@ -644,7 +674,7 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
             <div className="wm-request-footer-label">
               <i className="bi bi-send me-1"></i>Join Telegram Support Channel
             </div>
-            <a href={TG_CHANNEL_LINK} target="_blank" rel="noopener noreferrer" className="wm-tg-support-link">
+            <a href={channels.toolsTelegramLink} target="_blank" rel="noopener noreferrer" className="wm-tg-support-link">
               <i className="bi bi-telegram me-2"></i>
               <span>WHTSIPA Tools</span>
               <i className="bi bi-box-arrow-up-right ms-auto"></i>
@@ -668,6 +698,7 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
             onClose={onClose}
             onBack={() => setStep('main')}
             user={user}
+            toolsTelegramLink={channels.toolsTelegramLink}
             userName={user?.firstName || user?.name || ''}
             waLink={waLink}
           />

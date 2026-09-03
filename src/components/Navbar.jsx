@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import api from '../services/api'
 import logoWhts from '../assets/media/logo-whts.jpg'
 import logoWhtsDark from '../assets/media/logo-whts-dark.png'
 import { THREAT_DATA } from '../data/threatData'
@@ -270,7 +271,16 @@ export default function Navbar() {
   const [langSearch, setLangSearch] = useState('')
   const [activeLang, setActiveLang] = useState(LANGUAGES.find(l => l.code === 'EN'))
   const [showSignOutToast, setShowSignOutToast] = useState(false)
+  // Falls back to the hardcoded default below if the fetch fails — same
+  // admin-configured value the Footer uses, so both stay in sync.
+  const [communityLink, setCommunityLink] = useState('https://t.me/WHTSIPADigitalSecurityWorld')
   const langRef = useRef(null)
+
+  useEffect(() => {
+    api.get('/config').then(({ data }) => {
+      if (data?.telegramCommunityLink) setCommunityLink(data.telegramCommunityLink)
+    }).catch(() => { /* keep default */ })
+  }, [])
 
   useEffect(() => {
     const handler = (e) => {
@@ -464,7 +474,7 @@ export default function Navbar() {
                 <ul className="dropdown-menu dropdown-menu-end cyber-dropdown p-3">
                   <li><Link className="dropdown-item cyber-dropdown-item" to="/essential-eight"><i className="bi bi-shield-check me-2" style={{ color: 'var(--green)' }}></i>Essential Eight</Link></li>
                   <li><Link className="dropdown-item cyber-dropdown-item" to="/blog"><i className="bi bi-newspaper me-2" style={{ color: 'var(--cyan)' }}></i>Knowledge Base</Link></li>
-                  <li><a className="dropdown-item cyber-dropdown-item" href="https://t.me/WHTSIPADigitalSecurityWorld" target="_blank" rel="noopener noreferrer"><i className="bi bi-telegram me-2" style={{ color: '#0088cc' }}></i>Join our Community</a></li>
+                  <li><a className="dropdown-item cyber-dropdown-item" href={communityLink} target="_blank" rel="noopener noreferrer"><i className="bi bi-telegram me-2" style={{ color: '#0088cc' }}></i>Join our Community</a></li>
                 </ul>
               </li>
 

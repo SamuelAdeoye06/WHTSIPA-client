@@ -42,6 +42,11 @@ export default function AdminReportDetail() {
   const [deleting, setDeleting] = useState(false)
   const [sendEmailOpen, setSendEmailOpen] = useState(false)
   const [sendingEmail, setSendingEmail]   = useState(false)
+  const [notificationEmail, setNotificationEmail] = useState('')
+
+  useEffect(() => {
+    api.get('/config').then(({ data }) => setNotificationEmail(data?.notificationEmail || '')).catch(() => {})
+  }, [])
 
   useEffect(() => {
     api.get('/reports/all')
@@ -182,6 +187,7 @@ export default function AdminReportDetail() {
       <SendEmailDialog
         open={sendEmailOpen}
         recordLabel="Report"
+        defaultEmail={notificationEmail}
         loading={sendingEmail}
         onCancel={() => setSendEmailOpen(false)}
         onConfirm={handleSendEmail}
