@@ -167,13 +167,6 @@ function SignUpPhoneField({ form, setForm, errors, setErrors, handleBlur }) {
       </div>
 
 
-      {!isValidDial && dialDigits.length > 0 && (
-        <div className="auth-field-error">
-          <i className="bi bi-exclamation-circle me-1"></i>
-          Country code +{dialDigits} is invalid or not in the allowed countries list.
-        </div>
-      )}
-
       {errors.phone && (
         <div className="auth-field-error">
           <i className="bi bi-exclamation-circle me-1"></i>{errors.phone}
