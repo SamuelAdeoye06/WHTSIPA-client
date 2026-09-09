@@ -792,6 +792,23 @@
 .site-dark .custom-country-dropdown-menu,
 .site-dark .phone-country-dropdown-menu,
 .site-dark .bc-phone-dropdown-menu,
+/* ── Light-theme override for CountrySelectField's collapsed button ──
+   .cyber-select's base rule (in Report.css) is styled for dark pages and
+   applies globally once bundled — pass theme="light" on light pages to
+   pull in this override instead of inheriting near-white dark-theme text. */
+.theme-light.custom-country-field-wrap .cyber-select,
+.theme-light .custom-country-btn {
+  background: #ffffff !important;
+  border: 1.5px solid #e5e7eb !important;
+  color: #1f2937 !important;
+}
+.theme-light .custom-country-btn .country-select-label { color: #1f2937 !important; }
+.theme-light .custom-country-btn:focus,
+.theme-light .custom-country-btn.is-active {
+  border-color: #0d9488 !important;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12) !important;
+}
+
 .theme-dark .custom-country-dropdown-menu,
 .theme-dark .phone-country-dropdown-menu,
 .dark-theme .custom-country-dropdown-menu,

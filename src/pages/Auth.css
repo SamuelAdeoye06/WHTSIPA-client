@@ -648,6 +648,18 @@
   padding: 0.65rem 0.9rem;
 }
 
+/* Override cyber-input's dark-theme text color (defined in Report.css,
+   applies globally once bundled) for this light-background auth page.
+   Compound selector + !important guarantees this wins regardless of
+   stylesheet load order. */
+.phone-field-group .cyber-input.auth-phone-fix,
+.phone-field-group .cyber-input.auth-phone-fix:focus {
+  color: #1f2937 !important;
+}
+.phone-field-group .cyber-input.auth-phone-fix::placeholder {
+  color: #9ca3af !important;
+}
+
 .phone-country-dropdown-menu {
   position: absolute;
   top: calc(100% + 6px);

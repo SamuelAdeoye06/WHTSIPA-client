@@ -106,7 +106,7 @@ function SignUpPhoneField({ form, setForm, errors, setErrors, handleBlur }) {
           id="phone"
           name="phoneDigits"
           type="tel"
-          className={`form-control cyber-input ${errors.phone ? 'is-invalid' : ''}`}
+          className={`form-control cyber-input auth-phone-fix ${errors.phone ? 'is-invalid' : ''}`}
           placeholder="Phone number digits"
           value={form.phoneDigits || ''}
           onChange={handleDigitsChange}
@@ -431,6 +431,7 @@ export default function SignUp() {
                   name="country"
                   label="Country"
                   isRequired={true}
+                  theme="light"
                   value={form.country}
                   onChange={(code) => {
                     setForm(p => {
