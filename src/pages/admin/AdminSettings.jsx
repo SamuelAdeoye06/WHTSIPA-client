@@ -59,7 +59,7 @@ export default function AdminSettings() {
   const [notifErr, setNotifErr]       = useState('')
 
   useEffect(() => {
-    api.get('/config')
+    api.get('/admin/config')
       .then(({ data }) => setConfig(data))
       .catch(() => setSaveErr('Could not load current settings.'))
       .finally(() => setLoading(false))

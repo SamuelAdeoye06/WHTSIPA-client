@@ -32,7 +32,7 @@ export default function AdminBookingDetail() {
   const [notificationEmail, setNotificationEmail] = useState('')
 
   useEffect(() => {
-    api.get('/config').then(({ data }) => setNotificationEmail(data?.notificationEmail || '')).catch(() => {})
+    api.get('/admin/config').then(({ data }) => setNotificationEmail(data?.notificationEmail || '')).catch(() => {})
   }, [])
 
   useEffect(() => {
