@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import api from '../../services/api'
-import { getCountryFlag, ALLOWED_COUNTRIES, REGIONS } from '../../utils/countryUtils'
+import { getCountryFlag, getCountrySearchPlaceholder, ALLOWED_COUNTRIES, REGIONS } from '../../utils/countryUtils'
 import './AdminShared.css'
 
 export default function AdminCountries() {
@@ -179,7 +179,7 @@ export default function AdminCountries() {
           {/* Search Box */}
           <input
             className="admin-search-input"
-            placeholder="Search country, code, dial (+234), or region…"
+            placeholder={getCountrySearchPlaceholder(countries.filter(c => c.showInDropdown))}
             value={search}
             onChange={e => setSearch(e.target.value)}
             style={{ minWidth: '220px', flex: '1 1 220px' }}

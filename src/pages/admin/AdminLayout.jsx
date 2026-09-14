@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { NavLink, Outlet, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import AdminIdleWarning from './components/AdminIdleWarning'
 import './AdminLayout.css'
 
 const NAV_ITEMS = [
@@ -49,6 +50,7 @@ export default function AdminLayout() {
 
   return (
     <div className="admin-shell">
+      <AdminIdleWarning />
       {/* Backdrop — tapping it closes the mobile drawer */}
       {mobileNavOpen && (
         <div className="admin-backdrop" onClick={() => setMobileNavOpen(false)} />

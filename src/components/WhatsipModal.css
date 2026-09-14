@@ -165,6 +165,8 @@
 .wm-wa:hover { box-shadow: 0 4px 24px rgba(37,211,102,0.2); }
 .wm-tg    { border-color: rgba(0,136,204,0.45); color: #0088cc; background: rgba(0,136,204,0.06); }
 .wm-tg:hover { box-shadow: 0 4px 24px rgba(0,136,204,0.2); }
+.wm-call  { border-color: rgba(234,179,8,0.45); color: #eab308; background: rgba(234,179,8,0.06); }
+.wm-call:hover { box-shadow: 0 4px 24px rgba(234,179,8,0.2); }
 .wm-email { border-color: rgba(120,214,255,0.3); color: #22d3ee; background: rgba(120,214,255,0.06); }
 .wm-email:hover { box-shadow: 0 4px 24px rgba(120,214,255,0.15); }
 .wm-form  { border-color: rgba(255,255,255,0.15); color: rgba(233,243,255,0.85); background: rgba(255,255,255,0.04); }

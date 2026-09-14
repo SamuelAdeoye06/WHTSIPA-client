@@ -15,10 +15,11 @@ import { genTicketId } from '../utils/ticketId'
 import { uploadEvidenceFiles } from '../utils/uploadFiles'
 import ChatSessionHistory from './ChatSessionHistory'
 import './WhatsipModal.css'
-import { getCountryFlag } from '../utils/countryUtils'
+import { getCountryFlag, getCountrySearchPlaceholder } from '../utils/countryUtils'
 import { useCountries } from '../context/CountriesContext'
 import { useToast } from '../context/ToastContext'
 import { MAX_FILES, ACCEPT_ATTR, LIMIT_HINT } from '../utils/uploadLimits'
+import { formatPhoneDisplay } from '../utils/phoneFormat'
 
 /* ── IP → country detection ── */
 async function detectCountry() {
@@ -439,6 +440,7 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
     telegramHandle: TELEGRAM_USERNAME,
     email: SUPPORT_EMAIL,
     toolsTelegramLink: TG_CHANNEL_LINK,
+    phone: '',
   })
 
   useEffect(() => {
@@ -449,6 +451,7 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
         telegramHandle: worker?.telegramHandle || prev.telegramHandle,
         email: worker?.email || prev.email,
         toolsTelegramLink: data?.toolsTelegramLink || prev.toolsTelegramLink,
+        phone: worker?.phone || prev.phone,
       }))
     }).catch(() => { /* keep defaults */ })
   }, [])
@@ -504,6 +507,7 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
   const waLink   = `https://wa.me/${channels.whatsapp}?text=${waMessage}`
   const tgLink   = `https://t.me/${channels.telegramHandle}`
   const mailLink = `mailto:${channels.email}?subject=WHTSIPA%20Support%20%7C%20${ticketId}&body=Ticket%3A%20${ticketId}`
+  const callLink = channels.phone ? `tel:+${channels.phone}` : null
 
   /* Auth gate */
   if (!user && mode !== 'recovery') {
@@ -576,6 +580,7 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
             <div className="d-flex gap-2 flex-wrap">
               <a href={waLink} target="_blank" rel="noreferrer" className="wm-channel-btn wm-wa"><i className="bi bi-whatsapp"></i>WhatsApp (24/7)</a>
               <a href={tgLink} target="_blank" rel="noreferrer" className="wm-channel-btn wm-tg"><i className="bi bi-telegram"></i>Telegram</a>
+              {callLink && <a href={callLink} className="wm-channel-btn wm-call"><i className="bi bi-telephone"></i>Call Us</a>}
             </div>
           </div>
         </div>
@@ -607,6 +612,11 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
             <a href={mailLink} className="wm-channel-btn wm-email">
               <i className="bi bi-envelope"></i><span><strong>Email Us</strong><small>{channels.email}</small></span><i className="bi bi-arrow-right ms-auto"></i>
             </a>
+            {callLink && (
+              <a href={callLink} className="wm-channel-btn wm-call">
+                <i className="bi bi-telephone"></i><span><strong>Call Us</strong><small>{formatPhoneDisplay(channels.phone)}</small></span><i className="bi bi-arrow-right ms-auto"></i>
+              </a>
+            )}
             {mode === 'hire' && (
               <button className="wm-channel-btn wm-form" onClick={() => setStep('form')}>
                 <i className="bi bi-file-earmark-text"></i><span><strong>Submit Hire Request Form</strong><small>Structured intake form — creates a ticket</small></span><i className="bi bi-arrow-right ms-auto"></i>
@@ -911,7 +921,7 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
                               <input
                                 type="text"
                                 className="form-control form-control-sm custom-country-search"
-                                placeholder="Search country or code (+234, NG)..."
+                                placeholder={getCountrySearchPlaceholder(allCountries)}
                                 value={phoneSearch}
                                 onChange={(e) => setPhoneSearch(e.target.value)}
                                 autoFocus

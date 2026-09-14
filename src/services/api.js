@@ -20,7 +20,24 @@ api.interceptors.request.use(config => {
 
 // Global response error handler
 api.interceptors.response.use(
-  res => res,
+  res => {
+    // Sliding admin session — protect() reissues a fresh token with a
+    // renewed expiry on every authenticated admin request (see
+    // auth.middleware.js). Swap it into storage so the next request uses
+    // the renewed one instead of the one that's now ticking toward expiry.
+    const refreshed = res.headers?.['x-refreshed-token']
+    if (refreshed) {
+      try {
+        const stored = localStorage.getItem('whts_user')
+        if (stored) {
+          const parsed = JSON.parse(stored)
+          parsed.token = refreshed
+          localStorage.setItem('whts_user', JSON.stringify(parsed))
+        }
+      } catch { /* ignore */ }
+    }
+    return res
+  },
   err => {
     if (err.response?.status === 401) {
       // Token expired — clear local session

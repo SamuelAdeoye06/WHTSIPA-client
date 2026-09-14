@@ -724,6 +724,11 @@ export default function Threats() {
   const [modalThreat,     setModalThreat]     = useState('')
   const [showThreatChat,  setShowThreatChat]  = useState(false)
   const [contacts,        setContacts]        = useState(THREATS_CONTACTS)
+  // Was hardcoded to a broken Telegram handle (t.me/WHTS_support, which
+  // doesn't exist) before this was wired to admin config. Falls back to
+  // the Threats page's own configured Telegram link if the fetch fails
+  // or nothing's been set yet, so this is never broken by default.
+  const [scenarioActiveRepLink, setScenarioActiveRepLink] = useState(THREATS_CONTACTS.telegram.url)
 
   // Pull the currently-active worker for this page from the admin config.
   // Falls back to the hardcoded THREATS_CONTACTS defaults above if the
@@ -731,6 +736,7 @@ export default function Threats() {
   // renders with missing contact details.
   useEffect(() => {
     api.get('/config').then(({ data }) => {
+      if (data?.scenarioActiveRepLink) setScenarioActiveRepLink(data.scenarioActiveRepLink)
       const worker = data?.threatsPageWorkers?.find(w => w._id === data.activeThreatsWorkerId)
       if (!worker) return
       setContacts(prev => ({
@@ -808,7 +814,7 @@ export default function Threats() {
                 You need to protect yourself. Contact an Active Representative now —
                 they will guide you through staying safe online.
               </p>
-              <a href="https://t.me/WHTS_support" target="_blank" rel="noopener noreferrer"
+              <a href={scenarioActiveRepLink} target="_blank" rel="noopener noreferrer"
                 className="btn btn-alert w-100 mb-2">
                 <i className="bi bi-telegram me-2"></i>Contact Active Representative
               </a>

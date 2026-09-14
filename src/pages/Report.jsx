@@ -10,7 +10,7 @@ import api from '../services/api'
 import { uploadEvidenceFiles } from '../utils/uploadFiles'
 import { openLiveChat, onAgentJoined } from '../utils/tidio'
 import { genTicketId } from '../utils/ticketId'
-import { getCountryFlag } from '../utils/countryUtils'
+import { getCountryFlag, getCountrySearchPlaceholder } from '../utils/countryUtils'
 import { useCountries } from '../context/CountriesContext'
 import CountrySelectField from '../components/CountrySelectField'
 import { useToast } from '../context/ToastContext'
@@ -314,7 +314,7 @@ function PhoneCountryField({ formik, fieldName, phoneCodeFieldName, phoneDialFie
               <input
                 type="text"
                 className="form-control form-control-sm custom-country-search"
-                placeholder="Search country or code (+234, NG)..."
+                placeholder={getCountrySearchPlaceholder(allCountries)}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 autoFocus

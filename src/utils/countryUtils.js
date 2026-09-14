@@ -268,3 +268,41 @@ export function matchCountrySearch(country, query) {
 
   return false
 }
+
+/* ───────────────────────────────────────────────────────────────
+   Dynamic search-placeholder fallback chain
+   The country search fields (signup, report, essential eight, hire
+   modal, admin panel) used to hardcode a single example country in
+   their placeholder text. If that country is ever blocked from
+   signup/dropdowns via the admin panel, the placeholder should stop
+   referencing it and move to the next one in this list automatically
+   — spread across continents so there's always a sensible example
+   available even if several get blocked.
+───────────────────────────────────────────────────────────────── */
+const PLACEHOLDER_FALLBACK_CHAIN = [
+  'US', // North America
+  'GB', // Europe
+  'AU', // Oceania
+  'JP', // Asia
+  'BR', // South America
+  'ZA', // Africa
+]
+
+/* getCountrySearchPlaceholder(countries)
+   `countries` is whatever list is currently visible/allowed (e.g.
+   allCountries or signupCountries from useCountries()). Walks the
+   fallback chain and uses the first country still present in that
+   list; if somehow none of the chain is present, falls back to
+   whichever country is first in the given list, or a generic string
+   if the list itself is empty. */
+export function getCountrySearchPlaceholder(countries) {
+  if (countries && countries.length > 0) {
+    for (const code of PLACEHOLDER_FALLBACK_CHAIN) {
+      const match = countries.find(c => c.code === code)
+      if (match) return `Search country or code (${match.dial}, ${match.code})...`
+    }
+    const first = countries[0]
+    return `Search country or code (${first.dial}, ${first.code})...`
+  }
+  return 'Search country or code...'
+}

@@ -38,6 +38,13 @@ const LINK_GROUPS = [
       ['toolsTelegramLink', 'Telegram — Tools Support', 'https://t.me/...'],
     ],
   },
+  {
+    heading: 'Scenario Active Representative Contact',
+    hint: 'The "You Need Help" prompt on the Threats page quiz — shown after a visitor fails 3 scenarios, with a "Contact Active Representative" button.',
+    fields: [
+      ['scenarioActiveRepLink', 'Telegram — Active Representative', 'https://t.me/...'],
+    ],
+  },
 ]
 
 const ALL_LINK_KEYS = LINK_GROUPS.flatMap(g => g.fields.map(([key]) => key))
@@ -57,6 +64,11 @@ export default function AdminSettings() {
   const [notifSaving, setNotifSaving] = useState(false)
   const [notifMsg, setNotifMsg]       = useState('')
   const [notifErr, setNotifErr]       = useState('')
+
+  const [sessionSaving, setSessionSaving] = useState(false)
+  const [sessionMsg, setSessionMsg]       = useState('')
+  const [sessionErr, setSessionErr]       = useState('')
+  const [loggingOutAll, setLoggingOutAll] = useState(false)
 
   useEffect(() => {
     api.get('/admin/config')
@@ -97,10 +109,22 @@ export default function AdminSettings() {
 
     setPwSaving(true)
     try {
-      await api.post('/auth/change-password', {
+      const { data } = await api.post('/auth/change-password', {
         currentPassword: pwForm.currentPassword,
         newPassword:      pwForm.newPassword,
       })
+      // Changing the password bumps tokenVersion server-side, which
+      // invalidates every previously-issued token — including the one
+      // this browser is currently using. The server sends back a fresh
+      // token in the same response so this session isn't logged out by
+      // its own action; swap it into storage now.
+      if (data?.token) {
+        try {
+          const stored = JSON.parse(localStorage.getItem('whts_user') || '{}')
+          stored.token = data.token
+          localStorage.setItem('whts_user', JSON.stringify(stored))
+        } catch { /* ignore */ }
+      }
       setPwMsg('Password changed successfully.')
       setPwForm({ currentPassword: '', newPassword: '', confirmPassword: '' })
     } catch (err) {
@@ -122,6 +146,38 @@ export default function AdminSettings() {
       setNotifErr(err.response?.data?.message || 'Could not save this address.')
     } finally {
       setNotifSaving(false)
+    }
+  }
+
+  const handleSaveSessionLength = async (e) => {
+    e.preventDefault()
+    setSessionSaving(true)
+    setSessionMsg('')
+    setSessionErr('')
+    try {
+      await api.put('/config', { adminSessionSeconds: Number(config.adminSessionSeconds) || 30 })
+      setSessionMsg('Saved. Takes effect on next login.')
+    } catch (err) {
+      setSessionErr(err.response?.data?.message || 'Could not save session length.')
+    } finally {
+      setSessionSaving(false)
+    }
+  }
+
+  const handleLogoutAllSessions = async () => {
+    if (!window.confirm('This ends every active admin login right now, including this one. Continue?')) return
+    setLoggingOutAll(true)
+    try {
+      await api.post('/auth/logout-all-sessions')
+      // The call above just invalidated the token this request used, so
+      // the next request anywhere will 401 and the api.js interceptor
+      // redirects to /signin — but redirect immediately rather than
+      // waiting on that, since we already know the outcome.
+      localStorage.removeItem('whts_user')
+      window.location.href = '/signin'
+    } catch (err) {
+      setLoggingOutAll(false)
+      alert(err.response?.data?.message || 'Could not log out all sessions.')
     }
   }
 
@@ -166,6 +222,55 @@ export default function AdminSettings() {
             {notifErr && <span style={{ color: '#dc2626', fontSize: '0.88rem' }}>{notifErr}</span>}
           </div>
         </form>
+      </div>
+
+      {/* ── Admin session rules ── */}
+      <div className="admin-card" style={{ marginBottom: '1.5rem' }}>
+        <div className="admin-card-header">
+          <h3><i className="bi bi-shield-lock"></i> Admin Session</h3>
+        </div>
+        <form onSubmit={handleSaveSessionLength} className="admin-detail-grid">
+          <div>
+            <label className="admin-detail-field-label" htmlFor="adminSessionSeconds">
+              Session Length
+            </label>
+            <select
+              id="adminSessionSeconds"
+              className="admin-search-input"
+              style={{ width: '100%' }}
+              value={config?.adminSessionSeconds || 30}
+              onChange={e => setConfig(prev => ({ ...prev, adminSessionSeconds: e.target.value }))}
+            >
+              <option value={30}>30 seconds</option>
+              <option value={60}>1 minute</option>
+              <option value={300}>5 minutes</option>
+              <option value={600}>10 minutes</option>
+              <option value={900}>15 minutes</option>
+              <option value={1800}>30 minutes</option>
+            </select>
+            <div style={{ fontSize: '0.78rem', color: '#9ca3af', marginTop: '0.3rem' }}>
+              How long an admin can stay idle in the panel before being signed out automatically.
+              Staying active resets the clock — this only counts inactive time. Defaults to the
+              shortest option (30 seconds) until changed, for safety.
+            </div>
+          </div>
+          <div className="admin-detail-field-full" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <button type="submit" className="admin-btn admin-btn-primary" disabled={sessionSaving}>
+              {sessionSaving ? 'Saving…' : 'Save'}
+            </button>
+            {sessionMsg && <span style={{ color: '#15803d', fontSize: '0.88rem' }}>{sessionMsg}</span>}
+            {sessionErr && <span style={{ color: '#dc2626', fontSize: '0.88rem' }}>{sessionErr}</span>}
+          </div>
+        </form>
+        <div className="admin-card-body" style={{ paddingTop: 0 }}>
+          <button type="button" className="admin-btn admin-btn-danger" onClick={handleLogoutAllSessions} disabled={loggingOutAll}>
+            <i className="bi bi-door-closed"></i> {loggingOutAll ? 'Logging out…' : 'Log Out of All Sessions'}
+          </button>
+          <div style={{ fontSize: '0.78rem', color: '#9ca3af', marginTop: '0.5rem' }}>
+            Immediately ends every active admin login, including this one — everyone (including you)
+            will need to sign in again with the current password.
+          </div>
+        </div>
       </div>
 
       {/* ── Threats page channels ── */}

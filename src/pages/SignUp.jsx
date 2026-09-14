@@ -5,7 +5,7 @@ import './Auth.css'
 import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
 import logoWhts from '../assets/media/logo-whts.jpg'
-import { getCountryFlag } from '../utils/countryUtils'
+import { getCountryFlag, getCountrySearchPlaceholder } from '../utils/countryUtils'
 import { useCountries } from '../context/CountriesContext'
 import CountrySelectField from '../components/CountrySelectField'
 
@@ -121,7 +121,7 @@ function SignUpPhoneField({ form, setForm, errors, setErrors, handleBlur }) {
               <input
                 type="text"
                 className="form-control form-control-sm custom-country-search"
-                placeholder="Search country or code (+234, NG)..."
+                placeholder={getCountrySearchPlaceholder(signupCountries)}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 autoFocus

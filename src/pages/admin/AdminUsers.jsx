@@ -69,7 +69,7 @@ export default function AdminUsers() {
     },
     delete: {
       title: 'Delete this account permanently?',
-      message: 'This cannot be undone. Their submitted reports, tickets, and bookings are NOT deleted along with the account — only the login itself is removed.',
+      message: 'This cannot be undone. Their account, plus every report, ticket, booking, and contact message they submitted, will be permanently deleted. If you just want to block their login and keep their data, use Restrict instead.',
       confirmLabel: 'Delete Account',
       danger: true,
     },

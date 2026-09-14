@@ -4,7 +4,7 @@ import { useToast } from '../../../context/ToastContext'
 import { formatPhoneDisplay } from '../../../utils/phoneFormat'
 import ConfirmDialog from './ConfirmDialog'
 
-const EMPTY_FORM = { name: '', whatsapp: '', telegramHandle: '', email: '' }
+const EMPTY_FORM = { name: '', whatsapp: '', telegramHandle: '', email: '', phone: '' }
 
 /* Manages the worker roster for one page-context (Threats or Contact).
    Exactly one worker is "active" at a time — that's the one whose details
@@ -20,7 +20,7 @@ export default function WorkerListEditor({ context, workers, activeWorkerId, onC
 
   const startAdd = () => { setForm(EMPTY_FORM); setEditingId(null); setAdding(true) }
   const startEdit = (worker) => {
-    setForm({ name: worker.name, whatsapp: worker.whatsapp, telegramHandle: worker.telegramHandle, email: worker.email })
+    setForm({ name: worker.name, whatsapp: worker.whatsapp, telegramHandle: worker.telegramHandle, email: worker.email, phone: worker.phone || '' })
     setAdding(false)
     setEditingId(worker._id)
   }
@@ -93,7 +93,7 @@ export default function WorkerListEditor({ context, workers, activeWorkerId, onC
           onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required />
         <div>
           <input className="admin-search-input" style={{ width: '100%' }}
-            placeholder="WhatsApp — country code + number, no + (e.g. 16502184673 for US, 2348012345678 for Nigeria)"
+            placeholder="WhatsApp — country code + number, no + (e.g. 16502184673 for US, 447911123456 for UK)"
             value={form.whatsapp}
             onChange={e => setForm(f => ({ ...f, whatsapp: e.target.value.replace(/[^\d]/g, '') }))} />
           {form.whatsapp && (
@@ -104,6 +104,15 @@ export default function WorkerListEditor({ context, workers, activeWorkerId, onC
           onChange={e => setForm(f => ({ ...f, telegramHandle: e.target.value.replace(/^@+/, '') }))} />
         <input className="admin-search-input" placeholder="Email" type="email" value={form.email}
           onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
+        <div>
+          <input className="admin-search-input" style={{ width: '100%' }}
+            placeholder="Call phone — country code + number, no + (e.g. 16502184673)"
+            value={form.phone}
+            onChange={e => setForm(f => ({ ...f, phone: e.target.value.replace(/[^\d]/g, '') }))} />
+          {form.phone && (
+            <div className="worker-form-preview">Will show as: {formatPhoneDisplay(form.phone)}</div>
+          )}
+        </div>
       </div>
       <div className="worker-form-actions">
         <button type="button" className="admin-btn admin-btn-ghost admin-btn-sm" onClick={cancelForm} disabled={busy}>
@@ -137,6 +146,7 @@ export default function WorkerListEditor({ context, workers, activeWorkerId, onC
                   {w.whatsapp && <span><i className="bi bi-whatsapp"></i> {formatPhoneDisplay(w.whatsapp)}</span>}
                   {w.telegramHandle && <span><i className="bi bi-telegram"></i> @{w.telegramHandle}</span>}
                   {w.email && <span><i className="bi bi-envelope"></i> {w.email}</span>}
+                  {w.phone && <span><i className="bi bi-telephone"></i> {formatPhoneDisplay(w.phone)}</span>}
                 </div>
               </div>
               <div className="worker-card-actions">

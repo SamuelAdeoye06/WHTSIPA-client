@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { getCountryFlag } from '../utils/countryUtils'
+import { getCountryFlag, getCountrySearchPlaceholder } from '../utils/countryUtils'
 import { useCountries } from '../context/CountriesContext'
 
 export default function CountrySelectField({
@@ -67,7 +67,7 @@ export default function CountrySelectField({
               <input
                 type="text"
                 className="form-control form-control-sm custom-country-search"
-                placeholder="Search country or code (+61, AUS)..."
+                placeholder={getCountrySearchPlaceholder(allCountries)}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 autoFocus
