@@ -28,7 +28,12 @@ export default function SignIn() {
     try {
         const { data } = await api.post('/auth/login', { email: form.email, password: form.password })
         login({ ...data.user, token: data.token })
-        const { from = '/', ...rest } = location.state || {}
+        // React Router state (set when navigating here client-side) takes
+        // priority; ?from= is the fallback for forced logouts that had to
+        // use a full page reload (401 interceptor, idle-timeout modal),
+        // which can't carry router state — see services/api.js.
+        const searchFrom = new URLSearchParams(location.search).get('from')
+        const { from = searchFrom || '/', ...rest } = location.state || {}
         navigate(from, Object.keys(rest).length ? { state: rest } : {})
     } catch (err) {
          setError(err.response?.data?.message || 'Invalid email or password.')

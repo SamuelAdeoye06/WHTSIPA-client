@@ -39,7 +39,8 @@ export default function AdminIdleWarning() {
     clearTimeout(idleTimerRef.current)
     clearInterval(graceTimerRef.current)
     logout()
-    window.location.href = '/signin'
+    const from = encodeURIComponent(window.location.pathname)
+    window.location.href = `/signin?from=${from}`
   }, [logout])
 
   const startIdleTimer = useCallback(() => {

@@ -40,9 +40,13 @@ api.interceptors.response.use(
   },
   err => {
     if (err.response?.status === 401) {
-      // Token expired — clear local session
+      // Token expired — clear local session. Carry the current path as a
+      // query param since window.location can't pass React Router state;
+      // SignIn.jsx reads ?from= to send the person back where they were
+      // instead of defaulting to the homepage.
       localStorage.removeItem('whts_user')
-      window.location.href = '/signin'
+      const from = encodeURIComponent(window.location.pathname)
+      window.location.href = `/signin?from=${from}`
     }
     return Promise.reject(err)
   }
