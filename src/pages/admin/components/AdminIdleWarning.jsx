@@ -28,16 +28,23 @@ export default function AdminIdleWarning() {
 
   const idleTimerRef  = useRef(null)
   const graceTimerRef = useRef(null)
+  // Guards against a real race: the grace countdown's setInterval tick and
+  // a "Stay Logged In" click can both already be queued in the same
+  // instant (browser fires the interval's due tick before the click's
+  // clearInterval() call has a chance to cancel it). Whichever of
+  // handleSignOut/handleStayLoggedIn actually runs first "claims" this
+  // flag; the other bails out instead of both executing.
+  const resolvedRef = useRef(false)
 
   useEffect(() => {
     api.get('/admin/config').then(({ data }) => {
       if (data?.adminSessionSeconds) setIdleSeconds(data.adminSessionSeconds)
-      console.log(`[idle] session length loaded: ${data?.adminSessionSeconds || 30}s`)
     }).catch(() => { /* keep default */ })
   }, [])
 
   const handleSignOut = useCallback(() => {
-    console.log(`[idle] handleSignOut() called at ${new Date().toISOString()}`)
+    if (resolvedRef.current) return
+    resolvedRef.current = true
     clearTimeout(idleTimerRef.current)
     clearInterval(graceTimerRef.current)
     logout()
@@ -47,9 +54,8 @@ export default function AdminIdleWarning() {
 
   const startIdleTimer = useCallback(() => {
     clearTimeout(idleTimerRef.current)
-    console.log(`[idle] startIdleTimer() armed for ${idleSeconds}s at ${new Date().toISOString()}`)
     idleTimerRef.current = setTimeout(() => {
-      console.log(`[idle] idle threshold reached at ${new Date().toISOString()} — showing warning`)
+      resolvedRef.current = false
       setShowWarning(true)
       setGraceLeft(GRACE_PERIOD_SECONDS)
     }, idleSeconds * 1000)
@@ -88,14 +94,13 @@ export default function AdminIdleWarning() {
   }, [showWarning, handleSignOut])
 
   const handleStayLoggedIn = async () => {
-    console.log(`[idle] "Stay Logged In" clicked at ${new Date().toISOString()}`)
+    if (resolvedRef.current) return // the grace tick already fired and signed out — too late
+    resolvedRef.current = true
     clearInterval(graceTimerRef.current)
     setShowWarning(false)
     try {
       await api.get('/auth/me') // triggers the sliding token refresh server-side
-      console.log(`[idle] /auth/me refresh call succeeded at ${new Date().toISOString()}`)
-    } catch (err) {
-      console.log(`[idle] /auth/me refresh call FAILED at ${new Date().toISOString()}:`, err.response?.status, err.response?.data)
+    } catch {
       // If this fails the token's likely already dead — next real action
       // will 401 and the api.js interceptor bounces to /signin anyway.
     }
