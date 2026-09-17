@@ -16,6 +16,7 @@ import CountrySelectField from '../components/CountrySelectField'
 import { useToast } from '../context/ToastContext'
 import { MAX_FILES, MAX_FILE_SIZE_MB, ACCEPT_ATTR, LIMIT_HINT } from '../utils/uploadLimits'
 import ChatSessionHistory from '../components/ChatSessionHistory'
+import ConfirmDialog from './admin/components/ConfirmDialog'
 
 /* ── Incident types (Updated per spec) ── */
 const INCIDENT_TYPES = [
@@ -735,6 +736,7 @@ export default function Report() {
   const [loading, setLoading]           = useState(false)
   const [showLiveChat, setShowLiveChat] = useState(false)
   const [activeRecovery, setActiveRecovery] = useState(null)
+  const [confirmClearOpen, setConfirmClearOpen] = useState(false)
   const isLoadedRef = useRef(false)
 
   const { user } = useAuth()
@@ -888,6 +890,17 @@ export default function Report() {
       await handleFormSubmit(values)
     }
   })
+
+  const handleConfirmClearDraft = () => {
+    if (reportType === 'personal') {
+      localStorage.removeItem('whts_personal_draft')
+      personalFormik.resetForm()
+    } else {
+      localStorage.removeItem('whts_public_draft')
+      publicFormik.resetForm()
+    }
+    setConfirmClearOpen(false)
+  }
 
   /* ── 3. Submission Handler ── */
   const handleFormSubmit = async (values) => {
@@ -1227,17 +1240,7 @@ export default function Report() {
                   <button
                     type="button"
                     className="btn-clear-draft"
-                    onClick={() => {
-                      if (window.confirm('Are you sure you want to clear your current draft?')) {
-                        if (reportType === 'personal') {
-                          localStorage.removeItem('whts_personal_draft')
-                          personalFormik.resetForm()
-                        } else {
-                          localStorage.removeItem('whts_public_draft')
-                          publicFormik.resetForm()
-                        }
-                      }
-                    }}
+                    onClick={() => setConfirmClearOpen(true)}
                   >
                     Clear Draft
                   </button>
@@ -2252,6 +2255,16 @@ export default function Report() {
           userName={user?.firstName}
           user={user}
           setReportType={setReportType}
+        />
+
+        <ConfirmDialog
+          open={confirmClearOpen}
+          danger
+          title="Clear your draft?"
+          message="This clears everything you've filled in so far on this form. This cannot be undone."
+          confirmLabel="Clear Draft"
+          onCancel={() => setConfirmClearOpen(false)}
+          onConfirm={handleConfirmClearDraft}
         />
       </>
     </div>

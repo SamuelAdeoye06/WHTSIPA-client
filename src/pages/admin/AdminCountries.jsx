@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import api from '../../services/api'
 import { getCountryFlag, getCountrySearchPlaceholder, ALLOWED_COUNTRIES, REGIONS } from '../../utils/countryUtils'
+import ConfirmDialog from './components/ConfirmDialog'
 import './AdminShared.css'
 
 export default function AdminCountries() {
@@ -54,12 +55,17 @@ export default function AdminCountries() {
   }
 
   // Bulk action on currently filtered countries
-  const handleBulkAction = async (field, value) => {
+  const [pendingBulkAction, setPendingBulkAction] = useState(null) // { field, value, targets }
+
+  const requestBulkAction = (field, value) => {
     const targets = filtered.filter(c => c[field] !== value)
     if (targets.length === 0) return
+    setPendingBulkAction({ field, value, targets })
+  }
 
-    const confirmMsg = `Are you sure you want to set "${field === 'signupAllowed' ? 'Allow Sign Up' : 'Show in Dropdowns'}" to ${value ? 'ALLOWED / VISIBLE' : 'BLOCKED / HIDDEN'} for all ${targets.length} currently filtered countries?`
-    if (!window.confirm(confirmMsg)) return
+  const handleBulkAction = async () => {
+    if (!pendingBulkAction) return
+    const { field, value, targets } = pendingBulkAction
 
     setBulkUpdating(true)
     setNotice('')
@@ -83,6 +89,7 @@ export default function AdminCountries() {
       })
     } finally {
       setBulkUpdating(false)
+      setPendingBulkAction(null)
     }
   }
 
@@ -262,7 +269,7 @@ export default function AdminCountries() {
                 type="button"
                 className="admin-btn admin-btn-ghost admin-btn-sm"
                 disabled={bulkUpdating || filtered.length === 0}
-                onClick={() => handleBulkAction('signupAllowed', true)}
+                onClick={() => requestBulkAction('signupAllowed', true)}
                 title="Allow signup for all countries currently in view"
               >
                 <i className="bi bi-check2-all text-success"></i> Allow Signups
@@ -271,7 +278,7 @@ export default function AdminCountries() {
                 type="button"
                 className="admin-btn admin-btn-ghost admin-btn-sm"
                 disabled={bulkUpdating || filtered.length === 0}
-                onClick={() => handleBulkAction('signupAllowed', false)}
+                onClick={() => requestBulkAction('signupAllowed', false)}
                 title="Block signup for all countries currently in view"
               >
                 <i className="bi bi-slash-circle text-danger"></i> Block Signups
@@ -280,7 +287,7 @@ export default function AdminCountries() {
                 type="button"
                 className="admin-btn admin-btn-ghost admin-btn-sm"
                 disabled={bulkUpdating || filtered.length === 0}
-                onClick={() => handleBulkAction('showInDropdown', true)}
+                onClick={() => requestBulkAction('showInDropdown', true)}
                 title="Show in dropdowns for all countries currently in view"
               >
                 <i className="bi bi-eye text-primary"></i> Show All
@@ -289,7 +296,7 @@ export default function AdminCountries() {
                 type="button"
                 className="admin-btn admin-btn-ghost admin-btn-sm"
                 disabled={bulkUpdating || filtered.length === 0}
-                onClick={() => handleBulkAction('showInDropdown', false)}
+                onClick={() => requestBulkAction('showInDropdown', false)}
                 title="Hide from dropdowns for all countries currently in view"
               >
                 <i className="bi bi-eye-slash text-secondary"></i> Hide All
@@ -455,6 +462,16 @@ export default function AdminCountries() {
           </>
         )}
       </div>
+
+      <ConfirmDialog
+        open={!!pendingBulkAction}
+        title="Apply bulk change?"
+        message={pendingBulkAction ? `Set "${pendingBulkAction.field === 'signupAllowed' ? 'Allow Sign Up' : 'Show in Dropdowns'}" to ${pendingBulkAction.value ? 'ALLOWED / VISIBLE' : 'BLOCKED / HIDDEN'} for all ${pendingBulkAction.targets.length} currently filtered countries?` : ''}
+        confirmLabel="Apply"
+        loading={bulkUpdating}
+        onCancel={() => setPendingBulkAction(null)}
+        onConfirm={handleBulkAction}
+      />
     </div>
   )
 }

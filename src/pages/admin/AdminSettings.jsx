@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import api from '../../services/api'
 import WorkerListEditor from './components/WorkerListEditor'
+import ConfirmDialog from './components/ConfirmDialog'
+import { useToast } from '../../context/ToastContext'
 import './AdminShared.css'
 
 /* Grouped by page/context so it's obvious in the admin UI which part of
@@ -50,6 +52,7 @@ const LINK_GROUPS = [
 const ALL_LINK_KEYS = LINK_GROUPS.flatMap(g => g.fields.map(([key]) => key))
 
 export default function AdminSettings() {
+  const { showToast } = useToast()
   const [config, setConfig]   = useState(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving]   = useState(false)
@@ -69,6 +72,7 @@ export default function AdminSettings() {
   const [sessionMsg, setSessionMsg]       = useState('')
   const [sessionErr, setSessionErr]       = useState('')
   const [loggingOutAll, setLoggingOutAll] = useState(false)
+  const [logoutAllConfirmOpen, setLogoutAllConfirmOpen] = useState(false)
 
   useEffect(() => {
     api.get('/admin/config')
@@ -165,7 +169,6 @@ export default function AdminSettings() {
   }
 
   const handleLogoutAllSessions = async () => {
-    if (!window.confirm('This ends every active admin login right now, including this one. Continue?')) return
     setLoggingOutAll(true)
     try {
       await api.post('/auth/logout-all-sessions')
@@ -177,7 +180,8 @@ export default function AdminSettings() {
       window.location.href = '/signin'
     } catch (err) {
       setLoggingOutAll(false)
-      alert(err.response?.data?.message || 'Could not log out all sessions.')
+      setLogoutAllConfirmOpen(false)
+      showToast(err.response?.data?.message || 'Could not log out all sessions.', 'error')
     }
   }
 
@@ -263,7 +267,7 @@ export default function AdminSettings() {
           </div>
         </form>
         <div className="admin-card-body" style={{ paddingTop: 0 }}>
-          <button type="button" className="admin-btn admin-btn-danger" onClick={handleLogoutAllSessions} disabled={loggingOutAll}>
+          <button type="button" className="admin-btn admin-btn-danger" onClick={() => setLogoutAllConfirmOpen(true)} disabled={loggingOutAll}>
             <i className="bi bi-door-closed"></i> {loggingOutAll ? 'Logging out…' : 'Log Out of All Sessions'}
           </button>
           <div style={{ fontSize: '0.78rem', color: '#9ca3af', marginTop: '0.5rem' }}>
@@ -421,6 +425,17 @@ export default function AdminSettings() {
           </div>
         </form>
       </div>
+
+      <ConfirmDialog
+        open={logoutAllConfirmOpen}
+        danger
+        title="Log out of all sessions?"
+        message="This ends every active admin login right now, including this one — everyone will need to sign in again."
+        confirmLabel="Log Out Everyone"
+        loading={loggingOutAll}
+        onCancel={() => setLogoutAllConfirmOpen(false)}
+        onConfirm={handleLogoutAllSessions}
+      />
     </div>
   )
 }

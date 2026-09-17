@@ -32,10 +32,12 @@ export default function AdminIdleWarning() {
   useEffect(() => {
     api.get('/admin/config').then(({ data }) => {
       if (data?.adminSessionSeconds) setIdleSeconds(data.adminSessionSeconds)
+      console.log(`[idle] session length loaded: ${data?.adminSessionSeconds || 30}s`)
     }).catch(() => { /* keep default */ })
   }, [])
 
   const handleSignOut = useCallback(() => {
+    console.log(`[idle] handleSignOut() called at ${new Date().toISOString()}`)
     clearTimeout(idleTimerRef.current)
     clearInterval(graceTimerRef.current)
     logout()
@@ -45,7 +47,9 @@ export default function AdminIdleWarning() {
 
   const startIdleTimer = useCallback(() => {
     clearTimeout(idleTimerRef.current)
+    console.log(`[idle] startIdleTimer() armed for ${idleSeconds}s at ${new Date().toISOString()}`)
     idleTimerRef.current = setTimeout(() => {
+      console.log(`[idle] idle threshold reached at ${new Date().toISOString()} — showing warning`)
       setShowWarning(true)
       setGraceLeft(GRACE_PERIOD_SECONDS)
     }, idleSeconds * 1000)
@@ -84,11 +88,14 @@ export default function AdminIdleWarning() {
   }, [showWarning, handleSignOut])
 
   const handleStayLoggedIn = async () => {
+    console.log(`[idle] "Stay Logged In" clicked at ${new Date().toISOString()}`)
     clearInterval(graceTimerRef.current)
     setShowWarning(false)
     try {
       await api.get('/auth/me') // triggers the sliding token refresh server-side
-    } catch {
+      console.log(`[idle] /auth/me refresh call succeeded at ${new Date().toISOString()}`)
+    } catch (err) {
+      console.log(`[idle] /auth/me refresh call FAILED at ${new Date().toISOString()}:`, err.response?.status, err.response?.data)
       // If this fails the token's likely already dead — next real action
       // will 401 and the api.js interceptor bounces to /signin anyway.
     }
