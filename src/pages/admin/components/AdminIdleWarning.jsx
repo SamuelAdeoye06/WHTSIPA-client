@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import api from '../../../services/api'
 import { useAuth } from '../../../context/AuthContext'
+import { forceSignOut } from '../../../services/authRedirect'
 import '../AdminShared.css'
 
 // How long the "Are you still logged in?" modal waits for a response
@@ -26,14 +27,20 @@ export default function AdminIdleWarning() {
   const [showWarning, setShowWarning] = useState(false)
   const [graceLeft, setGraceLeft] = useState(GRACE_PERIOD_SECONDS)
 
-  const idleTimerRef  = useRef(null)
-  const graceTimerRef = useRef(null)
-  // Guards against a real race: the grace countdown's setInterval tick and
-  // a "Stay Logged In" click can both already be queued in the same
-  // instant (browser fires the interval's due tick before the click's
-  // clearInterval() call has a chance to cancel it). Whichever of
-  // handleSignOut/handleStayLoggedIn actually runs first "claims" this
-  // flag; the other bails out instead of both executing.
+  const idleTimerRef     = useRef(null)
+  // The ONE thing that decides sign-out: a single setTimeout scheduled
+  // for the exact grace deadline. Unlike a repeating setInterval whose
+  // "final tick" callback can already be queued before a cancel takes
+  // effect, a single deadline timeout has nothing to race against —
+  // clearTimeout either beats it or doesn't, with no in-between state.
+  const deadlineTimerRef = useRef(null)
+  // Purely cosmetic — just repaints the countdown text. Never itself
+  // triggers sign-out.
+  const tickIntervalRef  = useRef(null)
+  // Extra guard on top of the deadline/clearTimeout split above, since
+  // handleSignOut can still be invoked from two places (the deadline
+  // timer firing, or the user clicking "Sign Out" by hand) — whichever
+  // runs first claims this flag, the other bails out.
   const resolvedRef = useRef(false)
 
   useEffect(() => {
@@ -46,10 +53,10 @@ export default function AdminIdleWarning() {
     if (resolvedRef.current) return
     resolvedRef.current = true
     clearTimeout(idleTimerRef.current)
-    clearInterval(graceTimerRef.current)
-    logout()
-    const from = encodeURIComponent(window.location.pathname)
-    window.location.href = `/signin?from=${from}`
+    clearTimeout(deadlineTimerRef.current)
+    clearInterval(tickIntervalRef.current)
+    logout() // clears React auth state immediately for anything that renders before the hard nav lands
+    forceSignOut() // shared lock — see services/authRedirect.js
   }, [logout])
 
   const startIdleTimer = useCallback(() => {
@@ -77,26 +84,32 @@ export default function AdminIdleWarning() {
     }
   }, [handleActivity, startIdleTimer])
 
-  // Grace-period countdown once the warning is showing
+  // Grace period: one setTimeout scheduled for the exact deadline decides
+  // sign-out (handleSignOut, above). The setInterval here only repaints
+  // the countdown text every 250ms from that same deadline — it never
+  // makes the sign-out decision itself, so there's no "final tick" to
+  // race a click against anymore.
   useEffect(() => {
     if (!showWarning) return
-    graceTimerRef.current = setInterval(() => {
-      setGraceLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(graceTimerRef.current)
-          handleSignOut()
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-    return () => clearInterval(graceTimerRef.current)
+    const deadline = Date.now() + GRACE_PERIOD_SECONDS * 1000
+    setGraceLeft(GRACE_PERIOD_SECONDS)
+
+    deadlineTimerRef.current = setTimeout(handleSignOut, GRACE_PERIOD_SECONDS * 1000)
+    tickIntervalRef.current = setInterval(() => {
+      setGraceLeft(Math.max(0, Math.ceil((deadline - Date.now()) / 1000)))
+    }, 250)
+
+    return () => {
+      clearTimeout(deadlineTimerRef.current)
+      clearInterval(tickIntervalRef.current)
+    }
   }, [showWarning, handleSignOut])
 
   const handleStayLoggedIn = async () => {
-    if (resolvedRef.current) return // the grace tick already fired and signed out — too late
+    if (resolvedRef.current) return // the deadline already fired and signed out — too late
     resolvedRef.current = true
-    clearInterval(graceTimerRef.current)
+    clearTimeout(deadlineTimerRef.current)
+    clearInterval(tickIntervalRef.current)
     setShowWarning(false)
     try {
       await api.get('/auth/me') // triggers the sliding token refresh server-side

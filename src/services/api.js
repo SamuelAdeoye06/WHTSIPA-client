@@ -1,5 +1,6 @@
 // Central Axios instance — all API calls go through here
 import axios from 'axios'
+import { forceSignOut } from './authRedirect'
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
@@ -40,13 +41,12 @@ api.interceptors.response.use(
   },
   err => {
     if (err.response?.status === 401) {
-      // Token expired — clear local session. Carry the current path as a
-      // query param since window.location can't pass React Router state;
-      // SignIn.jsx reads ?from= to send the person back where they were
-      // instead of defaulting to the homepage.
-      localStorage.removeItem('whts_user')
-      const from = encodeURIComponent(window.location.pathname)
-      window.location.href = `/signin?from=${from}`
+      // Token expired/invalidated — hand off to the shared redirect lock
+      // rather than navigating directly. If the idle-timeout modal (or
+      // another in-flight request's 401) already claimed the redirect,
+      // this is a no-op; otherwise this call does it. See authRedirect.js
+      // for why a single lock matters here.
+      forceSignOut()
     }
     return Promise.reject(err)
   }

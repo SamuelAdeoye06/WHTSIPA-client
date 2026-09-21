@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { NavLink, Outlet, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { isRedirecting } from '../../services/authRedirect'
 import AdminIdleWarning from './components/AdminIdleWarning'
 import './AdminLayout.css'
 
@@ -34,8 +35,15 @@ export default function AdminLayout() {
     )
   }
 
-  // Not signed in at all — send to sign-in, remember where they were headed
+  // Not signed in at all — send to sign-in, remember where they were headed.
+  // Exception: if a forced-logout hard redirect (idle timeout, 401) is
+  // already in flight via authRedirect.js, don't fire our own client-side
+  // navigation here — it would mutate window.location.pathname via
+  // history.replaceState before that real navigation lands, and a second
+  // caller of forceSignOut() could then read the wrong page. Just render
+  // nothing and let the real navigation land.
   if (!user) {
+    if (isRedirecting()) return null
     return <Navigate to="/signin" state={{ from: location.pathname }} replace />
   }
 
