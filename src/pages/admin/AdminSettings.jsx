@@ -75,11 +75,37 @@ export default function AdminSettings() {
   const [loggingOutAll, setLoggingOutAll] = useState(false)
   const [logoutAllConfirmOpen, setLogoutAllConfirmOpen] = useState(false)
 
+  // ── Two-factor auth ──
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(null) // null = still loading current status
+
+  const [setupOpen, setSetupOpen]         = useState(false)
+  const [setupStep, setSetupStep]         = useState('qr') // 'qr' | 'backup-codes'
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState('')
+  const [manualSecret, setManualSecret]   = useState('')
+  const [setupCode, setSetupCode]         = useState('')
+  const [setupErr, setSetupErr]           = useState('')
+  const [setupSaving, setSetupSaving]     = useState(false)
+  const [newBackupCodes, setNewBackupCodes] = useState([])
+
+  const [disableOpen, setDisableOpen]         = useState(false)
+  const [disablePassword, setDisablePassword] = useState('')
+  const [disableErr, setDisableErr]           = useState('')
+  const [disableSaving, setDisableSaving]     = useState(false)
+
+  const [regenOpen, setRegenOpen]         = useState(false)
+  const [regenPassword, setRegenPassword] = useState('')
+  const [regenErr, setRegenErr]           = useState('')
+  const [regenSaving, setRegenSaving]     = useState(false)
+  const [regenCodes, setRegenCodes]       = useState([])
+
   useEffect(() => {
     api.get('/admin/config')
       .then(({ data }) => setConfig(data))
       .catch(() => setSaveErr('Could not load current settings.'))
       .finally(() => setLoading(false))
+    api.get('/auth/me')
+      .then(({ data }) => setTwoFactorEnabled(!!data.twoFactorEnabled))
+      .catch(() => setTwoFactorEnabled(false))
   }, [])
 
   const handleFieldChange = (key) => (e) => {
@@ -186,6 +212,89 @@ export default function AdminSettings() {
     }
   }
 
+  const handleStartSetup = async () => {
+    setSetupErr('')
+    setSetupSaving(true)
+    try {
+      const { data } = await api.post('/auth/2fa/setup')
+      setQrCodeDataUrl(data.qrCodeDataUrl)
+      setManualSecret(data.secret)
+      setSetupCode('')
+      setSetupStep('qr')
+      setSetupOpen(true)
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Could not start 2FA setup.', 'error')
+    } finally {
+      setSetupSaving(false)
+    }
+  }
+
+  const handleConfirmSetup = async (e) => {
+    e.preventDefault()
+    setSetupErr('')
+    setSetupSaving(true)
+    try {
+      const { data } = await api.post('/auth/2fa/confirm-setup', { code: setupCode })
+      setNewBackupCodes(data.backupCodes)
+      setSetupStep('backup-codes')
+      setTwoFactorEnabled(true)
+    } catch (err) {
+      setSetupErr(err.response?.data?.message || 'Incorrect code. Please try again.')
+      setSetupCode('')
+    } finally {
+      setSetupSaving(false)
+    }
+  }
+
+  const handleCloseSetup = () => {
+    setSetupOpen(false)
+    setQrCodeDataUrl('')
+    setManualSecret('')
+    setSetupCode('')
+    setSetupErr('')
+    setNewBackupCodes([])
+    setSetupStep('qr')
+  }
+
+  const handleDisable2FA = async (e) => {
+    e.preventDefault()
+    setDisableErr('')
+    setDisableSaving(true)
+    try {
+      await api.post('/auth/2fa/disable', { currentPassword: disablePassword })
+      setTwoFactorEnabled(false)
+      setDisableOpen(false)
+      setDisablePassword('')
+      showToast('Two-factor authentication has been disabled.', 'success')
+    } catch (err) {
+      setDisableErr(err.response?.data?.message || 'Could not disable 2FA.')
+    } finally {
+      setDisableSaving(false)
+    }
+  }
+
+  const handleRegenerateBackupCodes = async (e) => {
+    e.preventDefault()
+    setRegenErr('')
+    setRegenSaving(true)
+    try {
+      const { data } = await api.post('/auth/2fa/regenerate-backup-codes', { currentPassword: regenPassword })
+      setRegenCodes(data.backupCodes)
+      setRegenPassword('')
+    } catch (err) {
+      setRegenErr(err.response?.data?.message || 'Could not generate new backup codes.')
+    } finally {
+      setRegenSaving(false)
+    }
+  }
+
+  const handleCloseRegen = () => {
+    setRegenOpen(false)
+    setRegenPassword('')
+    setRegenErr('')
+    setRegenCodes([])
+  }
+
   if (loading) return <div className="admin-page-loading">Loading settings…</div>
 
   return (
@@ -275,6 +384,43 @@ export default function AdminSettings() {
             Immediately ends every active admin login, including this one — everyone (including you)
             will need to sign in again with the current password.
           </div>
+        </div>
+      </div>
+
+      {/* ── Two-factor authentication ── */}
+      <div className="admin-card" style={{ marginBottom: '1.5rem' }}>
+        <div className="admin-card-header">
+          <h3><i className="bi bi-shield-check"></i> Two-Factor Authentication</h3>
+        </div>
+        <div className="admin-card-body">
+          {twoFactorEnabled === null ? (
+            <p className="admin-card-body-hint">Checking status…</p>
+          ) : twoFactorEnabled ? (
+            <>
+              <p className="admin-card-body-hint" style={{ color: '#15803d' }}>
+                <i className="bi bi-check-circle-fill me-1"></i>
+                2FA is enabled. You'll be asked for a code from your authenticator app every time you sign in.
+              </p>
+              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                <button type="button" className="admin-btn admin-btn-ghost" onClick={() => setRegenOpen(true)}>
+                  <i className="bi bi-arrow-repeat"></i> Regenerate Backup Codes
+                </button>
+                <button type="button" className="admin-btn admin-btn-danger" onClick={() => setDisableOpen(true)}>
+                  <i className="bi bi-shield-x"></i> Disable 2FA
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="admin-card-body-hint">
+                Add a second layer of security to your admin account using Google Authenticator or any
+                compatible authenticator app. Optional, but recommended.
+              </p>
+              <button type="button" className="admin-btn admin-btn-primary" onClick={handleStartSetup} disabled={setupSaving}>
+                <i className="bi bi-qr-code"></i> {setupSaving ? 'Starting…' : 'Enable 2FA'}
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -426,6 +572,160 @@ export default function AdminSettings() {
           </div>
         </form>
       </div>
+
+      {/* ── 2FA setup modal — QR step, then backup codes shown once ── */}
+      {setupOpen && (
+        <div className="admin-confirm-overlay" onClick={setupStep === 'backup-codes' ? undefined : handleCloseSetup}>
+          <div className="admin-confirm-box" style={{ maxWidth: 440, textAlign: 'left' }} onClick={e => e.stopPropagation()}>
+            {setupStep === 'qr' ? (
+              <>
+                <h3 style={{ textAlign: 'center' }}>Scan this with your authenticator app</h3>
+                {qrCodeDataUrl && (
+                  <div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
+                    <img src={qrCodeDataUrl} alt="2FA QR code" style={{ width: 200, height: 200, borderRadius: 8, border: '1px solid #e5e7eb' }} />
+                  </div>
+                )}
+                <p style={{ fontSize: '0.8rem', color: '#6b7280', textAlign: 'center' }}>
+                  Can't scan? Enter this code manually: <br />
+                  <code style={{ fontSize: '0.85rem', wordBreak: 'break-all' }}>{manualSecret}</code>
+                </p>
+                <form onSubmit={handleConfirmSetup} style={{ marginTop: '1rem' }}>
+                  <label className="admin-detail-field-label">Enter the 6-digit code to confirm</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={6}
+                    className="admin-search-input"
+                    style={{ width: '100%', textAlign: 'center', fontSize: '1.2rem', letterSpacing: '0.3em' }}
+                    value={setupCode}
+                    onChange={e => setSetupCode(e.target.value.replace(/\D/g, ''))}
+                    autoFocus
+                  />
+                  {setupErr && <div style={{ color: '#dc2626', fontSize: '0.85rem', marginTop: '0.4rem' }}>{setupErr}</div>}
+                  <div className="admin-confirm-actions" style={{ marginTop: '1.2rem' }}>
+                    <button type="button" className="admin-btn admin-btn-ghost" onClick={handleCloseSetup} disabled={setupSaving}>
+                      Cancel
+                    </button>
+                    <button type="submit" className="admin-btn admin-btn-primary" disabled={setupSaving || setupCode.length !== 6}>
+                      {setupSaving ? 'Verifying…' : 'Confirm & Enable'}
+                    </button>
+                  </div>
+                </form>
+              </>
+            ) : (
+              <>
+                <h3 style={{ textAlign: 'center' }}><i className="bi bi-shield-check" style={{ color: '#15803d' }}></i> 2FA Enabled</h3>
+                <p style={{ fontSize: '0.85rem', color: '#6b7280' }}>
+                  Save these backup codes somewhere safe — each works once, for signing in if you lose access
+                  to your authenticator app. <strong>They won't be shown again.</strong>
+                </p>
+                <div style={{
+                  display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem',
+                  background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 8,
+                  padding: '0.9rem', margin: '0.8rem 0', fontFamily: 'monospace', fontSize: '0.9rem',
+                }}>
+                  {newBackupCodes.map(c => <div key={c}>{c}</div>)}
+                </div>
+                <div className="admin-confirm-actions">
+                  <button type="button" className="admin-btn admin-btn-primary" onClick={handleCloseSetup}>
+                    I've saved these codes
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Disable 2FA modal ── */}
+      {disableOpen && (
+        <div className="admin-confirm-overlay" onClick={() => { setDisableOpen(false); setDisablePassword(''); setDisableErr('') }}>
+          <div className="admin-confirm-box" style={{ maxWidth: 400, textAlign: 'left' }} onClick={e => e.stopPropagation()}>
+            <h3 style={{ textAlign: 'center' }}>Disable Two-Factor Authentication?</h3>
+            <p style={{ fontSize: '0.85rem', color: '#6b7280', textAlign: 'center' }}>
+              Enter your password to confirm. Your account will only need a password to sign in afterward.
+            </p>
+            <form onSubmit={handleDisable2FA}>
+              <input
+                type="password"
+                className="admin-search-input"
+                style={{ width: '100%' }}
+                placeholder="Current password"
+                value={disablePassword}
+                onChange={e => setDisablePassword(e.target.value)}
+                autoFocus
+                required
+              />
+              {disableErr && <div style={{ color: '#dc2626', fontSize: '0.85rem', marginTop: '0.4rem' }}>{disableErr}</div>}
+              <div className="admin-confirm-actions" style={{ marginTop: '1.2rem' }}>
+                <button type="button" className="admin-btn admin-btn-ghost"
+                  onClick={() => { setDisableOpen(false); setDisablePassword(''); setDisableErr('') }} disabled={disableSaving}>
+                  Cancel
+                </button>
+                <button type="submit" className="admin-btn admin-btn-danger" disabled={disableSaving}>
+                  {disableSaving ? 'Disabling…' : 'Disable 2FA'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Regenerate backup codes modal ── */}
+      {regenOpen && (
+        <div className="admin-confirm-overlay" onClick={regenCodes.length ? undefined : handleCloseRegen}>
+          <div className="admin-confirm-box" style={{ maxWidth: 420, textAlign: 'left' }} onClick={e => e.stopPropagation()}>
+            {regenCodes.length === 0 ? (
+              <>
+                <h3 style={{ textAlign: 'center' }}>Regenerate Backup Codes?</h3>
+                <p style={{ fontSize: '0.85rem', color: '#6b7280', textAlign: 'center' }}>
+                  This invalidates all your existing backup codes. Enter your password to confirm.
+                </p>
+                <form onSubmit={handleRegenerateBackupCodes}>
+                  <input
+                    type="password"
+                    className="admin-search-input"
+                    style={{ width: '100%' }}
+                    placeholder="Current password"
+                    value={regenPassword}
+                    onChange={e => setRegenPassword(e.target.value)}
+                    autoFocus
+                    required
+                  />
+                  {regenErr && <div style={{ color: '#dc2626', fontSize: '0.85rem', marginTop: '0.4rem' }}>{regenErr}</div>}
+                  <div className="admin-confirm-actions" style={{ marginTop: '1.2rem' }}>
+                    <button type="button" className="admin-btn admin-btn-ghost" onClick={handleCloseRegen} disabled={regenSaving}>
+                      Cancel
+                    </button>
+                    <button type="submit" className="admin-btn admin-btn-primary" disabled={regenSaving}>
+                      {regenSaving ? 'Generating…' : 'Regenerate'}
+                    </button>
+                  </div>
+                </form>
+              </>
+            ) : (
+              <>
+                <h3 style={{ textAlign: 'center' }}>New Backup Codes</h3>
+                <p style={{ fontSize: '0.85rem', color: '#6b7280' }}>
+                  Your old codes no longer work. Save these somewhere safe — <strong>they won't be shown again.</strong>
+                </p>
+                <div style={{
+                  display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem',
+                  background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 8,
+                  padding: '0.9rem', margin: '0.8rem 0', fontFamily: 'monospace', fontSize: '0.9rem',
+                }}>
+                  {regenCodes.map(c => <div key={c}>{c}</div>)}
+                </div>
+                <div className="admin-confirm-actions">
+                  <button type="button" className="admin-btn admin-btn-primary" onClick={handleCloseRegen}>
+                    I've saved these codes
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       <ConfirmDialog
         open={logoutAllConfirmOpen}
