@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import api from '../../services/api'
 import { getCountryFlag, getCountrySearchPlaceholder, ALLOWED_COUNTRIES, REGIONS } from '../../utils/countryUtils'
 import ConfirmDialog from './components/ConfirmDialog'
+import StyledSelect from '../../components/StyledSelect'
 import './AdminShared.css'
 
 export default function AdminCountries() {
@@ -193,7 +194,7 @@ export default function AdminCountries() {
           />
 
           {/* Region / Continent Filter */}
-          <select
+          <StyledSelect
             className="admin-filter-select"
             value={regionFilter}
             onChange={e => setRegionFilter(e.target.value)}
@@ -205,10 +206,10 @@ export default function AdminCountries() {
                 {r} ({stats.regionCounts[r] || 0})
               </option>
             ))}
-          </select>
+          </StyledSelect>
 
           {/* Status Filter */}
-          <select
+          <StyledSelect
             className="admin-filter-select"
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value)}
@@ -219,10 +220,10 @@ export default function AdminCountries() {
             <option value="signup-blocked">Signup Blocked ({stats.total - stats.signupCount})</option>
             <option value="dropdown-visible">In Dropdowns ({stats.dropdownCount})</option>
             <option value="dropdown-hidden">Hidden from Dropdowns ({stats.total - stats.dropdownCount})</option>
-          </select>
+          </StyledSelect>
 
           {/* Sort Filter */}
-          <select
+          <StyledSelect
             className="admin-filter-select"
             value={sortBy}
             onChange={e => setSortBy(e.target.value)}
@@ -233,7 +234,7 @@ export default function AdminCountries() {
             <option value="region-asc">Sort: Region</option>
             <option value="code-asc">Sort: ISO Code</option>
             <option value="dial-asc">Sort: Dial Code</option>
-          </select>
+          </StyledSelect>
         </div>
 
         {/* Region / Filter Quick Summary & Bulk Action Bar */}

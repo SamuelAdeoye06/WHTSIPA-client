@@ -321,6 +321,112 @@
   background: #fff;
 }
 
+/* ── StyledSelect — replaces native <select> app-wide per client
+   instruction. Same visual tokens as .admin-status-select /
+   .admin-filter-select above so it drops in without a visual jump;
+   apply those same class names to .styled-select-wrap to inherit sizing. ── */
+.styled-select-wrap {
+  position: relative;
+  display: inline-block;
+}
+.styled-select-wrap.admin-filter-select,
+.styled-select-wrap.admin-status-select {
+  padding: 0; /* sizing moves to the inner button so the outer wrap can position the menu */
+  background: none;
+  border: none;
+}
+.styled-select-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+  /* Sensible default for any wrap that isn't .admin-status-select or
+     .admin-filter-select (e.g. Settings' session-length select, which
+     reuses .admin-search-input's look) — matches .admin-search-input. */
+  padding: 0.5rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 0.88rem;
+  background: #fff;
+  color: #1f2937;
+}
+.admin-status-select .styled-select-btn {
+  font-size: 0.82rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #1f2937;
+}
+.admin-filter-select .styled-select-btn {
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 0.86rem;
+  background: #fff;
+  color: #1f2937;
+}
+.styled-select-btn:focus,
+.styled-select-wrap.is-active .styled-select-btn {
+  outline: none;
+  border-color: #0d9488 !important;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
+}
+.styled-select-wrap.is-disabled .styled-select-btn {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.styled-select-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.styled-select-arrow {
+  font-size: 0.7rem;
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+.styled-select-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 40;
+  min-width: 100%;
+  max-height: 260px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0.35rem;
+  list-style: none;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.16);
+}
+.styled-select-item {
+  display: block;
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  border: none;
+  background: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: #1f2937;
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.styled-select-item:hover { background: #f1f5f9; }
+.styled-select-item.active { background: #ccfbf1; color: #0f766e; font-weight: 600; }
+.styled-select-item.disabled { opacity: 0.5; cursor: not-allowed; }
+.styled-select-menu::-webkit-scrollbar { width: 6px; }
+.styled-select-menu::-webkit-scrollbar-track { background: transparent; }
+.styled-select-menu::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 6px; }
+.styled-select-menu::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
 /* ── Detail page ── */
 .admin-back-link {
   display: inline-flex;

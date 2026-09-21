@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import api from '../../services/api'
 import StatusPill from './components/StatusPill'
 import ConfirmDialog from './components/ConfirmDialog'
+import StyledSelect from '../../components/StyledSelect'
 import SendEmailDialog from './components/SendEmailDialog'
 import { useToast } from '../../context/ToastContext'
 import { exportRecordAsPDF } from '../../utils/pdfExport'
@@ -108,11 +109,11 @@ export default function AdminContactMessageDetail() {
           <p className="admin-page-sub">{message.name} · {message.email} · {new Date(message.createdAt).toLocaleString()}</p>
         </div>
         <div className="admin-detail-actions">
-          <select className="admin-status-select" value={message.status} onChange={handleStatusChange} disabled={savingStatus}>
+          <StyledSelect className="admin-status-select" value={message.status} onChange={handleStatusChange} disabled={savingStatus}>
             <option value="unread">Unread</option>
             <option value="read">Read</option>
             <option value="replied">Replied</option>
-          </select>
+          </StyledSelect>
           <a className="admin-btn admin-btn-ghost" href={`mailto:${message.email}?subject=Re: ${message.subject}`}>
             <i className="bi bi-reply-fill"></i> Reply by Email
           </a>

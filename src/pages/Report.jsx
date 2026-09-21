@@ -6,6 +6,7 @@ import '../styles/cyber.css'
 import './Report.css'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
+import StyledSelect from '../components/StyledSelect'
 import api from '../services/api'
 import { uploadEvidenceFiles } from '../utils/uploadFiles'
 import { openLiveChat, onAgentJoined } from '../utils/tidio'
@@ -1536,16 +1537,16 @@ export default function Report() {
                       <div className="col-12 col-md-6">
                         <label className="form-label cyber-label" htmlFor="personal-financialLoss">Total Financial Losses <span className="text-muted-cyber">(Optional)</span></label>
                         <div className="input-group">
-                          <select
+                          <StyledSelect
                             name="financialLossCurrency"
                             className="form-select cyber-select"
-                            style={{ 
-                              maxWidth: '120px', 
-                              fontSize: '0.82rem', 
-                              paddingLeft: '0.5rem', 
-                              paddingRight: '1.5rem', 
-                              borderRight: 'none', 
-                              borderRadius: '12px 0 0 12px' 
+                            style={{ maxWidth: '120px' }}
+                            buttonStyle={{
+                              fontSize: '0.82rem',
+                              paddingLeft: '0.5rem',
+                              paddingRight: '1.5rem',
+                              borderRight: 'none',
+                              borderRadius: '12px 0 0 12px'
                             }}
                             value={personalFormik.values.financialLossCurrency}
                             onChange={personalFormik.handleChange}
@@ -1559,7 +1560,7 @@ export default function Report() {
                                 </option>
                               )
                             })}
-                          </select>
+                          </StyledSelect>
                           <input
                             id="personal-financialLoss"
                             name="financialLoss"
@@ -1577,7 +1578,7 @@ export default function Report() {
                       {/* Have you contacted bank/authorities */}
                       <div className="col-12 col-md-6">
                         <label className="form-label cyber-label" htmlFor="personal-authorities">Have you contacted your bank, platform, or authorities? <span className="text-muted-cyber">(Optional)</span></label>
-                        <select
+                        <StyledSelect
                           id="personal-authorities"
                           name="contactedAuthorities"
                           className="form-select cyber-select"
@@ -1590,7 +1591,7 @@ export default function Report() {
                           <option value="Only bank / platform">Only bank / platform</option>
                           <option value="No, not yet">No, not yet</option>
                           <option value="In Progress">In Progress</option>
-                        </select>
+                        </StyledSelect>
                       </div>
 
                       {/* Evidence upload */}
@@ -1878,7 +1879,7 @@ export default function Report() {
                       {/* Status of Incident */}
                       <div className="col-12 col-md-6">
                         <label className="form-label cyber-label" htmlFor="public-incidentStatus">Status of Incident <span className="text-danger">* (Required)</span></label>
-                        <select
+                        <StyledSelect
                           id="public-incidentStatus"
                           name="incidentStatus"
                           className={`form-select cyber-select ${publicFormik.touched.incidentStatus && publicFormik.errors.incidentStatus ? 'is-invalid' : ''}`}
@@ -1892,7 +1893,7 @@ export default function Report() {
                           <option value="Requires Investigation">Requires Investigation</option>
                           <option value="Needs to be Neutralized">Needs to be Neutralized</option>
                           <option value="Others">Others</option>
-                        </select>
+                        </StyledSelect>
                         {publicFormik.values.incidentStatus === 'Others' && (
                           <div className="mt-2">
                             <input

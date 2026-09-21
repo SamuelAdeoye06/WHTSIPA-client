@@ -250,6 +250,32 @@
 .wm-field textarea::placeholder { color: rgba(233,243,255,0.28); }
 .wm-field select option { background: #0d1a35; color: #f0f4ff; }
 
+/* StyledSelect inside this dark modal — mirrors .wm-field select above,
+   since that tag-selector rule no longer matches once select becomes a
+   <div>/<button> component. */
+.wm-field .styled-select-wrap { width: 100%; }
+.wm-field .styled-select-btn {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(120,214,255,0.2);
+  border-radius: 10px;
+  color: #f0f4ff;
+  font-size: 0.88rem;
+  padding: 0.65rem 0.85rem;
+  font-family: inherit;
+  transition: border-color 0.18s ease;
+}
+.wm-field .styled-select-wrap.is-active .styled-select-btn,
+.wm-field .styled-select-btn:focus { border-color: rgba(34,240,255,0.5) !important; box-shadow: none; }
+.wm-field .styled-select-arrow { color: rgba(233,243,255,0.5); }
+.wm-field .styled-select-menu {
+  background: #0d1a35;
+  border: 1px solid rgba(120,214,255,0.25);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+}
+.wm-field .styled-select-item { color: #f0f4ff; }
+.wm-field .styled-select-item:hover { background: rgba(255,255,255,0.08); }
+.wm-field .styled-select-item.active { background: rgba(34,240,255,0.15); color: #22f0ff; }
+
 .wm-row { display: flex; gap: 0.65rem; margin-bottom: 0.5rem; }
 .wm-row input { flex: 1; }
 

@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
 import { getCountryFlag, getCountrySearchPlaceholder } from '../utils/countryUtils'
 import { useCountries } from '../context/CountriesContext'
+import StyledSelect from '../components/StyledSelect'
 
 /* ─────────────────────────────────────────────
    Fallback shown while the backend number loads.
@@ -511,7 +512,7 @@ function BookCallModal({ onClose }) {
                 value={form.preferredDate} onChange={set('preferredDate')} />
             </F>
             <F id="bc-time" label="Preferred Time *" error={errors.preferredTime}>
-              <select id="bc-time" className={`bc-input ${errors.preferredTime ? 'bc-input-err' : ''}`}
+              <StyledSelect id="bc-time" className={`bc-input ${errors.preferredTime ? 'bc-input-err' : ''}`}
                 value={form.preferredTime} onChange={set('preferredTime')}>
                 <option value="">Select time</option>
                 {['09:00 AM','10:00 AM','11:00 AM','12:00 PM',
@@ -519,7 +520,7 @@ function BookCallModal({ onClose }) {
                   'other'].map(t => (
                   <option key={t} value={t}>{t === 'other' ? 'Other (type below)' : t}</option>
                 ))}
-              </select>
+              </StyledSelect>
               {form.preferredTime === 'other' && (
                 <input
                   className={`bc-input mt-2 ${errors.preferredTime ? 'bc-input-err' : ''}`}

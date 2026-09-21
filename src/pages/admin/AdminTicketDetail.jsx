@@ -5,6 +5,7 @@ import StatusPill from './components/StatusPill'
 import ConfirmDialog from './components/ConfirmDialog'
 import SendEmailDialog from './components/SendEmailDialog'
 import AttachmentViewer from './components/AttachmentViewer'
+import StyledSelect from '../../components/StyledSelect'
 import { useToast } from '../../context/ToastContext'
 import { exportRecordAsPDF } from '../../utils/pdfExport'
 import './AdminShared.css'
@@ -127,16 +128,16 @@ export default function AdminTicketDetail() {
         </div>
         <div className="admin-detail-actions">
           <div className="d-flex flex-column gap-2">
-            <select className="admin-status-select" value={ticket.status} onChange={handleStatusChange} disabled={savingStatus}>
+            <StyledSelect className="admin-status-select" value={ticket.status} onChange={handleStatusChange} disabled={savingStatus}>
               <option value="open">Open</option>
               <option value="in-progress">In progress</option>
               <option value="resolved">Resolved</option>
               <option value="ended">Ended</option>
-            </select>
+            </StyledSelect>
             {ticket.status !== 'ended' && (
-              <select className="admin-status-select" value={closingMsg} onChange={e => setClosingMsg(e.target.value)} style={{ fontSize: '0.78rem' }}>
+              <StyledSelect className="admin-status-select" value={closingMsg} onChange={e => setClosingMsg(e.target.value)} style={{ fontSize: '0.78rem' }}>
                 {CLOSING_MESSAGES.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
-              </select>
+              </StyledSelect>
             )}
           </div>
           <button className="admin-btn admin-btn-ghost" onClick={handleExportPDF}>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import api from '../../services/api'
 import WorkerListEditor from './components/WorkerListEditor'
 import ConfirmDialog from './components/ConfirmDialog'
+import StyledSelect from '../../components/StyledSelect'
 import { useToast } from '../../context/ToastContext'
 import './AdminShared.css'
 
@@ -238,7 +239,7 @@ export default function AdminSettings() {
             <label className="admin-detail-field-label" htmlFor="adminSessionSeconds">
               Session Length
             </label>
-            <select
+            <StyledSelect
               id="adminSessionSeconds"
               className="admin-search-input"
               style={{ width: '100%' }}
@@ -251,7 +252,7 @@ export default function AdminSettings() {
               <option value={600}>10 minutes</option>
               <option value={900}>15 minutes</option>
               <option value={1800}>30 minutes</option>
-            </select>
+            </StyledSelect>
             <div style={{ fontSize: '0.78rem', color: '#9ca3af', marginTop: '0.3rem' }}>
               How long an admin can stay idle in the panel before being signed out automatically.
               Staying active resets the clock — this only counts inactive time. Defaults to the

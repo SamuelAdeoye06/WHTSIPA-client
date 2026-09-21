@@ -14,6 +14,7 @@ import { openLiveChat, onAgentJoined } from '../utils/tidio'
 import { genTicketId } from '../utils/ticketId'
 import { uploadEvidenceFiles } from '../utils/uploadFiles'
 import ChatSessionHistory from './ChatSessionHistory'
+import StyledSelect from './StyledSelect'
 import './WhatsipModal.css'
 import { getCountryFlag, getCountrySearchPlaceholder } from '../utils/countryUtils'
 import { useCountries } from '../context/CountriesContext'
@@ -839,9 +840,9 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
             {isHire && (
               <div className="wm-field">
                 <label>Desired Engagement Duration</label>
-                <select value={form.duration} onChange={e => setForm(f => ({ ...f, duration: e.target.value }))}>
+                <StyledSelect value={form.duration} onChange={e => setForm(f => ({ ...f, duration: e.target.value }))}>
                   {['One-Time Assistance (single incident)', '7 Days', '30 Days', '90 Days', 'Ongoing / Retainer', 'Other (specify)'].map(o => <option key={o}>{o}</option>)}
-                </select>
+                </StyledSelect>
               </div>
             )}
 

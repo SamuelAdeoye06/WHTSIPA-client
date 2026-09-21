@@ -698,6 +698,29 @@
 }
 
 /* ══════════════════════════════════════════════════════════
+   StyledSelect — light-page default for pages using the shared
+   .contact-field class name (Contact, ThreatsTools' request form,
+   etc.) but that don't import Contact.css directly. Matches
+   Contact.css's own .contact-field tokens for visual consistency.
+   className lands on the button itself (see StyledSelect.jsx), so
+   this mirrors the original bare-class rule shape directly.
+   ══════════════════════════════════════════════════════════ */
+.styled-select-btn.contact-field {
+  width: 100%;
+  background: #ffffff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  color: #1f2937;
+  font-size: 0.9rem;
+  padding: 0.68rem 0.9rem;
+}
+.styled-select-wrap.is-active .styled-select-btn.contact-field,
+.styled-select-btn.contact-field:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.1) !important;
+}
+
+/* ══════════════════════════════════════════════════════════
    TIDIO WIDGET CUSTOM OVERRIDES — WHTSIPA BRANDING
    Aligns Tidio iframe styling with WHTSIPA blue theme (#1d4ed8)
    ══════════════════════════════════════════════════════════ */

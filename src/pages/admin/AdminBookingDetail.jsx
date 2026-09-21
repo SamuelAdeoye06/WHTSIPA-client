@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import api from '../../services/api'
 import StatusPill from './components/StatusPill'
 import ConfirmDialog from './components/ConfirmDialog'
+import StyledSelect from '../../components/StyledSelect'
 import SendEmailDialog from './components/SendEmailDialog'
 import { useToast } from '../../context/ToastContext'
 import { exportRecordAsPDF } from '../../utils/pdfExport'
@@ -105,12 +106,12 @@ export default function AdminBookingDetail() {
           <p className="admin-page-sub">{booking.preferredDate} at {booking.preferredTime} · Submitted {new Date(booking.createdAt).toLocaleString()}</p>
         </div>
         <div className="admin-detail-actions">
-          <select className="admin-status-select" value={booking.status} onChange={handleStatusChange} disabled={savingStatus}>
+          <StyledSelect className="admin-status-select" value={booking.status} onChange={handleStatusChange} disabled={savingStatus}>
             <option value="pending">Pending</option>
             <option value="confirmed">Confirmed</option>
             <option value="completed">Completed</option>
             <option value="cancelled">Cancelled</option>
-          </select>
+          </StyledSelect>
           <button className="admin-btn admin-btn-ghost" onClick={handleExportPDF}>
             <i className="bi bi-file-earmark-pdf"></i> Download PDF
           </button>

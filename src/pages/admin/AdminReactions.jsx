@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import api from '../../services/api'
 import { formatReactionCount } from '../../utils/numberFormatter'
+import StyledSelect from '../../components/StyledSelect'
 import './AdminShared.css'
 
 export default function AdminReactions() {
@@ -254,7 +255,7 @@ export default function AdminReactions() {
 
           {/* Filter Dropdowns Grid */}
           <div className="admin-reactions-filters-grid">
-            <select
+            <StyledSelect
               className="admin-filter-select"
               value={pageFilter}
               onChange={e => setPageFilter(e.target.value)}
@@ -263,9 +264,9 @@ export default function AdminReactions() {
               <option value="all">📂 All Pages ({reactions.length})</option>
               <option value="about">🏛️ About WHTSIPA ({aboutCount})</option>
               <option value="about-officials">🛡️ Officials ({officialsCount})</option>
-            </select>
+            </StyledSelect>
 
-            <select
+            <StyledSelect
               className="admin-filter-select"
               value={sortBy}
               onChange={e => setSortBy(e.target.value)}
@@ -275,7 +276,7 @@ export default function AdminReactions() {
               <option value="dislikes-desc">👎 Highest Dislikes</option>
               <option value="name-asc">🔤 Name (A-Z)</option>
               <option value="page-asc">📑 Section</option>
-            </select>
+            </StyledSelect>
           </div>
         </div>
 

@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import '../styles/cyber.css'
 import './ThreatsTools.css'
 import { THREATS_AND_TOOLS } from '../data/threatsToolsData'
+import StyledSelect from '../components/StyledSelect'
+import { useToast } from '../context/ToastContext'
 
 // ── Tool request form uses Anthropic API for AI assistant ──
 import iconDeepfake from '../assets/media/icons/icon-deepfake.png'
@@ -63,6 +65,7 @@ const ICON_MAP = {
 const TABS = ['Types of Threats', 'Threat & Tool Analysis', 'How Our Tools Work', 'Request Tools']
 
 export default function ThreatsTools() {
+  const { showToast } = useToast()
   const [activeTab, setActiveTab] = useState('Types of Threats')
   const [expanded, setExpanded] = useState(null)
   const [requestForm, setRequestForm] = useState({ name: '', email: '', tool: '', detail: '' })
@@ -322,7 +325,17 @@ export default function ThreatsTools() {
                 ) : (
                   <div className="tt-request-card p-4 p-md-5">
                     <h4 className="fw-bold mb-4" style={{ color: '#0f172a' }}>Tool Request Form</h4>
-                    <form onSubmit={(e) => { e.preventDefault(); setSubmitted(true) }}>
+                    <form onSubmit={(e) => {
+                      e.preventDefault()
+                      // Native <select required> used to block submission here —
+                      // StyledSelect isn't a real form control, so this replaces
+                      // that guarantee explicitly rather than silently losing it.
+                      if (!requestForm.tool) {
+                        showToast('Please select a tool category.', 'error')
+                        return
+                      }
+                      setSubmitted(true)
+                    }}>
                       <div className="row g-3">
                         <div className="col-12 col-sm-6">
                           <label className="contact-label">Full Name</label>
@@ -336,13 +349,13 @@ export default function ThreatsTools() {
                         </div>
                         <div className="col-12">
                           <label className="contact-label">Tool or Solution Needed</label>
-                          <select className="contact-field" value={requestForm.tool} onChange={set('tool')} required>
+                          <StyledSelect className="contact-field" value={requestForm.tool} onChange={set('tool')}>
                             <option value="">Select a tool category</option>
                             {THREATS_AND_TOOLS.map(t => (
                               <option key={t.id} value={t.tool}>{t.tool}</option>
                             ))}
                             <option value="custom">Custom / Not Listed</option>
-                          </select>
+                          </StyledSelect>
                         </div>
                         <div className="col-12">
                           <label className="contact-label">Describe Your Situation</label>

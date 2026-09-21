@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../../services/api'
 import StatusPill from './components/StatusPill'
+import StyledSelect from '../../components/StyledSelect'
 import './AdminShared.css'
 
 export default function AdminReports() {
@@ -71,12 +72,12 @@ export default function AdminReports() {
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
-          <select className="admin-filter-select" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+          <StyledSelect className="admin-filter-select" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
             <option value="all">All statuses</option>
             <option value="open">Open</option>
             <option value="in-review">In review</option>
             <option value="resolved">Resolved</option>
-          </select>
+          </StyledSelect>
         </div>
 
         {loading ? (

@@ -46,6 +46,19 @@
   color: #f0f4ff;
 }
 
+/* StyledSelect's dropdown menu/items — new UI with no native <option>
+   equivalent to inherit from, so styled explicitly to match .cyber-select
+   option's dark tokens above. Menu is a later sibling of the button
+   within the same wrap, hence the sibling combinator. */
+.cyber-select ~ .styled-select-menu {
+  background: #0a1628;
+  border: 1px solid rgba(120, 214, 255, 0.22);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.45);
+}
+.cyber-select ~ .styled-select-menu .styled-select-item { color: #f0f4ff; }
+.cyber-select ~ .styled-select-menu .styled-select-item:hover { background: rgba(255,255,255,0.06); }
+.cyber-select ~ .styled-select-menu .styled-select-item.active { background: rgba(34,240,255,0.12); color: #22f0ff; }
+
 textarea.cyber-input { resize: vertical; min-height: 120px; }
 
 .page-light .cyber-label {
@@ -75,6 +88,14 @@ textarea.cyber-input { resize: vertical; min-height: 120px; }
   background: #ffffff;
   color: #0f172a;
 }
+.page-light .cyber-select ~ .styled-select-menu {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.14);
+}
+.page-light .cyber-select ~ .styled-select-menu .styled-select-item { color: #0f172a; }
+.page-light .cyber-select ~ .styled-select-menu .styled-select-item:hover { background: #f1f5f9; }
+.page-light .cyber-select ~ .styled-select-menu .styled-select-item.active { background: #dbeafe; color: #1d4ed8; }
 
 /* ── Report type tabs ── */
 .report-type-tabs {
