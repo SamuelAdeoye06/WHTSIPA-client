@@ -46,6 +46,11 @@ const LINK_GROUPS = [
     hint: 'The "You Need Help" prompt on the Threats page quiz — shown after a visitor fails 3 scenarios, with a "Contact Active Representative" button.',
     fields: [
       ['scenarioActiveRepLink', 'Telegram — Active Representative', 'https://t.me/...'],
+      // 4th element flags this field for red styling in the admin panel
+      // only (per client request) — has no effect on how it looks to
+      // actual site visitors, who just see whatever plain-colored text
+      // is typed in here on the public "Contact Active Representative" button.
+      ['scenarioActiveRepText', 'Button Text / Username', 'e.g. @WHTS_SUPPORT', true],
     ],
   },
 ]
@@ -494,17 +499,29 @@ export default function AdminSettings() {
               </h4>
               <p style={{ fontSize: '0.8rem', color: '#9ca3af', marginBottom: '0.9rem' }}>{group.hint}</p>
               <div className="admin-detail-grid" style={{ padding: 0, gap: '1rem 1.5rem' }}>
-                {group.fields.map(([key, label, placeholder]) => (
+                {group.fields.map(([key, label, placeholder, redInAdmin]) => (
                   <div key={key}>
-                    <label className="admin-detail-field-label" htmlFor={key}>{label}</label>
+                    <label
+                      className="admin-detail-field-label"
+                      htmlFor={key}
+                      style={redInAdmin ? { color: '#dc2626' } : undefined}
+                    >
+                      {label}
+                    </label>
                     <input
                       id={key}
                       className="admin-search-input"
-                      style={{ width: '100%' }}
+                      style={{ width: '100%', ...(redInAdmin ? { color: '#dc2626', fontWeight: 600 } : {}) }}
                       placeholder={placeholder}
                       value={config?.[key] || ''}
                       onChange={handleFieldChange(key)}
                     />
+                    {redInAdmin && (
+                      <div style={{ fontSize: '0.76rem', color: '#dc2626', marginTop: '0.3rem' }}>
+                        This is what shows on the button — visitors see it in plain text, this red
+                        coloring is only here in the admin panel so it's easy to spot.
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

@@ -729,6 +729,11 @@ export default function Threats() {
   // the Threats page's own configured Telegram link if the fetch fails
   // or nothing's been set yet, so this is never broken by default.
   const [scenarioActiveRepLink, setScenarioActiveRepLink] = useState(THREATS_CONTACTS.telegram.url)
+  // Companion field — the button's visible label/username, separate from
+  // the link above. Falls back to the same static text that was
+  // hardcoded before this field existed, so the button never renders
+  // blank if nothing's been set in admin yet.
+  const [scenarioActiveRepText, setScenarioActiveRepText] = useState('Contact Active Representative')
 
   // Pull the currently-active worker for this page from the admin config.
   // Falls back to the hardcoded THREATS_CONTACTS defaults above if the
@@ -737,6 +742,7 @@ export default function Threats() {
   useEffect(() => {
     api.get('/config').then(({ data }) => {
       if (data?.scenarioActiveRepLink) setScenarioActiveRepLink(data.scenarioActiveRepLink)
+      if (data?.scenarioActiveRepText) setScenarioActiveRepText(data.scenarioActiveRepText)
       const worker = data?.threatsPageWorkers?.find(w => w._id === data.activeThreatsWorkerId)
       if (!worker) return
       setContacts(prev => ({
@@ -816,7 +822,7 @@ export default function Threats() {
               </p>
               <a href={scenarioActiveRepLink} target="_blank" rel="noopener noreferrer"
                 className="btn btn-alert w-100 mb-2">
-                <i className="bi bi-telegram me-2"></i>Contact Active Representative
+                <i className="bi bi-telegram me-2"></i>{scenarioActiveRepText}
               </a>
               <button className="btn btn-outline-cyber w-100" onClick={() => setShowRepPrompt(false)}>
                 Keep Practicing
