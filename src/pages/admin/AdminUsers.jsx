@@ -109,6 +109,7 @@ export default function AdminUsers() {
                   <tr>
                     <th>Name</th>
                     <th>Email</th>
+                    <th>Phone</th>
                     <th>Country</th>
                     <th>Role</th>
                     <th>Verified</th>
@@ -124,6 +125,7 @@ export default function AdminUsers() {
                       <tr key={u._id}>
                         <td className="admin-table-truncate" style={{ maxWidth: 140 }} title={`${u.firstName} ${u.lastName}`}>{u.firstName} {u.lastName}</td>
                         <td className="admin-table-truncate" style={{ maxWidth: 190 }} title={u.email}>{u.email}</td>
+                        <td className="admin-table-truncate" style={{ maxWidth: 140 }} title={u.phone}>{u.phone || '—'}</td>
                         <td className="admin-table-truncate" style={{ maxWidth: 100 }} title={u.country}>{u.country}</td>
                         <td style={{ textTransform: 'capitalize' }}>{u.role}</td>
                         <td>{u.isVerified ? <span className="admin-pill admin-pill-resolved">Verified</span> : <span className="admin-pill admin-pill-open">Unverified</span>}</td>
@@ -196,6 +198,7 @@ export default function AdminUsers() {
                           </div>
                         </div>
                         <div className="admin-mobile-card-sub">{u.email}</div>
+                        <div className="admin-mobile-card-sub">{u.phone || 'No phone on file'}</div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.4rem', fontSize: '0.78rem', color: '#94a3b8' }}>
                           <span>Country: <strong>{u.country || 'N/A'}</strong></span>
                           <span>Joined {new Date(u.createdAt).toLocaleDateString()}</span>

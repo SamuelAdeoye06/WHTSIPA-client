@@ -442,6 +442,13 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
     email: SUPPORT_EMAIL,
     toolsTelegramLink: TG_CHANNEL_LINK,
     phone: '',
+    // Recovery-mode ("Need personalised recovery support?") channels are
+    // deliberately separate from the "Hire Our Team" worker above — they
+    // have their own dedicated admin fields (Settings → Recovery Steps
+    // Support) so editing Hire/Threats/Contact channels elsewhere never
+    // silently changes what shows on the Recovery Steps screen.
+    recoveryWhatsapp: WHATSAPP_NUMBER,
+    recoveryTelegramHandle: TELEGRAM_USERNAME,
   })
 
   useEffect(() => {
@@ -453,6 +460,8 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
         email: worker?.email || prev.email,
         toolsTelegramLink: data?.toolsTelegramLink || prev.toolsTelegramLink,
         phone: worker?.phone || prev.phone,
+        recoveryWhatsapp: data?.recoveryWhatsappNumber || prev.recoveryWhatsapp,
+        recoveryTelegramHandle: data?.recoveryTelegramHandle || prev.recoveryTelegramHandle,
       }))
     }).catch(() => { /* keep defaults */ })
   }, [])
@@ -509,6 +518,10 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
   const tgLink   = `https://t.me/${channels.telegramHandle}`
   const mailLink = `mailto:${channels.email}?subject=WHTSIPA%20Support%20%7C%20${ticketId}&body=Ticket%3A%20${ticketId}`
   const callLink = channels.phone ? `tel:+${channels.phone}` : null
+  // Recovery Steps screen uses its own dedicated channels (see Settings →
+  // Recovery Steps Support), not the Hire Our Team worker above.
+  const recoveryWaLink = `https://wa.me/${channels.recoveryWhatsapp}`
+  const recoveryTgLink = `https://t.me/${channels.recoveryTelegramHandle}`
 
   /* Auth gate */
   if (!user && mode !== 'recovery') {
@@ -579,9 +592,8 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
           <div className="wm-recovery-cta">
             <p className="wm-subtitle">Need personalised recovery support?</p>
             <div className="d-flex gap-2 flex-wrap">
-              <a href={waLink} target="_blank" rel="noreferrer" className="wm-channel-btn wm-wa"><i className="bi bi-whatsapp"></i>WhatsApp (24/7)</a>
-              <a href={tgLink} target="_blank" rel="noreferrer" className="wm-channel-btn wm-tg"><i className="bi bi-telegram"></i>Telegram</a>
-              {callLink && <a href={callLink} className="wm-channel-btn wm-call"><i className="bi bi-telephone"></i>Call Us</a>}
+              <a href={recoveryWaLink} target="_blank" rel="noreferrer" className="wm-channel-btn wm-wa"><i className="bi bi-whatsapp"></i>WhatsApp (24/7)</a>
+              <a href={recoveryTgLink} target="_blank" rel="noreferrer" className="wm-channel-btn wm-tg"><i className="bi bi-telegram"></i>Telegram</a>
             </div>
           </div>
         </div>

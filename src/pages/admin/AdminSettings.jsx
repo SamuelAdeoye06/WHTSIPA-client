@@ -46,14 +46,24 @@ const LINK_GROUPS = [
     hint: 'The "You Need Help" prompt on the Threats page quiz — shown after a visitor fails 3 scenarios, with a "Contact Active Representative" button.',
     fields: [
       ['scenarioActiveRepLink', 'Telegram — Active Representative', 'https://t.me/...'],
-      // 4th element flags this field for red styling in the admin panel
+      // 4th element flags this field for colored styling in the admin panel
       // only (per client request) — has no effect on how it looks to
       // actual site visitors, who just see whatever plain-colored text
       // is typed in here on the public "Contact Active Representative" button.
-      ['scenarioActiveRepText', 'Button Text / Username', 'e.g. @WHTS_SUPPORT', true],
+      ['scenarioActiveRepText', 'Button Text / Username', 'e.g. @WHTS_SUPPORT', 'red'],
+    ],
+  },
+  {
+    heading: 'Recovery Steps Support (Threats Page)',
+    hint: 'The "Need personalised recovery support?" WhatsApp/Telegram buttons on the "View Recovery Steps" screen. This is a separate, dedicated spot — it does not affect Hire Our Team, Contact, or Threats page channels above.',
+    fields: [
+      ['recoveryWhatsappNumber', 'WhatsApp Number', 'digits only, e.g. 19293816441', 'green'],
+      ['recoveryTelegramHandle', 'Telegram Handle', 'no @ or URL, e.g. WHTSIPA_DigitalTools', 'green'],
     ],
   },
 ]
+
+const HIGHLIGHT_COLORS = { red: '#dc2626', green: '#16a34a' }
 
 const ALL_LINK_KEYS = LINK_GROUPS.flatMap(g => g.fields.map(([key]) => key))
 
@@ -499,31 +509,35 @@ export default function AdminSettings() {
               </h4>
               <p style={{ fontSize: '0.8rem', color: '#9ca3af', marginBottom: '0.9rem' }}>{group.hint}</p>
               <div className="admin-detail-grid" style={{ padding: 0, gap: '1rem 1.5rem' }}>
-                {group.fields.map(([key, label, placeholder, redInAdmin]) => (
-                  <div key={key}>
-                    <label
-                      className="admin-detail-field-label"
-                      htmlFor={key}
-                      style={redInAdmin ? { color: '#dc2626' } : undefined}
-                    >
-                      {label}
-                    </label>
-                    <input
-                      id={key}
-                      className="admin-search-input"
-                      style={{ width: '100%', ...(redInAdmin ? { color: '#dc2626', fontWeight: 600 } : {}) }}
-                      placeholder={placeholder}
-                      value={config?.[key] || ''}
-                      onChange={handleFieldChange(key)}
-                    />
-                    {redInAdmin && (
-                      <div style={{ fontSize: '0.76rem', color: '#dc2626', marginTop: '0.3rem' }}>
-                        This is what shows on the button — visitors see it in plain text, this red
-                        coloring is only here in the admin panel so it's easy to spot.
-                      </div>
-                    )}
-                  </div>
-                ))}
+                {group.fields.map(([key, label, placeholder, highlight]) => {
+                  const hex = HIGHLIGHT_COLORS[highlight]
+                  return (
+                    <div key={key}>
+                      <label
+                        className="admin-detail-field-label"
+                        htmlFor={key}
+                        style={hex ? { color: hex } : undefined}
+                      >
+                        {label}
+                      </label>
+                      <input
+                        id={key}
+                        className="admin-search-input"
+                        style={{ width: '100%', ...(hex ? { color: hex, fontWeight: 600 } : {}) }}
+                        placeholder={placeholder}
+                        value={config?.[key] || ''}
+                        onChange={handleFieldChange(key)}
+                      />
+                      {hex && (
+                        <div style={{ fontSize: '0.76rem', color: hex, marginTop: '0.3rem' }}>
+                          This is the exact place to change this — {hex === HIGHLIGHT_COLORS.red
+                            ? 'this is what shows on the button, visitors see it in plain text; this red'
+                            : 'this'} coloring is only here in the admin panel so it's easy to spot.
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             </div>
           ))}
