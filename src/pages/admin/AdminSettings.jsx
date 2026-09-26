@@ -54,12 +54,15 @@ const LINK_GROUPS = [
     ],
   },
   {
-    heading: 'Recovery Steps Support (Threats Page)',
-    hint: 'The "Need personalised recovery support?" WhatsApp/Telegram buttons on the "View Recovery Steps" screen. This is a separate, dedicated spot — it does not affect Hire Our Team, Contact, or Threats page channels above.',
+    heading: 'Need personalised recovery support (Threats Page)',
     fields: [
-      ['recoveryWhatsappNumber', 'WhatsApp Number', 'digits only, e.g. 19293816441', 'green'],
-      ['recoveryTelegramHandle', 'Telegram Handle', 'no @ or URL, e.g. WHTSIPA_DigitalTools', 'green'],
+      ['recoveryWhatsappNumber', 'WhatsApp Number', 'digits only, e.g. 19293816441'],
+      ['recoveryTelegramHandle', 'Telegram Handle', 'no @ or URL, e.g. WHTSIPA_DigitalTools'],
     ],
+    // Heading-only highlight (not the fields) — green, per client request,
+    // so it's easy to spot as "the place to change this" without recoloring
+    // the inputs themselves.
+    headingColor: '#16a34a',
   },
 ]
 
@@ -504,10 +507,10 @@ export default function AdminSettings() {
         <form onSubmit={handleSaveLinks} className="admin-card-body">
           {LINK_GROUPS.map((group, i) => (
             <div key={group.heading} style={{ marginBottom: i === LINK_GROUPS.length - 1 ? '1.5rem' : '2rem' }}>
-              <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.15rem' }}>
+              <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: group.headingColor || '#0f172a', marginBottom: '0.15rem' }}>
                 {group.heading}
               </h4>
-              <p style={{ fontSize: '0.8rem', color: '#9ca3af', marginBottom: '0.9rem' }}>{group.hint}</p>
+              {group.hint && <p style={{ fontSize: '0.8rem', color: '#9ca3af', marginBottom: '0.9rem' }}>{group.hint}</p>}
               <div className="admin-detail-grid" style={{ padding: 0, gap: '1rem 1.5rem' }}>
                 {group.fields.map(([key, label, placeholder, highlight]) => {
                   const hex = HIGHLIGHT_COLORS[highlight]
