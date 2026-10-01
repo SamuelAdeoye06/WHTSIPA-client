@@ -137,12 +137,10 @@ export default function About() {
           <div className="container">
             <div className="text-center mb-5">
               <div className="section-label mb-2">Our Partners</div>
-              <h2 className="fw-bold mb-2" style={{ color: '#0f172a' }}>Government Affiliated Agencies</h2>
+              <h2 className="fw-bold mb-2" style={{ color: '#0f172a' }}>Our Partners</h2>
+              <h3 className="fw-bold mb-2" style={{ color: '#0f172a' }}>Working Escalation to Authorities</h3>
               <p style={{ color: '#4a5568', maxWidth: '56ch', margin: '0 auto' }}>
-                WHTSIPA operates in formal alignment with the listed U.S. government agencies and
-                international law enforcement bodies. All valid reports received are reviewed and
-                submitted to the relevant authorities listed to support partnership and ensure smooth
-                operational coordination.
+                WHTSIPA reviews valid reports and forwards them to the listed relevant U.S. and international agencies so those bodies can take any action they determine is needed, based on the reviewed results we send. We are not a government agency and do not act on behalf of any government. Our role is to receive information, recover losses and relevant details, investigate, assess the matter, and pass confirmed findings including IP-related information to the proper listed authorities for local prosecution and to support our aim of keeping the digital world coordinated.
               </p>
             </div>
             <div className="row g-4">
