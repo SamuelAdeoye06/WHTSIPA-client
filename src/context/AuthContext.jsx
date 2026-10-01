@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import api from '../services/api'
+import { resetRestrictedStrikes } from '../services/authRedirect'
 
 const AuthContext = createContext(null)
 
@@ -24,6 +25,10 @@ export function AuthProvider({ children }) {
     // userData = { id, name, firstName, email, country, token }
     setUser(userData)
     localStorage.setItem('whts_user', JSON.stringify(userData))
+    // A real, successful sign-in means this browser is no longer mid-cheat
+    // on a restricted session — clear any escalation count so it doesn't
+    // carry over and wrongly affect this (or a future legitimate) visit.
+    resetRestrictedStrikes()
   }
 
   const logout = () => {

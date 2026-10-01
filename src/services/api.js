@@ -1,6 +1,6 @@
 // Central Axios instance — all API calls go through here
 import axios from 'axios'
-import { forceSignOut } from './authRedirect'
+import { forceSignOut, forceRestrictedRedirect } from './authRedirect'
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
@@ -47,6 +47,10 @@ api.interceptors.response.use(
       // this is a no-op; otherwise this call does it. See authRedirect.js
       // for why a single lock matters here.
       forceSignOut()
+    } else if (err.response?.status === 403 && err.response?.data?.code === 'ACCOUNT_RESTRICTED') {
+      // A restricted account's still-open session just got caught making an
+      // API call. Escalating kick-out — see forceRestrictedRedirect().
+      forceRestrictedRedirect()
     }
     return Promise.reject(err)
   }

@@ -38,6 +38,7 @@ import AdminCountries from './pages/admin/AdminCountries'
 import AdminReactions from './pages/admin/AdminReactions'
 import AdminSettings from './pages/admin/AdminSettings'
 import PrivacyTerms from './pages/PrivacyTerms'
+import AccessRemoved from './pages/AccessRemoved'
 import './styles/cyber.css'
 
 const KNOWN_ROUTES = [
@@ -45,9 +46,9 @@ const KNOWN_ROUTES = [
   '/signin', '/signup', '/verify-otp', '/forgot-password', '/reset-password',
   '/about', '/about-officials', '/contact',
   '/essential-eight', '/for-victims-government', '/blog', '/threats-tools', '/tools',
-  '/recover', '/privacy', '/terms'
+  '/recover', '/privacy', '/terms', '/access-removed'
 ]
-const BARE_ROUTES = ['/signin', '/signup', '/verify-otp', '/forgot-password', '/reset-password']
+const BARE_ROUTES = ['/signin', '/signup', '/verify-otp', '/forgot-password', '/reset-password', '/access-removed']
 
 function Layout() {
   const location = useLocation()
@@ -102,6 +103,7 @@ function Layout() {
           <Route path="/tools"                  element={<ThreatsTools />} />
           <Route path="/privacy"                element={<PrivacyTerms mode="privacy" />} />
           <Route path="/terms"                  element={<PrivacyTerms mode="terms" />} />
+          <Route path="/access-removed"         element={<AccessRemoved />} />
           <Route path="/recover"                element={<Navigate to="/report" state={{ scrollTo: 'recover' }} replace />} />
           {/* ── Admin panel (parent/child routing — AdminLayout gates on user.role === 'admin') ── */}
           <Route path="/admin" element={<AdminLayout />}>

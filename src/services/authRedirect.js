@@ -34,3 +34,40 @@ export function forceSignOut() {
 export function isRedirecting() {
   return redirecting
 }
+
+// ── Restricted-account escalation ──
+// A restricted account is already blocked on every API call by the backend
+// (see auth.middleware.js) — this just makes a live session actually *feel*
+// blocked instead of sitting there silently failing in the background.
+// Each time a restricted account's stale session gets caught making an API
+// call, it escalates: 1st catch → Sign In, 2nd catch → Sign Up, 3rd+ catch →
+// removed from the app entirely, no way back in. The count is kept in
+// localStorage (not memory) so it survives a page reload or the browser
+// Back button, which is exactly the "cheat and reverse back" case this
+// exists for. It's reset the moment a real sign-in/sign-up succeeds (see
+// resetRestrictedStrikes(), called from AuthContext's login()) so it never
+// lingers and affects a different, legitimate future visit on the same
+// browser.
+const STRIKES_KEY = 'whts_restricted_strikes'
+
+export function forceRestrictedRedirect() {
+  if (redirecting) return
+  redirecting = true
+
+  let strikes = Number(localStorage.getItem(STRIKES_KEY) || 0) + 1
+  localStorage.setItem(STRIKES_KEY, String(strikes))
+  localStorage.removeItem('whts_user')
+
+  if (strikes === 1) {
+    const from = encodeURIComponent(window.location.pathname)
+    window.location.href = `/signin?from=${from}`
+  } else if (strikes === 2) {
+    window.location.href = '/signup'
+  } else {
+    window.location.href = '/access-removed'
+  }
+}
+
+export function resetRestrictedStrikes() {
+  localStorage.removeItem(STRIKES_KEY)
+}
