@@ -21,6 +21,27 @@ export function AuthProvider({ children }) {
       .finally(() => setLoading(false))
   }, [])
 
+  // The browser's back/forward cache (bfcache) can restore an old page
+  // exactly as it was — frozen JS state and all — without re-running any
+  // of our code or hitting the server again. That's what let a restricted
+  // user's old dashboard reappear when they hit Back: nothing re-checked
+  // whether they were still allowed there. `pageshow` with
+  // `event.persisted === true` is the browser's own signal that a page was
+  // just restored this way (rather than freshly loaded), so this re-runs
+  // the same /auth/me check right then. If the account is restricted, the
+  // normal 403 → api.js's interceptor → forceRestrictedRedirect() chain
+  // kicks in immediately, same as any other blocked request.
+  useEffect(() => {
+    const handlePageShow = (event) => {
+      if (!event.persisted) return
+      const stored = localStorage.getItem('whts_user')
+      if (!stored) return
+      api.get('/auth/me').catch(() => {})
+    }
+    window.addEventListener('pageshow', handlePageShow)
+    return () => window.removeEventListener('pageshow', handlePageShow)
+  }, [])
+
   const login = (userData) => {
     // userData = { id, name, firstName, email, country, token }
     setUser(userData)
