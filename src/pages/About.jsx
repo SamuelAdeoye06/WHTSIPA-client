@@ -137,8 +137,7 @@ export default function About() {
           <div className="container">
             <div className="text-center mb-5">
               <div className="section-label mb-2">Our Partners</div>
-              <h2 className="fw-bold mb-2" style={{ color: '#0f172a' }}>Our Partners</h2>
-              <h3 className="fw-bold mb-2" style={{ color: '#0f172a' }}>Working Escalation to Authorities</h3>
+              <h2 className="fw-bold mb-2" style={{ color: '#0f172a' }}>Working Escalation to Authorities</h2>
               <p style={{ color: '#4a5568', maxWidth: '56ch', margin: '0 auto' }}>
                 WHTSIPA reviews valid reports and forwards them to the listed relevant U.S. and international agencies so those bodies can take any action they determine is needed, based on the reviewed results we send. We are not a government agency and do not act on behalf of any government. Our role is to receive information, recover losses and relevant details, investigate, assess the matter, and pass confirmed findings including IP-related information to the proper listed authorities for local prosecution and to support our aim of keeping the digital world coordinated.
               </p>
