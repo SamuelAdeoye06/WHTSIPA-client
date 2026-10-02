@@ -398,6 +398,14 @@
   min-width: 100%;
   max-height: 260px;
   overflow-y: auto;
+}
+/* The menu now renders via a portal onto document.body (see
+   StyledSelect.jsx) with inline position/top/left/min-width overriding the
+   rules above — this just keeps it safely above the sticky admin
+   sidebar/topbar (z-index up to 40), since it's no longer nested inside
+   whatever stacking context its trigger button sits in. */
+.styled-select-menu-portal {
+  z-index: 45;
   margin: 0;
   padding: 0.35rem;
   list-style: none;

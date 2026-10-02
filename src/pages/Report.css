@@ -48,16 +48,24 @@
 
 /* StyledSelect's dropdown menu/items — new UI with no native <option>
    equivalent to inherit from, so styled explicitly to match .cyber-select
-   option's dark tokens above. Menu is a later sibling of the button
-   within the same wrap, hence the sibling combinator. */
-.cyber-select ~ .styled-select-menu {
+   option's dark tokens above.
+   .cyber-select-menu / .is-light — passed via StyledSelect's menuClassName
+   prop. The menu is portaled onto document.body (see StyledSelect.jsx), so
+   it's no longer a DOM sibling of .cyber-select or a descendant of
+   .page-light — these plain classes are what actually target it now,
+   regardless of where in the DOM it renders. Report.jsx currently always
+   renders inside .page-light, so in practice only the .is-light rules
+   below are reachable today — the base (dark) rules are kept for if that
+   ever changes, same as the two-tier light/dark split that existed here
+   before. */
+.cyber-select-menu {
   background: #0a1628;
   border: 1px solid rgba(120, 214, 255, 0.22);
   box-shadow: 0 16px 48px rgba(0,0,0,0.45);
 }
-.cyber-select ~ .styled-select-menu .styled-select-item { color: #f0f4ff; }
-.cyber-select ~ .styled-select-menu .styled-select-item:hover { background: rgba(255,255,255,0.06); }
-.cyber-select ~ .styled-select-menu .styled-select-item.active { background: rgba(34,240,255,0.12); color: #22f0ff; }
+.cyber-select-menu .styled-select-item { color: #f0f4ff; }
+.cyber-select-menu .styled-select-item:hover { background: rgba(255,255,255,0.06); }
+.cyber-select-menu .styled-select-item.active { background: rgba(34,240,255,0.12); color: #22f0ff; }
 
 textarea.cyber-input { resize: vertical; min-height: 120px; }
 
@@ -88,14 +96,14 @@ textarea.cyber-input { resize: vertical; min-height: 120px; }
   background: #ffffff;
   color: #0f172a;
 }
-.page-light .cyber-select ~ .styled-select-menu {
+.cyber-select-menu.is-light {
   background: #ffffff;
   border-color: #cbd5e1;
   box-shadow: 0 16px 48px rgba(0,0,0,0.14);
 }
-.page-light .cyber-select ~ .styled-select-menu .styled-select-item { color: #0f172a; }
-.page-light .cyber-select ~ .styled-select-menu .styled-select-item:hover { background: #f1f5f9; }
-.page-light .cyber-select ~ .styled-select-menu .styled-select-item.active { background: #dbeafe; color: #1d4ed8; }
+.cyber-select-menu.is-light .styled-select-item { color: #0f172a; }
+.cyber-select-menu.is-light .styled-select-item:hover { background: #f1f5f9; }
+.cyber-select-menu.is-light .styled-select-item.active { background: #dbeafe; color: #1d4ed8; }
 
 /* ── Report type tabs ── */
 .report-type-tabs {

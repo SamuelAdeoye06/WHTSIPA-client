@@ -852,7 +852,7 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
             {isHire && (
               <div className="wm-field">
                 <label>Desired Engagement Duration</label>
-                <StyledSelect value={form.duration} onChange={e => setForm(f => ({ ...f, duration: e.target.value }))}>
+                <StyledSelect value={form.duration} onChange={e => setForm(f => ({ ...f, duration: e.target.value }))} menuClassName="wm-select-menu">
                   {['One-Time Assistance (single incident)', '7 Days', '30 Days', '90 Days', 'Ongoing / Retainer', 'Other (specify)'].map(o => <option key={o}>{o}</option>)}
                 </StyledSelect>
               </div>

@@ -1540,6 +1540,7 @@ export default function Report() {
                           <StyledSelect
                             name="financialLossCurrency"
                             className="form-select cyber-select"
+                            menuClassName="cyber-select-menu is-light"
                             style={{ maxWidth: '120px' }}
                             buttonStyle={{
                               fontSize: '0.82rem',
@@ -1582,6 +1583,7 @@ export default function Report() {
                           id="personal-authorities"
                           name="contactedAuthorities"
                           className="form-select cyber-select"
+                          menuClassName="cyber-select-menu is-light"
                           value={personalFormik.values.contactedAuthorities}
                           onChange={personalFormik.handleChange}
                           onBlur={personalFormik.handleBlur}
@@ -1883,6 +1885,7 @@ export default function Report() {
                           id="public-incidentStatus"
                           name="incidentStatus"
                           className={`form-select cyber-select ${publicFormik.touched.incidentStatus && publicFormik.errors.incidentStatus ? 'is-invalid' : ''}`}
+                          menuClassName="cyber-select-menu is-light"
                           value={publicFormik.values.incidentStatus}
                           onChange={publicFormik.handleChange}
                           onBlur={publicFormik.handleBlur}
