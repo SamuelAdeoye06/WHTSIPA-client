@@ -125,6 +125,10 @@ export default function AdminCountries() {
       list = list.filter(c => c.showInDropdown)
     } else if (statusFilter === 'dropdown-hidden') {
       list = list.filter(c => !c.showInDropdown)
+    } else if (statusFilter === 'page-access-allowed') {
+      list = list.filter(c => c.pageAccessAllowed)
+    } else if (statusFilter === 'page-access-blocked') {
+      list = list.filter(c => !c.pageAccessAllowed)
     }
 
     // 4. Sorting
@@ -151,13 +155,14 @@ export default function AdminCountries() {
     const total = countries.length
     const signupCount = countries.filter(c => c.signupAllowed).length
     const dropdownCount = countries.filter(c => c.showInDropdown).length
+    const pageAccessCount = countries.filter(c => c.pageAccessAllowed).length
 
     const regionCounts = {}
     REGIONS.forEach(r => {
       regionCounts[r] = countries.filter(c => c.region === r).length
     })
 
-    return { total, signupCount, dropdownCount, regionCounts }
+    return { total, signupCount, dropdownCount, pageAccessCount, regionCounts }
   }, [countries])
 
   return (
@@ -165,7 +170,7 @@ export default function AdminCountries() {
       <div className="admin-page-header">
         <h1 className="admin-page-title">Country &amp; Region Access</h1>
         <p className="admin-page-sub">
-          Manage user signup permissions and country/dial-code visibility by continent, region, or status.
+          Manage user signup permissions, country/dial-code visibility, and full site access by continent, region, or status.
         </p>
       </div>
 
@@ -220,6 +225,8 @@ export default function AdminCountries() {
             <option value="signup-blocked">Signup Blocked ({stats.total - stats.signupCount})</option>
             <option value="dropdown-visible">In Dropdowns ({stats.dropdownCount})</option>
             <option value="dropdown-hidden">Hidden from Dropdowns ({stats.total - stats.dropdownCount})</option>
+            <option value="page-access-allowed">Page Access Allowed ({stats.pageAccessCount})</option>
+            <option value="page-access-blocked">Page Access Blocked ({stats.total - stats.pageAccessCount})</option>
           </StyledSelect>
 
           {/* Sort Filter */}
@@ -302,6 +309,24 @@ export default function AdminCountries() {
               >
                 <i className="bi bi-eye-slash text-secondary"></i> Hide All
               </button>
+              <button
+                type="button"
+                className="admin-btn admin-btn-ghost admin-btn-sm"
+                disabled={bulkUpdating || filtered.length === 0}
+                onClick={() => requestBulkAction('pageAccessAllowed', true)}
+                title="Allow full site access for all countries currently in view"
+              >
+                <i className="bi bi-unlock text-success"></i> Allow Page Access
+              </button>
+              <button
+                type="button"
+                className="admin-btn admin-btn-ghost admin-btn-sm"
+                disabled={bulkUpdating || filtered.length === 0}
+                onClick={() => requestBulkAction('pageAccessAllowed', false)}
+                title="Block the whole site from loading for all countries currently in view"
+              >
+                <i className="bi bi-lock text-danger"></i> Block Page Access
+              </button>
             </div>
           </div>
         )}
@@ -334,6 +359,7 @@ export default function AdminCountries() {
                     <th>Dial Code</th>
                     <th style={{ textAlign: 'center' }}>Allow Sign Up</th>
                     <th style={{ textAlign: 'center' }}>Show in Dropdowns</th>
+                    <th style={{ textAlign: 'center' }}>Page Access</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -384,6 +410,20 @@ export default function AdminCountries() {
                             {c.showInDropdown ? 'Visible' : 'Hidden'}
                           </div>
                         </td>
+                        <td style={{ textAlign: 'center' }}>
+                          <label className="admin-switch" title={`Toggle whole-site access for ${c.name}`}>
+                            <input
+                              type="checkbox"
+                              checked={Boolean(c.pageAccessAllowed)}
+                              disabled={isBusy}
+                              onChange={() => handleToggle(c.code, 'pageAccessAllowed', c.pageAccessAllowed)}
+                            />
+                            <span className="admin-switch-slider"></span>
+                          </label>
+                          <div style={{ fontSize: '0.72rem', marginTop: '0.2rem', color: c.pageAccessAllowed ? '#15803d' : '#dc2626', fontWeight: 600 }}>
+                            {c.pageAccessAllowed ? 'Allowed' : 'Blocked'}
+                          </div>
+                        </td>
                       </tr>
                     )
                   })}
@@ -415,7 +455,7 @@ export default function AdminCountries() {
                       </div>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.65rem', background: '#f8fafc', padding: '0.75rem', borderRadius: '8px', marginTop: '0.5rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.65rem', background: '#f8fafc', padding: '0.75rem', borderRadius: '8px', marginTop: '0.5rem' }}>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                         <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>
                           Sign Up
@@ -455,6 +495,26 @@ export default function AdminCountries() {
                           </span>
                         </div>
                       </div>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>
+                          Page Access
+                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <label className="admin-switch">
+                            <input
+                              type="checkbox"
+                              checked={Boolean(c.pageAccessAllowed)}
+                              disabled={isBusy}
+                              onChange={() => handleToggle(c.code, 'pageAccessAllowed', c.pageAccessAllowed)}
+                            />
+                            <span className="admin-switch-slider"></span>
+                          </label>
+                          <span style={{ fontSize: '0.8rem', fontWeight: 600, color: c.pageAccessAllowed ? '#15803d' : '#dc2626' }}>
+                            {c.pageAccessAllowed ? 'Allowed' : 'Blocked'}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )
@@ -467,7 +527,15 @@ export default function AdminCountries() {
       <ConfirmDialog
         open={!!pendingBulkAction}
         title="Apply bulk change?"
-        message={pendingBulkAction ? `Set "${pendingBulkAction.field === 'signupAllowed' ? 'Allow Sign Up' : 'Show in Dropdowns'}" to ${pendingBulkAction.value ? 'ALLOWED / VISIBLE' : 'BLOCKED / HIDDEN'} for all ${pendingBulkAction.targets.length} currently filtered countries?` : ''}
+        message={pendingBulkAction ? `Set "${
+          pendingBulkAction.field === 'signupAllowed' ? 'Allow Sign Up' :
+          pendingBulkAction.field === 'showInDropdown' ? 'Show in Dropdowns' :
+          'Page Access'
+        }" to ${pendingBulkAction.value ? 'ALLOWED / VISIBLE' : 'BLOCKED / HIDDEN'} for all ${pendingBulkAction.targets.length} currently filtered countries?${
+          pendingBulkAction.field === 'pageAccessAllowed' && !pendingBulkAction.value
+            ? ' This will stop the entire site from loading for visitors in these countries, not just signup.'
+            : ''
+        }` : ''}
         confirmLabel="Apply"
         loading={bulkUpdating}
         onCancel={() => setPendingBulkAction(null)}
