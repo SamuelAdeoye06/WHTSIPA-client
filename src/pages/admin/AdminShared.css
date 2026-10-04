@@ -405,7 +405,18 @@
    sidebar/topbar (z-index up to 40), since it's no longer nested inside
    whatever stacking context its trigger button sits in. */
 .styled-select-menu-portal {
-  z-index: 45;
+  /* Was 45 — far too low. The rest of this codebase's other floating
+     menus (the phone-country-code dropdowns in Report.css/Auth.css/
+     Navbar.css/WhatsipModal.css) already use z-index 9999-10000, for
+     exactly this reason: a modal like the Book-a-Call form's backdrop
+     sits at z-index 1200, so anything meant to float above page content
+     in general — including inside a modal — needs to clear that, or it
+     renders invisibly underneath it instead of merely looking clipped.
+     That's what made the booking form's "Select time" dropdown appear to
+     do nothing at all when clicked: it WAS opening, just hidden behind
+     the modal. Matching the site's existing convention here rather than
+     inventing a new number. */
+  z-index: 10001;
   margin: 0;
   padding: 0.35rem;
   list-style: none;
