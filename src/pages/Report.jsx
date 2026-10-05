@@ -10,6 +10,7 @@ import StyledSelect from '../components/StyledSelect'
 import api from '../services/api'
 import { uploadEvidenceFiles } from '../utils/uploadFiles'
 import { openLiveChat, onAgentJoined } from '../utils/tidio'
+import { sanitizePhoneDigits, PHONE_DIGITS_MAX_LENGTH } from '../utils/phoneFormat'
 import { genTicketId } from '../utils/ticketId'
 import { getCountryFlag, getCountrySearchPlaceholder } from '../utils/countryUtils'
 import { useCountries } from '../context/CountriesContext'
@@ -301,10 +302,12 @@ function PhoneCountryField({ formik, fieldName, phoneCodeFieldName, phoneDialFie
           id={fieldName}
           name={fieldName}
           type="tel"
+          inputMode="numeric"
+          maxLength={PHONE_DIGITS_MAX_LENGTH}
           className={`form-control cyber-input ${formik.touched[fieldName] && formik.errors[fieldName] ? 'is-invalid' : ''}`}
           placeholder="Phone number digits"
           value={formik.values[fieldName]}
-          onChange={formik.handleChange}
+          onChange={e => formik.setFieldValue(fieldName, sanitizePhoneDigits(e.target.value))}
           onBlur={formik.handleBlur}
         />
 
@@ -766,7 +769,7 @@ export default function Report() {
     validationSchema: Yup.object({
       fullName: Yup.string(),
       email: Yup.string().email('Invalid email address'),
-      phone: Yup.string().required('Phone Number is required'),
+      phone: Yup.string().required('Phone Number is required').max(PHONE_DIGITS_MAX_LENGTH, 'Phone number is too long'),
       country: Yup.string().required('Country of Residence is required'),
       communicationMethod: Yup.string().required('Preferred Communication Method is required'),
       communicationValue: Yup.string().test(
@@ -833,7 +836,7 @@ export default function Report() {
     validationSchema: Yup.object({
       fullName: Yup.string(),
       email: Yup.string().email('Invalid email address'),
-      phone: Yup.string().required('Phone Number is required'),
+      phone: Yup.string().required('Phone Number is required').max(PHONE_DIGITS_MAX_LENGTH, 'Phone number is too long'),
       country: Yup.string().required('Country is required'),
       organization: Yup.string(),
       communicationMethod: Yup.string(),
@@ -1361,6 +1364,7 @@ export default function Report() {
                               id="personal-commVal-phone"
                               name="communicationValue"
                               type="tel"
+                              maxLength={20}
                               placeholder="+1 234 567 8900"
                               className={`form-control cyber-input ${personalFormik.touched.communicationValue && personalFormik.errors.communicationValue ? 'is-invalid' : ''}`}
                               value={personalFormik.values.communicationValue}
@@ -1382,6 +1386,7 @@ export default function Report() {
                               id="personal-commVal-sms"
                               name="communicationValue"
                               type="tel"
+                              maxLength={20}
                               placeholder="+1 234 567 8900"
                               className={`form-control cyber-input ${personalFormik.touched.communicationValue && personalFormik.errors.communicationValue ? 'is-invalid' : ''}`}
                               value={personalFormik.values.communicationValue}
@@ -1800,6 +1805,7 @@ export default function Report() {
                               id="public-commVal-sms"
                               name="communicationValue"
                               type="tel"
+                              maxLength={20}
                               placeholder="+1 234 567 8900"
                               className="form-control cyber-input"
                               value={publicFormik.values.communicationValue}

@@ -7,6 +7,7 @@ import api from '../services/api'
 import { getCountryFlag, getCountrySearchPlaceholder } from '../utils/countryUtils'
 import { useCountries } from '../context/CountriesContext'
 import StyledSelect from '../components/StyledSelect'
+import { sanitizePhoneDigits, PHONE_DIGITS_MAX_LENGTH } from '../utils/phoneFormat'
 
 /* ─────────────────────────────────────────────
    Fallback shown while the backend number loads.
@@ -248,10 +249,12 @@ function BookingPhoneField({ countryCode, setCountryCode, dialCode, setDialCode,
         <input
           id="bc-phone"
           type="tel"
+          inputMode="numeric"
+          maxLength={PHONE_DIGITS_MAX_LENGTH}
           className={`bc-input bc-input-phone ${error ? 'bc-input-err' : ''}`}
           placeholder="Phone number digits"
           value={digits}
-          onChange={e => setDigits(e.target.value)}
+          onChange={e => setDigits(sanitizePhoneDigits(e.target.value))}
         />
 
         {/* Floating Dropdown Overlay */}

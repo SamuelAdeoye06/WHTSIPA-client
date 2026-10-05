@@ -20,7 +20,7 @@ import { getCountryFlag, getCountrySearchPlaceholder } from '../utils/countryUti
 import { useCountries } from '../context/CountriesContext'
 import { useToast } from '../context/ToastContext'
 import { MAX_FILES, ACCEPT_ATTR, LIMIT_HINT } from '../utils/uploadLimits'
-import { formatPhoneDisplay } from '../utils/phoneFormat'
+import { formatPhoneDisplay, sanitizePhoneDigits, PHONE_DIGITS_MAX_LENGTH } from '../utils/phoneFormat'
 
 /* ── IP → country detection ── */
 async function detectCountry() {
@@ -916,10 +916,12 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
                       {/* Editable digits only */}
                       <input
                         type="tel"
+                        inputMode="numeric"
+                        maxLength={PHONE_DIGITS_MAX_LENGTH}
                         className="wm-phone-digits"
                         placeholder="Phone number digits"
                         value={form.phoneDigits}
-                        onChange={e => setForm(f => ({ ...f, phoneDigits: e.target.value }))}
+                        onChange={e => setForm(f => ({ ...f, phoneDigits: sanitizePhoneDigits(e.target.value) }))}
                         required
                       />
 

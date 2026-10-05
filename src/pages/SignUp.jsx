@@ -8,6 +8,7 @@ import logoWhts from '../assets/media/logo-whts.jpg'
 import { getCountryFlag, getCountrySearchPlaceholder } from '../utils/countryUtils'
 import { useCountries } from '../context/CountriesContext'
 import CountrySelectField from '../components/CountrySelectField'
+import { sanitizePhoneDigits, PHONE_DIGITS_MAX_LENGTH } from '../utils/phoneFormat'
 
 
 const getFriendlyCode = (code) => {
@@ -68,7 +69,7 @@ function SignUpPhoneField({ form, setForm, errors, setErrors, handleBlur }) {
   const fullDial = form.phoneDialCode || selectedCountry?.dial || '+1'
 
   const handleDigitsChange = (e) => {
-    const digits = e.target.value
+    const digits = sanitizePhoneDigits(e.target.value)
     setForm(p => ({
       ...p,
       phoneDigits: digits,
@@ -106,6 +107,8 @@ function SignUpPhoneField({ form, setForm, errors, setErrors, handleBlur }) {
           id="phone"
           name="phoneDigits"
           type="tel"
+          inputMode="numeric"
+          maxLength={PHONE_DIGITS_MAX_LENGTH}
           className={`form-control cyber-input auth-phone-fix ${errors.phone ? 'is-invalid' : ''}`}
           placeholder="Phone number digits"
           value={form.phoneDigits || ''}
@@ -254,6 +257,7 @@ export default function SignUp() {
       case 'phone':
         const phoneVal = (form.phoneDigits || form.phone).trim()
         if (!phoneVal) return 'Phone number is required.'
+        if (phoneVal.length < 4) return 'Enter a valid phone number.'
         return ''
 
       case 'password':
