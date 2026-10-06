@@ -96,7 +96,18 @@ export default function StyledSelect({
     const rect = btnRef.current.getBoundingClientRect()
     setMenuPos({ top: rect.bottom + 6, left: rect.left, width: rect.width })
 
-    const closeOnScroll = () => setOpen(false)
+    // Bug fixed here: this used to close on ANY scroll with no target
+    // check, which also fired for scrolling the menu's own internal list
+    // (max-height + overflow-y: auto) — so trying to scroll down to see
+    // more options in a long list (e.g. the booking form's time slots)
+    // instantly closed the dropdown instead of scrolling it. Only close
+    // when the scroll happened outside the menu itself — i.e. the page/
+    // modal behind it moved, which really does mean the button's position
+    // is now stale and the menu should close.
+    const closeOnScroll = (e) => {
+      if (menuRef.current && menuRef.current.contains(e.target)) return
+      setOpen(false)
+    }
     window.addEventListener('scroll', closeOnScroll, true)
     window.addEventListener('resize', closeOnScroll)
     return () => {

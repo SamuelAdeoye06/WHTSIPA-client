@@ -9,6 +9,24 @@ import { useCountries } from '../context/CountriesContext'
 import StyledSelect from '../components/StyledSelect'
 import { sanitizePhoneDigits, PHONE_DIGITS_MAX_LENGTH } from '../utils/phoneFormat'
 
+// Custom "Other" time input, filtered live as the user types. Per client:
+// a number then AM/PM, nothing more, nothing less — so only digits, a
+// colon, a space, and the letters A/P/M survive; everything else
+// (including whole words like "early morning", which this was previously
+// allowing via a free-text placeholder) is stripped on the spot rather
+// than just rejected at submit time.
+function sanitizeCustomTime(value) {
+  return value
+    .replace(/[^0-9:apmAPM\s]/g, '')
+    .replace(/[apm]/gi, c => c.toUpperCase())
+    .slice(0, 8)
+}
+
+// e.g. "6:30 PM", "11 AM", "6PM" — digits (1-2), optional :minutes,
+// optional space, then AM or PM. Used at submit time so a half-typed or
+// malformed value (just "6" or just "PM") can't slip through.
+const CUSTOM_TIME_PATTERN = /^\d{1,2}(:\d{2})?\s?(AM|PM)$/
+
 /* ─────────────────────────────────────────────
    Fallback shown while the backend number loads.
    The real number is fetched from /api/booking/callback-number
@@ -400,8 +418,10 @@ function BookCallModal({ onClose }) {
     }
 
     if (!form.preferredDate)        e.preferredDate = 'Please select a preferred date'
-    if (!form.preferredTime && !form.preferredTimeCustom)
-                              e.preferredTime = 'Please select or enter a preferred time'
+    if (!form.preferredTime)
+      e.preferredTime = 'Please select a preferred time'
+    else if (form.preferredTime === 'other' && !CUSTOM_TIME_PATTERN.test(form.preferredTimeCustom.trim()))
+      e.preferredTime = 'Enter a time like "6:30 PM"'
     if (notesWordCount < 25)    e.notes = 'Please provide at least 25 words in the Additional Notes field'
     if (!form.consentPrivacy)   e.consentPrivacy = 'You must agree to the Privacy Policy and Terms'
     return e
@@ -532,9 +552,10 @@ function BookCallModal({ onClose }) {
               {form.preferredTime === 'other' && (
                 <input
                   className={`bc-input mt-2 ${errors.preferredTime ? 'bc-input-err' : ''}`}
-                  placeholder="e.g. 6:30 PM, early morning, flexible…"
+                  placeholder="e.g. 6:30 PM"
+                  maxLength={8}
                   value={form.preferredTimeCustom}
-                  onChange={e => setForm(p => ({ ...p, preferredTimeCustom: e.target.value }))}
+                  onChange={e => setForm(p => ({ ...p, preferredTimeCustom: sanitizeCustomTime(e.target.value) }))}
                 />
               )}
             </F>
