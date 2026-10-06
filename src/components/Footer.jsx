@@ -34,7 +34,7 @@ export default function Footer() {
             <div className="mb-3">
               <img
                 src={logoWhts}
-                alt="The Watch Eyes - WHTS"
+                alt="The Watch Eyes - WHTSIPA"
                 style={{ height: '80px', width: 'auto', borderRadius: '10px', mixBlendMode: 'lighten' }}
               />
             </div>
@@ -184,7 +184,7 @@ export default function Footer() {
         <div className="footer-bottom-bar">
           <div className="footer-bottom-inner">
             <div className="footer-bottom-copy">
-              © {year} WHTS · America Cyber Security World. All rights reserved.
+              © {year} WHTSIPA · America Cyber Security World. All rights reserved.
             </div>
             <div className="footer-bottom-links">
               <button className="footer-link-btn small" onClick={() => navigate('/contact')}>Contact</button>

@@ -740,7 +740,7 @@ export default function EssentialEight() {
       <section className="section-pad" style={{ background: '#f8fafc' }}>
         <div className="container">
           <div className="about-cta-banner p-4 p-md-5 text-center">
-            <div className="section-label mb-3">WHTS Tools</div>
+            <div className="section-label mb-3">WHTSIPA Tools</div>
             <h2 className="fw-bold mb-3" style={{ color: '#0f172a' }}>Get the Right Tools</h2>
             <p className="mb-4 mx-auto" style={{ maxWidth: '52ch', color: '#4a5568' }}>
               WHTSIPA provides tools aligned with every Essential Eight strategy —

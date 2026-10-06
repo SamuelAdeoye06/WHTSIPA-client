@@ -391,8 +391,8 @@ export default function Navbar() {
       <nav className={`navbar navbar-expand-lg cyber-navbar ${isDarkPage ? 'navbar-dark' : 'navbar-light navbar-white'}`}>
         <div className="container nav-inner">
 
-          <Link className="navbar-brand" to="/" aria-label="WHTS home">
-            <img src={isDarkPage ? logoWhtsDark : logoWhts} alt="The Watch Eyes - WHTS" className="brand-logo" />
+          <Link className="navbar-brand" to="/" aria-label="WHTSIPA home">
+            <img src={isDarkPage ? logoWhtsDark : logoWhts} alt="The Watch Eyes - WHTSIPA" className="brand-logo" />
           </Link>
 
           <div className="nav-top-actions">

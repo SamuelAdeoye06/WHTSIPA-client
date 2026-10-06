@@ -18,7 +18,7 @@ import agencyDescIrs from '../assets/media/agency-desc-irs.jpeg'
 const TIMELINE = [
   { year: '2018', title: 'WHTSIPA Founded', desc: 'The Watch Eyes organisation was established to track and expose cybercriminals targeting individuals and businesses.' },
   { year: '2019', title: 'ACSW Partnership', desc: 'America Cyber Security World formally partnered with WHTSIPA, expanding reach across federal and international frameworks.' },
-  { year: '2021', title: 'IC3 Integration', desc: 'Reports submitted through WHTS became eligible for escalation to the FBI\'s Internet Crime Complaint Center.' },
+  { year: '2021', title: 'IC3 Integration', desc: 'Reports submitted through WHTSIPA became eligible for escalation to the FBI\'s Internet Crime Complaint Center.' },
   { year: '2022', title: 'Research Published', desc: 'WHTSIPA published landmark research on ransomware impact, referenced by multiple government cybersecurity agencies.' },
   { year: '2024', title: 'Platform Launched', desc: 'The public-facing intelligence platform launched — giving individuals direct access to threat education and incident reporting.' },
   { year: '2026', title: 'Global Expansion', desc: 'Operations expanded to support victims across 40+ countries with multilingual reporting and recovery guidance.' },

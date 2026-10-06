@@ -123,7 +123,7 @@ export default function SignIn() {
 
           {/* Logo */}
           <Link to="/" className="auth-panel-logo">
-            <img src={logoWhts} alt="WHTS" />
+            <img src={logoWhts} alt="WHTSIPA" />
           </Link>
 
           {/* Headline */}

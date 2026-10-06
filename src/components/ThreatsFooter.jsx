@@ -28,7 +28,7 @@ export default function ThreatsFooter() {
         <div className="footer-bottom-bar">
           <div className="footer-bottom-inner">
             <div className="footer-bottom-copy">
-              © {year} WHTS · America Cyber Security World. All rights reserved.
+              © {year} WHTSIPA · America Cyber Security World. All rights reserved.
             </div>
           </div>
         </div>

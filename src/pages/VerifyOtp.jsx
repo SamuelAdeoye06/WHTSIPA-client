@@ -121,7 +121,7 @@ export default function VerifyOtp() {
         <div className="cyber-grid" aria-hidden="true" />
         <div className="auth-panel-left-inner">
           <Link to="/" className="auth-panel-logo">
-            <img src={logoWhts} alt="WHTS" />
+            <img src={logoWhts} alt="WHTSIPA" />
           </Link>
           <div className="auth-panel-headline">
             <h2>Almost there,</h2>

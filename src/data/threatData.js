@@ -21,7 +21,7 @@ export const THREAT_DATA = {
       { title: 'Inspect links safely', desc: 'Hover to preview destinations and avoid shortened URLs. Use a link scanner before clicking.' },
       { title: 'Authenticate email', desc: 'Check SPF, DKIM, and DMARC posture with your organization to filter spoofed senders.' },
       { title: 'Enable MFA everywhere', desc: 'Even if credentials are stolen, MFA prevents attackers from accessing your accounts.' },
-      { title: 'Report suspicious emails', desc: 'Forward phishing attempts to your IT team and to WHTS for investigation and pattern tracking.' },
+      { title: 'Report suspicious emails', desc: 'Forward phishing attempts to your IT team and to WHTSIPA for investigation and pattern tracking.' },
       { title: 'Use email filtering tools', desc: 'Deploy AI-powered email filtering tools to automatically detect and quarantine phishing attempts.' },
     ],
     indicators: [
@@ -207,7 +207,7 @@ export const THREAT_DATA = {
     steal credentials, and perform man-in-the-middle attacks. Evil twin hotspots — fake networks
     mimicking legitimate ones — are used in airports, hotels, and cafes to silently capture all
     data passing through connected devices.`,
-    solutions: `WHTS provides network security assessment tools and VPN configuration guidance to protect
+    solutions: `WHTSIPA provides network security assessment tools and VPN configuration guidance to protect
     your connections on any network type. Our tools identify rogue access points and alert you
     to suspicious network behavior in real time.`,
     prevention: [
@@ -337,7 +337,7 @@ export const THREAT_DATA = {
     and personal data. From SIM swapping to malicious apps installed via phishing links, mobile
     devices are the most targeted endpoints in modern cybercrime. Once compromised, an attacker
     can silently monitor everything on your device in real time.`,
-    solutions: `WHTS provides Mobile Threat Detection tools, SIM swap alerts, and device security
+    solutions: `WHTSIPA provides Mobile Threat Detection tools, SIM swap alerts, and device security
     audits to protect your phone from unauthorized access and monitoring.`,
     prevention: [
       { title: 'Enable SIM swap protection', desc: 'Contact your carrier and add a PIN or passphrase required before any SIM changes are authorized.' },
@@ -369,7 +369,7 @@ export const THREAT_DATA = {
     and tech support to extract credentials, OTPs, and payments. Caller ID spoofing makes these
     calls appear to come from legitimate numbers, making them highly convincing. Billions are lost
     annually to call scams targeting individuals and businesses.`,
-    solutions: `WHTS provides call scam reporting tools, caller verification guidance, and
+    solutions: `WHTSIPA provides call scam reporting tools, caller verification guidance, and
     real-time scam number databases to help you identify and report fraudulent callers.`,
     prevention: [
       { title: 'Never give OTPs over the phone', desc: 'Legitimate banks and agencies never ask for one-time passwords, PINs, or passwords over the phone — ever.' },
@@ -377,7 +377,7 @@ export const THREAT_DATA = {
       { title: 'Understand caller ID spoofing', desc: 'The number displayed on your screen can be faked. A call appearing from your bank\'s number does not mean it is your bank.' },
       { title: 'Register on do-not-call lists', desc: 'Register your number on official do-not-call registries to reduce unsolicited calls from scammers.' },
       { title: 'Use call filtering apps', desc: 'Enable your phone\'s built-in spam call filtering or install call-screening apps that flag known scam numbers.' },
-      { title: 'Report scam numbers to WHTS', desc: 'Report the number and details to WHTS immediately so it can be flagged in our scam number database.' },
+      { title: 'Report scam numbers to WHTS', desc: 'Report the number and details to WHTSIPA immediately so it can be flagged in our scam number database.' },
     ],
     indicators: [
       'Caller creates extreme urgency — "act now or face consequences"',
@@ -401,7 +401,7 @@ export const THREAT_DATA = {
     NINs, and personal data under the guise of processing a refund. These scams peak around
     tax season but run year-round, using emails, SMS, and fake websites that mirror official
     government portals pixel-for-pixel to deceive victims.`,
-    solutions: `WHTS provides guidance on verifying tax communications and reporting
+    solutions: `WHTSIPA provides guidance on verifying tax communications and reporting
     government impersonation scams to the appropriate authorities.`,
     prevention: [
       { title: 'Always use the official portal', desc: 'Access your tax account directly through the official government website — never through links in messages.' },
@@ -409,7 +409,7 @@ export const THREAT_DATA = {
       { title: 'Never pay via gift cards or crypto', desc: 'No government tax agency accepts payment via gift cards, wire transfer to personal accounts, or cryptocurrency.' },
       { title: 'Protect your government ID', desc: 'Your national identification number is the master key to your tax identity — never share it in response to unsolicited contact.' },
       { title: 'File taxes early', desc: 'Filing your tax return early reduces the window for fraudsters to file a fake return in your name and claim your refund.' },
-      { title: 'Report to authorities', desc: 'Report tax scam attempts to the IRS, HMRC, or your national tax authority and to WHTS immediately.' },
+      { title: 'Report to authorities', desc: 'Report tax scam attempts to the IRS, HMRC, or your national tax authority and to WHTSIPA immediately.' },
     ],
     indicators: [
       'Unexpected refund notification via SMS, email, or WhatsApp',
@@ -428,12 +428,12 @@ export const THREAT_DATA = {
     riskLabel: 'HIGH RISK',
     category: 'Social Engineering',
     tagline: 'Verify before you trust — and never send money',
-    safeHandling: 'Stop all contact, preserve all evidence, and report to WHTS and the platform immediately.',
+    safeHandling: 'Stop all contact, preserve all evidence, and report to WHTSIPA and the platform immediately.',
     overview: `Romance scammers build fabricated emotional relationships online over weeks or months
     before exploiting the victim financially. They use stolen photos, scripted conversations, and
     manufactured emergencies to extract money, gift cards, or cryptocurrency. Victims lose not just
     money but suffer significant emotional and psychological harm.`,
-    solutions: `WHTS provides romance scam detection guidance, reverse image search tools, and
+    solutions: `WHTSIPA provides romance scam detection guidance, reverse image search tools, and
     reporting pathways to help victims stop the abuse and begin recovery.`,
     prevention: [
       { title: 'Reverse image search every profile', desc: 'Before investing emotionally, run their profile photos through reverse image search — stolen photos from models are common.' },
@@ -441,7 +441,7 @@ export const THREAT_DATA = {
       { title: 'Never send money to online contacts', desc: 'No matter how real the relationship feels, never send money, gift cards, or crypto to someone you haven\'t met in person.' },
       { title: 'Be cautious of fast emotional escalation', desc: 'Scammers accelerate emotional intimacy deliberately to create trust before the ask. Real relationships develop over time.' },
       { title: 'Talk to someone you trust', desc: 'If a friend or family member expresses concern about someone you\'ve met online, take that seriously — outsiders spot red flags faster.' },
-      { title: 'Report and stop contact immediately', desc: 'Once you suspect a romance scam, stop all contact, document everything, and report to WHTS and the platform.' },
+      { title: 'Report and stop contact immediately', desc: 'Once you suspect a romance scam, stop all contact, document everything, and report to WHTSIPA and the platform.' },
     ],
     indicators: [
       'Claims to be overseas — military, oil rig, medical mission',
@@ -460,12 +460,12 @@ export const THREAT_DATA = {
     riskLabel: 'MED RISK',
     category: 'Recruitment Fraud',
     tagline: 'Legitimate employers never charge you to work',
-    safeHandling: 'Stop all contact, do not send money or documents, and report to WHTS and relevant job platforms.',
+    safeHandling: 'Stop all contact, do not send money or documents, and report to WHTSIPA and relevant job platforms.',
     overview: `Fake job offers target job seekers with promises of high-paying remote work to steal
     personal documents, charge fees, or launder money through victim accounts. These scams are
     increasingly sophisticated — using fake company websites, professional email signatures, and
     fabricated offer letters to appear legitimate before the trap is sprung.`,
-    solutions: `WHTS provides job scam verification tools and reporting pathways to protect
+    solutions: `WHTSIPA provides job scam verification tools and reporting pathways to protect
     job seekers and help dismantle fraudulent recruitment operations.`,
     prevention: [
       { title: 'Verify the company independently', desc: 'Search the company name plus "scam" or "reviews", check their official website, and verify the recruiter on LinkedIn.' },
@@ -497,7 +497,7 @@ export const THREAT_DATA = {
     or online activity using stalkerware, spyware, or social engineering. Perpetrators may be
     ex-partners, obsessive online contacts, or threat actors. Victims are often unaware they are
     being monitored, making early detection and safe exit planning critical.`,
-    solutions: `WHTS provides stalkerware detection guidance, safe device audit procedures, and
+    solutions: `WHTSIPA provides stalkerware detection guidance, safe device audit procedures, and
     reporting pathways coordinated with law enforcement for digital stalking cases.`,
     prevention: [
       { title: 'Audit your installed apps', desc: 'Regularly review all installed apps — look for anything you didn\'t install, especially apps with broad permissions.' },
@@ -505,7 +505,7 @@ export const THREAT_DATA = {
       { title: 'Limit real-time social media check-ins', desc: 'Avoid posting your real-time location or predictable daily routine on any social media platform.' },
       { title: 'Use a separate safe device if concerned', desc: 'If you suspect your device is compromised, use a separate clean device for sensitive communications until it is confirmed safe.' },
       { title: 'Document all incidents', desc: 'Screenshot messages, note dates and times, and preserve all evidence before blocking — it is critical for legal action.' },
-      { title: 'Contact WHTS and authorities', desc: 'Stalking cases require coordinated support. Contact WHTS for technical analysis and law enforcement for your physical safety.' },
+      { title: 'Contact WHTSIPA and authorities', desc: 'Stalking cases require coordinated support. Contact WHTSIPA for technical analysis and law enforcement for your physical safety.' },
     ],
     indicators: [
       'Someone consistently knows your location or schedule without being told',
@@ -529,7 +529,7 @@ export const THREAT_DATA = {
     approving unlimited token access — emptying entire wallets in seconds. Fake airdrop sites,
     cloned DeFi platforms, and compromised NFT project links are the most common delivery vectors.
     Once approval is granted, the drain is instant and typically irreversible.`,
-    solutions: `WHTS provides crypto scam detection tools, wallet audit guidance, and blockchain
+    solutions: `WHTSIPA provides crypto scam detection tools, wallet audit guidance, and blockchain
     forensic reporting to help track stolen assets and prevent further losses.`,
     prevention: [
       { title: 'Always verify the URL', desc: 'Before connecting your wallet, triple-check the URL — one wrong character leads to a drainer. Bookmark official sites.' },
@@ -556,19 +556,19 @@ export const THREAT_DATA = {
     riskLabel: 'MED RISK',
     category: 'Identity Impersonation',
     tagline: 'Verify before you connect — appearances are easily faked',
-    safeHandling: 'Do not engage further — report the profile to the platform and to WHTS immediately.',
+    safeHandling: 'Do not engage further — report the profile to the platform and to WHTSIPA immediately.',
     overview: `Fake and cloned social media profiles impersonate real people or brands to scam
     followers, spread misinformation, and conduct targeted fraud. Attackers copy profile photos,
     bios, and posts to create convincing duplicates — then contact the victim\'s connections
     pretending to be them to request money or sensitive information.`,
-    solutions: `WHTS provides profile verification guidance, reporting tools, and impersonation
+    solutions: `WHTSIPA provides profile verification guidance, reporting tools, and impersonation
     case management to help victims get fake profiles removed and prevent further harm.`,
     prevention: [
       { title: 'Reverse image search profile photos', desc: 'Run every suspicious profile photo through Google reverse image search to check if it belongs to someone else.' },
       { title: 'Verify through a second channel', desc: 'If someone you know contacts you from an unfamiliar account, call or message them on a known number to confirm.' },
       { title: 'Check account creation date and history', desc: 'Fake profiles are often newly created with few posts. Check the account age and content consistency.' },
       { title: 'Enable profile lock features', desc: 'On platforms that offer it, lock your profile so your photos and posts cannot be easily copied by impersonators.' },
-      { title: 'Report impersonation immediately', desc: 'Report fake profiles to the platform and to WHTS — fast reporting increases the chance of takedown.' },
+      { title: 'Report impersonation immediately', desc: 'Report fake profiles to the platform and to WHTSIPA — fast reporting increases the chance of takedown.' },
       { title: 'Never send money based on a DM alone', desc: 'Even if a message appears to come from a known contact, verify by phone before sending any money or sensitive information.' },
     ],
     indicators: [
@@ -593,7 +593,7 @@ export const THREAT_DATA = {
     leverage it for further phishing. Attackers gain access through phishing links, credential
     stuffing from breached passwords, and fake "verification" DMs. Once inside, they change
     the email and phone number — locking the real owner out instantly.`,
-    solutions: `WHTS provides social media account recovery guidance and security hardening
+    solutions: `WHTSIPA provides social media account recovery guidance and security hardening
     tools to help you reclaim and protect your Instagram account.`,
     prevention: [
       { title: 'Enable two-factor authentication', desc: 'Enable 2FA on Instagram using an authenticator app — not SMS alone, which is vulnerable to SIM swap attacks.' },
@@ -625,7 +625,7 @@ export const THREAT_DATA = {
     and Marketplace activity to attackers. Facebook accounts are high-value targets because they
     are linked to so many other services. Attackers use phishing, session hijacking, and
     credential stuffing to gain access — then use the account for scams or sell it.`,
-    solutions: `WHTS provides Facebook account recovery pathways, security audit tools, and
+    solutions: `WHTSIPA provides Facebook account recovery pathways, security audit tools, and
     reporting support for compromised social media accounts.`,
     prevention: [
       { title: 'Enable 2FA with an authenticator app', desc: 'Enable two-factor authentication using an authenticator app for stronger protection than SMS codes.' },
@@ -657,7 +657,7 @@ export const THREAT_DATA = {
     public figures, and individuals for financial fraud, extortion, and misinformation. The
     technology has become accessible to anyone — enabling convincing fakes to be produced in
     minutes using only a few seconds of real video or audio as source material.`,
-    solutions: `WHTS provides Deepfake Detection tools, media verification guidance, and
+    solutions: `WHTSIPA provides Deepfake Detection tools, media verification guidance, and
     reporting pathways for AI-generated fraud cases.`,
     prevention: [
       { title: 'Use Deepfake Detection tools', desc: 'Run suspicious videos through AI-powered Deepfake Detection tools before acting on any instructions they contain.' },
@@ -689,7 +689,7 @@ export const THREAT_DATA = {
     credential theft. Sent via SMS, email, WhatsApp, and social media — often appearing to come
     from trusted contacts whose accounts have been compromised — these links silently download
     payloads or redirect to convincing phishing pages the moment they are tapped.`,
-    solutions: `WHTS provides link scanning tools, safe browsing guidance, and malware
+    solutions: `WHTSIPA provides link scanning tools, safe browsing guidance, and malware
     removal support for devices compromised through malicious links.`,
     prevention: [
       { title: 'Scan links before clicking', desc: 'Paste any suspicious link into VirusTotal or Google Safe Browsing to check it before opening — takes 5 seconds.' },
@@ -722,7 +722,7 @@ export const THREAT_DATA = {
     malware, physical access, malicious apps, or remote exploitation. The longer it goes
     undetected, the greater the damage — attackers often establish multiple persistence
     mechanisms to survive reboots and partial cleanup.`,
-    solutions: `WHTS provides device compromise assessment tools, clean reinstallation guides,
+    solutions: `WHTSIPA provides device compromise assessment tools, clean reinstallation guides,
     and post-compromise account hardening support to fully recover from a device breach.`,
     prevention: [
       { title: 'Disconnect from all networks immediately', desc: 'At first sign of compromise, turn off WiFi and mobile data to cut the attacker\'s access channel.' },
@@ -751,7 +751,7 @@ export const THREAT_DATA = {
     tagline: 'One leaked password can unlock everything',
     safeHandling: 'Enable MFA on all accounts immediately and rotate any reused passwords.',
     overview: `Credential stuffing attacks use large databases of username/password pairs leaked from past breaches and automatically try them across hundreds of websites. Because most people reuse passwords, attackers regularly succeed — gaining access to banking, email, and social media accounts without any hacking required.`,
-    solutions: `WHTS provides MFA Tools, credential exposure monitoring, and automated breach alerting to stop account takeovers before they happen.`,
+    solutions: `WHTSIPA provides MFA Tools, credential exposure monitoring, and automated breach alerting to stop account takeovers before they happen.`,
     prevention: [
       { title: 'Use a unique password per site', desc: 'Reusing passwords is the core enabler of stuffing attacks — a password manager makes unique passwords effortless.' },
       { title: 'Enable MFA everywhere', desc: 'Multi-factor authentication stops stuffing attacks even when credentials are correct — it\'s the single most effective control.' },
@@ -779,7 +779,7 @@ export const THREAT_DATA = {
     tagline: 'The most trusted access is also the most dangerous',
     safeHandling: 'Do not confront suspected insiders directly — escalate to HR and legal before any action.',
     overview: `Insider threats come from current or former employees, contractors, and partners who abuse their legitimate access to steal data, sabotage systems, or enable external attacks. Unlike external breaches, insiders already have access — making them harder to detect and capable of causing severe damage before any alarm is triggered.`,
-    solutions: `WHTS provides Insider Risk Program (IRP) monitoring, User Behavior Analytics (UBA), and privileged access management tools to detect and contain insider threats early.`,
+    solutions: `WHTSIPA provides Insider Risk Program (IRP) monitoring, User Behavior Analytics (UBA), and privileged access management tools to detect and contain insider threats early.`,
     prevention: [
       { title: 'Apply least-privilege access', desc: 'Grant employees only the access they need for their role — limit blast radius if an insider turns malicious.' },
       { title: 'Monitor privileged user activity', desc: 'Log and review actions by administrators, finance teams, and anyone with access to sensitive data or systems.' },
@@ -807,7 +807,7 @@ export const THREAT_DATA = {
     tagline: 'Every exposed record is a liability and a target',
     safeHandling: 'Contain first — isolate affected systems before assessing the scope of exposure.',
     overview: `Data breaches occur when unauthorized parties gain access to sensitive information — customer records, financial data, healthcare files, or credentials. Whether caused by external attacks, misconfigured systems, or insider action, a breach triggers regulatory penalties, loss of customer trust, and long-term reputational damage. Speed of detection and response is everything.`,
-    solutions: `WHTS provides forensic investigation, rapid response retainers, breach containment tools, and Business Continuity Management (BCM) frameworks to minimize damage and meet regulatory requirements.`,
+    solutions: `WHTSIPA provides forensic investigation, rapid response retainers, breach containment tools, and Business Continuity Management (BCM) frameworks to minimize damage and meet regulatory requirements.`,
     prevention: [
       { title: 'Encrypt data at rest and in transit', desc: 'Encryption ensures that even if data is stolen, it cannot be read or used without the decryption key.' },
       { title: 'Implement DLP tools', desc: 'Data Loss Prevention tools monitor and block sensitive data from leaving your environment through unauthorized channels.' },
@@ -835,7 +835,7 @@ export const THREAT_DATA = {
     tagline: 'Unsecured APIs are open doors to your backend',
     safeHandling: 'Immediately revoke exposed API keys and audit all recent API activity for unauthorized calls.',
     overview: `APIs connect applications, services, and data — and poorly secured APIs expose your entire backend to attackers. Common vulnerabilities include broken authentication, excessive data exposure, lack of rate limiting, and injection flaws. API attacks are increasingly automated, and a single exposed endpoint can yield millions of records or full system compromise.`,
-    solutions: `WHTS provides secure API gateway configuration, real-time API threat monitoring, rate limiting enforcement, and penetration testing tools specifically targeting API attack surfaces.`,
+    solutions: `WHTSIPA provides secure API gateway configuration, real-time API threat monitoring, rate limiting enforcement, and penetration testing tools specifically targeting API attack surfaces.`,
     prevention: [
       { title: 'Authenticate every API call', desc: 'Use OAuth 2.0 or API key authentication — never expose unauthenticated endpoints, even internally.' },
       { title: 'Enforce rate limiting', desc: 'Rate limiting prevents automated abuse and brute-force attacks against your API endpoints.' },
@@ -863,7 +863,7 @@ export const THREAT_DATA = {
     tagline: 'Every delayed patch is an open invitation',
     safeHandling: 'Apply critical patches within 24–48 hours of release — prioritize internet-facing systems first.',
     overview: `Unpatched software is the single most exploited attack vector in cybercrime. When vendors release patches, attackers immediately reverse-engineer them to create exploits targeting organizations that haven't yet updated. Ransomware gangs, nation-state actors, and automated botnets all actively scan for known vulnerable software — turning delayed patching into a near-certain breach.`,
-    solutions: `WHTS provides managed endpoint patch services, vulnerability scanning, patch prioritization frameworks, and automated update enforcement tools for individuals and organizations.`,
+    solutions: `WHTSIPA provides managed endpoint patch services, vulnerability scanning, patch prioritization frameworks, and automated update enforcement tools for individuals and organizations.`,
     prevention: [
       { title: 'Enable automatic updates', desc: 'For OS and browsers, enable automatic updates — the patch delay between release and install is when attackers strike.' },
       { title: 'Maintain a software inventory', desc: 'You can\'t patch what you don\'t know exists — maintain a complete inventory of all software in your environment.' },
@@ -891,7 +891,7 @@ export const THREAT_DATA = {
     tagline: 'Your security camera may be watching for someone else',
     safeHandling: 'Immediately change default credentials and isolate exposed cameras from your main network.',
     overview: `Insecure CCTV and IP cameras are routinely compromised — default passwords, unpatched firmware, and direct internet exposure turn security cameras into surveillance tools for attackers. Compromised feeds have been used for voyeurism, corporate espionage, and to plan physical intrusions. Millions of cameras remain accessible on public search engines like Shodan.`,
-    solutions: `WHTS provides camera security audits, NPAPK (New Private Access Protection Key) implementation, network segmentation guidance, and Surveillance Protection Tools to lock down your camera infrastructure.`,
+    solutions: `WHTSIPA provides camera security audits, NPAPK (New Private Access Protection Key) implementation, network segmentation guidance, and Surveillance Protection Tools to lock down your camera infrastructure.`,
     prevention: [
       { title: 'Change default passwords immediately', desc: 'Default camera credentials are publicly documented — change them to strong, unique passwords on first setup.' },
       { title: 'Segment cameras on a separate network', desc: 'Place all cameras on a dedicated VLAN isolated from your main network — limit what a compromised camera can reach.' },
@@ -919,10 +919,10 @@ export const THREAT_DATA = {
     tagline: 'Online reputation damage can outlast any financial loss',
     safeHandling: 'Document everything immediately — screenshots, URLs, timestamps — before content is taken down.',
     overview: `Reputation attacks include coordinated negative review campaigns, leaked private content, impersonation accounts, defamatory posts, and dark web data exposure. For individuals and businesses alike, reputation damage erodes trust, tanks revenue, and can take years to recover. Attacks are often targeted, persistent, and difficult to attribute — making proactive monitoring essential.`,
-    solutions: `WHTS provides dark web monitoring, impersonation account takedowns, negative content removal, and proactive reputation monitoring tools to protect and restore your online presence.`,
+    solutions: `WHTSIPA provides dark web monitoring, impersonation account takedowns, negative content removal, and proactive reputation monitoring tools to protect and restore your online presence.`,
     prevention: [
       { title: 'Set up Google Alerts for your name/brand', desc: 'Free and immediate — get notified the moment your name or brand appears in new online content.' },
-      { title: 'Monitor the dark web for leaked content', desc: 'WHTS dark web monitoring scans for leaked images, documents, and personal data tied to your identity or brand.' },
+      { title: 'Monitor the dark web for leaked content', desc: 'WHTSIPA dark web monitoring scans for leaked images, documents, and personal data tied to your identity or brand.' },
       { title: 'Secure all social media accounts', desc: 'Enable MFA, use strong passwords, and audit connected apps — impersonation often starts with a compromised official account.' },
       { title: 'Respond to negative content strategically', desc: 'Not all negative content warrants a response — strategic silence often serves you better than public arguments with trolls.' },
       { title: 'Document and report impersonation accounts', desc: 'Report fake profiles on every platform immediately — platforms take impersonation seriously and act quickly with proper documentation.' },
@@ -947,7 +947,7 @@ export const THREAT_DATA = {
     tagline: 'Find your vulnerabilities before attackers do',
     safeHandling: 'Only commission penetration tests from qualified professionals with a signed scope agreement in place.',
     overview: `Penetration testing is authorized, simulated attack on your systems, networks, and applications to identify vulnerabilities before real attackers exploit them. Unlike automated vulnerability scanning, skilled pentesters chain vulnerabilities together the way an attacker would — revealing real-world risk rather than just theoretical exposure. Regular pentests are required by most security frameworks and cyber insurance policies.`,
-    solutions: `WHTS provides comprehensive penetration testing services for servers, web applications, APIs, mobile apps, and network infrastructure — with clear, actionable reporting and remediation guidance included.`,
+    solutions: `WHTSIPA provides comprehensive penetration testing services for servers, web applications, APIs, mobile apps, and network infrastructure — with clear, actionable reporting and remediation guidance included.`,
     prevention: [
       { title: 'Define a clear scope before testing begins', desc: 'A signed scope agreement protects both parties and ensures testers focus on the highest-risk areas of your environment.' },
       { title: 'Test at least annually', desc: 'Environments change constantly — annual pentests catch new vulnerabilities introduced by system changes, new software, or reconfigurations.' },
@@ -975,7 +975,7 @@ export const THREAT_DATA = {
     tagline: 'Your device may be part of a criminal network right now',
     safeHandling: 'Disconnect the suspected device from all networks immediately and run a full malware scan before reconnecting.',
     overview: `Botnets are networks of infected devices — computers, phones, routers, and IoT devices — controlled remotely by attackers without the owners' knowledge. Infected devices (called zombies or bots) are used to send spam, launch DDoS attacks, mine cryptocurrency, steal credentials, and spread malware. Botnet infections are often silent and can persist for months or years undetected.`,
-    solutions: `WHTS provides Device Cleanup Tools, Network Segmentation services, and Botnet Blocker Tools to detect infections, remove malware, and prevent re-infection of your devices and network.`,
+    solutions: `WHTSIPA provides Device Cleanup Tools, Network Segmentation services, and Botnet Blocker Tools to detect infections, remove malware, and prevent re-infection of your devices and network.`,
     prevention: [
       { title: 'Keep all devices updated', desc: 'Botnets exploit unpatched vulnerabilities — keeping devices updated closes the most common infection vectors.' },
       { title: 'Change default credentials on all devices', desc: 'Routers, cameras, and IoT devices with factory passwords are prime botnet targets — change them immediately on setup.' },

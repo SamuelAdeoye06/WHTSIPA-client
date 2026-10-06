@@ -6,9 +6,9 @@ const VICTIM_STEPS = [
   { icon: '🛑', title: 'Stop All Communication', desc: 'Immediately cease all contact with the scammer. Do not respond, pay, or negotiate. Every response gives them more leverage.' },
   { icon: '📸', title: 'Document Everything', desc: 'Screenshot all messages, emails, transaction records, and profile details before blocking. This evidence is critical for investigation.' },
   { icon: '🔒', title: 'Secure Your Accounts', desc: 'Change all passwords, enable MFA on every account, and revoke any access you may have granted. Start with email — it unlocks everything else.' },
-  { icon: '📋', title: 'Report to Authorities', desc: 'File a report with WHTS, the FBI IC3, FTC, and your local law enforcement. The more details you provide, the stronger the case.' },
+  { icon: '📋', title: 'Report to Authorities', desc: 'File a report with WHTSIPA, the FBI IC3, FTC, and your local law enforcement. The more details you provide, the stronger the case.' },
   { icon: '🤝', title: 'Seek Support', desc: 'Being scammed is traumatic. Reach out to trusted friends, family, or a counselor. You are not alone and it is not your fault.' },
-  { icon: '📞', title: 'Contact WHTS', desc: 'Our Active Representatives are experienced in victim recovery. We help guide you through every step and connect you with the right authorities.' },
+  { icon: '📞', title: 'Contact WHTSIPA', desc: 'Our Active Representatives are experienced in victim recovery. We help guide you through every step and connect you with the right authorities.' },
 ]
 
 const VICTIM_TYPES = [
@@ -36,7 +36,7 @@ const GOV_SERVICES = [
   {
     icon: '🗂️',
     title: 'Data Sharing',
-    desc: 'WHTS participates in responsible data sharing with affiliated law enforcement agencies — every valid report contributes to official cybercrime databases.',
+    desc: 'WHTSIPA participates in responsible data sharing with affiliated law enforcement agencies — every valid report contributes to official cybercrime databases.',
   },
   {
     icon: '🏛️',
@@ -92,7 +92,7 @@ export default function ForVictimsGovernment() {
                 <h2 className="fw-bold mb-3" style={{ color: '#0f172a' }}>You've Been Scammed.<br />Here's What to Do.</h2>
                 <p className="mb-4" style={{ color: '#4a5568' }}>
                     Being targeted by a cybercriminal is frightening and disorienting.
-                    WHTS provides clear, step-by-step guidance to help you stop the damage,
+                    WHTSIPA provides clear, step-by-step guidance to help you stop the damage,
                     recover your accounts, and report to the right authorities.
                 </p>
 
@@ -166,7 +166,7 @@ export default function ForVictimsGovernment() {
                     <h3 className="fw-bold mb-2" style={{ color: '#0f172a' }}>Work With WHTSIPA</h3>
                     <p className="mb-0" style={{ color: '#4a5568' }}>
                     Government agencies, law enforcement bodies, and registered organisations
-                    can contact WHTS to establish formal data sharing, reporting partnerships,
+                    can contact WHTSIPA to establish formal data sharing, reporting partnerships,
                     or collaborative cybercrime investigation support.
                     </p>
                 </div>

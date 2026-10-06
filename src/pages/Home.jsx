@@ -482,7 +482,7 @@ export default function Home() {
       <section className="section-pad-lg whywhtsip-section">
         <div className="container">
           <div className="text-center mb-5">
-            <div className="section-label mb-2" style={{ color: '#1a56db' }}>Why WHTSIP?</div>
+            <div className="section-label mb-2" style={{ color: '#1a56db' }}>Why WHTSIPA?</div>
             <h2 className="fw-bold mb-2" style={{ color: '#0f172a' }}>Built for Real World Action</h2>
             <p style={{ color: '#4a5568', maxWidth: '56ch', margin: '0 auto' }}>
               Trusted cybersecurity guidance as a Call to Action for individuals, businesses and organizations.

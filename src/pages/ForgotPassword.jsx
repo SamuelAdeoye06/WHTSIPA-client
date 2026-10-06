@@ -30,7 +30,7 @@ export default function ForgotPassword() {
       <div className="auth-panel-left">
         <div className="cyber-grid" aria-hidden="true" />
         <div className="auth-panel-left-inner">
-          <Link to="/" className="auth-panel-logo"><img src={logoWhts} alt="WHTS" /></Link>
+          <Link to="/" className="auth-panel-logo"><img src={logoWhts} alt="WHTSIPA" /></Link>
           <div className="auth-panel-headline">
             <h2>Reset your</h2>
             <span className="auth-panel-accent">Password.</span>

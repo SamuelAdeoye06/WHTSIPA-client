@@ -320,7 +320,7 @@ export default function SignUp() {
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🚫</div>
           <h2 style={{ fontWeight: 800, marginBottom: '0.5rem' }}>Service Unavailable</h2>
           <p style={{ color: 'rgba(233,243,255,0.6)', lineHeight: 1.7 }}>
-            WHTS is not currently available in your region. If you believe this is an error,
+            WHTSIPA is not currently available in your region. If you believe this is an error,
             please <Link to="/contact" style={{ color: 'var(--cyan)' }}>contact us</Link>.
           </p>
         </div>
@@ -337,12 +337,12 @@ export default function SignUp() {
         <div className="cyber-grid" aria-hidden="true" />
         <div className="auth-panel-left-inner">
           <Link to="/" className="auth-panel-logo">
-            <img src={logoWhts} alt="WHTS" />
+            <img src={logoWhts} alt="WHTSIPA" />
           </Link>
           <div className="auth-panel-headline">
             <h2>Join the network,</h2>
             <span className="auth-panel-accent">Stay protected.</span>
-            <p>Create your free WHTS account to report incidents, access our full threat library, and get guided recovery support.</p>
+            <p>Create your free WHTSIPA account to report incidents, access our full threat library, and get guided recovery support.</p>
           </div>
           <div className="auth-panel-stats">
             <div className="auth-stat-item">

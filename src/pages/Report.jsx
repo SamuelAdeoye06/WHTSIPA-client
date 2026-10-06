@@ -81,7 +81,7 @@ const RECOVERY_SCENARIOS = [
       'Enable MFA on all accounts and conduct a full security audit.',
       'Report the incident to law enforcement and relevant authorities.',
       'Document everything — screenshots, ransom notes, timelines.',
-      'Contact WHTS immediately for trusted recovery assistance.',
+      'Contact WHTSIPA immediately for trusted recovery assistance.',
       'Review and update your incident response plan.',
       'Monitor for secondary attacks or data leaks post-recovery.',
     ]
@@ -100,7 +100,7 @@ const RECOVERY_SCENARIOS = [
       'File taxes early if tax-related fraud is suspected.',
       'Place fraud alerts with credit reporting agencies.',
       'Maintain offline, encrypted backups of important documents.',
-      'Contact WHTS for expert guidance tailored to your situation.',
+      'Contact WHTSIPA for expert guidance tailored to your situation.',
       'Review accounts for suspicious activity for 12–24 months.',
     ]
   },
@@ -119,7 +119,7 @@ const RECOVERY_SCENARIOS = [
       'Restore data only from clean, offline backups.',
       'Reinstall the OS if the infection is severe.',
       'Notify affected parties about potential data exposure.',
-      'Contact WHTS for advanced removal and system restoration support.',
+      'Contact WHTSIPA for advanced removal and system restoration support.',
     ]
   },
   {
@@ -135,7 +135,7 @@ const RECOVERY_SCENARIOS = [
       'Monitor accounts for suspicious activity and enable recovery alerts.',
       'Use a VPN when accessing sensitive accounts remotely.',
       'Report the hack to our team and relevant platforms.',
-      'Contact WHTS for professional reverse engineering and full recovery support.',
+      'Contact WHTSIPA for professional reverse engineering and full recovery support.',
       'Grant only minimum required permissions to apps going forward.',
       'Verify all apps and services linked to your accounts.',
     ]
@@ -152,7 +152,7 @@ const RECOVERY_SCENARIOS = [
       'Enable privacy settings on all accounts and limit personal information visibility.',
       'Scan devices with trusted security tools and monitor for continued tracking.',
       'If physical safety is at risk, contact law enforcement immediately.',
-      'Contact WHTS — our specialists are experienced in tracing and neutralizing these threats.',
+      'Contact WHTSIPA — our specialists are experienced in tracing and neutralizing these threats.',
       'Act quickly — do not delay.',
     ]
   },
@@ -166,7 +166,7 @@ const RECOVERY_SCENARIOS = [
       'Preserve all evidence (emails, logs, IP addresses) without altering it.',
       'Change passwords and enable MFA on all business email accounts.',
       'Review and secure any linked accounts or vendor relationships.',
-      'File a BEC complaint and contact WHTS for urgent case assistance.',
+      'File a BEC complaint and contact WHTSIPA for urgent case assistance.',
       'Report to the FBI Internet Crime Complaint Center (IC3) and local authorities.',
       'Engage legal and cybersecurity professionals for full forensic investigation.',
       'Update email security policies and conduct employee training.',
@@ -185,7 +185,7 @@ const RECOVERY_SCENARIOS = [
       'Monitor credit reports and financial accounts for unusual activity.',
       'Avoid sending sensitive files to unknown or unverified contacts.',
       'Notify affected individuals or organizations if you are responsible for the breach.',
-      'Report to relevant authorities and WHTS for coordinated support.',
+      'Report to relevant authorities and WHTSIPA for coordinated support.',
       'Do not click suspicious links or download attachments from untrusted sources.',
     ]
   },
@@ -193,7 +193,7 @@ const RECOVERY_SCENARIOS = [
     id: 'wallet',
     emoji: '⛓️',
     title: 'Lost / Stolen Crypto Wallet',
-    immediate: 'Contact WHTS immediately and provide all available wallet details for specialized recovery.',
+    immediate: 'Contact WHTSIPA immediately and provide all available wallet details for specialized recovery.',
     steps: [
       'Check for unauthorized transactions and report to the wallet provider or exchange.',
       'Secure any remaining accessible wallets by enabling all available security features.',
@@ -2125,7 +2125,7 @@ export default function Report() {
                   </div>
                   <div className="mt-4 d-flex gap-3 flex-wrap">
                     <a className="btn btn-alert" href="#contact">
-                      <i className="bi bi-headset me-2"></i>Contact WHTS Now
+                      <i className="bi bi-headset me-2"></i>Contact WHTSIPA Now
                     </a>
                     <a className="btn btn-outline-cyber" href="#report">
                       <i className="bi bi-send me-2"></i>Submit a Report

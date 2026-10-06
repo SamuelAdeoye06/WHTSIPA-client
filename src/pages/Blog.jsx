@@ -84,7 +84,7 @@ const ARTICLES = [
     (ic3.gov), and your local police. A report number is important for insurance and legal purposes.
     
     **Step 6 — Seek support.** Being scammed is traumatic. Talk to someone you trust. 
-    WHTS counselors can help you navigate both the practical and emotional recovery process.`,
+    WHTSIPA counselors can help you navigate both the practical and emotional recovery process.`,
   },
 ]
 
