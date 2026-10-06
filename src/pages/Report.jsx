@@ -1279,7 +1279,10 @@ export default function Report() {
                       {/* Email Address */}
                       <div className="col-12 col-md-6">
                         <label className="form-label cyber-label" htmlFor="personal-email">
-                          Email Address <span className="text-muted-cyber fw-normal">(Optional – for confirmation and updates only)</span>
+                          Email Address{' '}
+                          <span className="text-muted-cyber fw-normal">
+                            {user ? '(Locked to your account email)' : '(Optional – for confirmation and updates only)'}
+                          </span>
                         </label>
                         <input
                           id="personal-email"
@@ -1287,9 +1290,11 @@ export default function Report() {
                           type="email"
                           placeholder="you@example.com"
                           className={`form-control cyber-input ${personalFormik.touched.email && personalFormik.errors.email ? 'is-invalid' : ''}`}
-                          value={personalFormik.values.email}
+                          value={user ? user.email : personalFormik.values.email}
                           onChange={personalFormik.handleChange}
                           onBlur={personalFormik.handleBlur}
+                          disabled={!!user}
+                          title={user ? 'Locked to your account email — this keeps submissions traceable to one verified account.' : undefined}
                         />
                         {personalFormik.touched.email && personalFormik.errors.email && (
                           <div className="cyber-error-msg"><i className="bi bi-exclamation-triangle-fill me-1"></i>{personalFormik.errors.email}</div>
@@ -1694,16 +1699,23 @@ export default function Report() {
 
                       {/* Email Address */}
                       <div className="col-12 col-md-6">
-                        <label className="form-label cyber-label" htmlFor="public-email">Email Address <span className="text-muted-cyber">(Optional – for confirmation and updates only)</span></label>
+                        <label className="form-label cyber-label" htmlFor="public-email">
+                          Email Address{' '}
+                          <span className="text-muted-cyber">
+                            {user ? '(Locked to your account email)' : '(Optional – for confirmation and updates only)'}
+                          </span>
+                        </label>
                         <input
                           id="public-email"
                           name="email"
                           type="email"
                           placeholder="you@example.com"
                           className={`form-control cyber-input ${publicFormik.touched.email && publicFormik.errors.email ? 'is-invalid' : ''}`}
-                          value={publicFormik.values.email}
+                          value={user ? user.email : publicFormik.values.email}
                           onChange={publicFormik.handleChange}
                           onBlur={publicFormik.handleBlur}
+                          disabled={!!user}
+                          title={user ? 'Locked to your account email — this keeps submissions traceable to one verified account.' : undefined}
                         />
                         {publicFormik.touched.email && publicFormik.errors.email && (
                           <div className="cyber-error-msg"><i className="bi bi-exclamation-triangle-fill me-1"></i>{publicFormik.errors.email}</div>

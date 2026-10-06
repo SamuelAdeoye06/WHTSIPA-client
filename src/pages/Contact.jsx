@@ -650,8 +650,18 @@ export default function Contact() {
                         <div className="contact-input-wrap">
                           <i className="bi bi-envelope contact-icon"></i>
                           <input className="contact-field ps-contact" type="email"
-                            placeholder="you@example.com" value={form.email} onChange={set('email')} required />
+                            placeholder="you@example.com"
+                            value={user ? user.email : form.email}
+                            onChange={set('email')}
+                            disabled={!!user}
+                            title={user ? 'Locked to your account email — this keeps submissions traceable to one verified account.' : undefined}
+                            required />
                         </div>
+                        {user && (
+                          <div style={{ fontSize: '0.76rem', color: '#9ca3af', marginTop: '0.3rem' }}>
+                            Locked to your account email so submissions can be tied back to a verified account.
+                          </div>
+                        )}
                       </div>
                       <div className="col-12">
                         <label className="contact-label">Subject <span className="text-danger">*</span></label>

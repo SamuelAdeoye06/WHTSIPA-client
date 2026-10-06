@@ -493,9 +493,14 @@ function BookCallModal({ onClose }) {
               placeholder="Your full name" value={form.name} onChange={set('name')} />
           </F>
 
-          <F id="bc-email" label="Email Address *" error={errors.email}>
+          <F id="bc-email" label={user ? 'Email Address * (Locked to your account email)' : 'Email Address *'} error={errors.email}>
             <input id="bc-email" type="email" className={`bc-input ${errors.email ? 'bc-input-err' : ''}`}
-              placeholder="you@example.com" value={form.email} onChange={set('email')} />
+              placeholder="you@example.com"
+              value={user ? user.email : form.email}
+              onChange={set('email')}
+              disabled={!!user}
+              title={user ? 'Locked to your account email — this keeps bookings traceable to one verified account.' : undefined}
+            />
           </F>
 
           <BookingPhoneField

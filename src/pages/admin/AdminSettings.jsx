@@ -35,13 +35,6 @@ const LINK_GROUPS = [
     ],
   },
   {
-    heading: 'Request Security Tools (Threats page)',
-    hint: 'The Telegram link used in the "Request Security Tools" modal — the AI chat handoff and the "Join Telegram Support Channel" card.',
-    fields: [
-      ['toolsTelegramLink', 'Telegram — Tools Support', 'https://t.me/...'],
-    ],
-  },
-  {
     heading: 'Scenario Active Representative Contact',
     hint: 'The "You Need Help" prompt on the Threats page quiz — shown after a visitor fails 3 scenarios, with a "Contact Active Representative" button.',
     fields: [
@@ -82,6 +75,10 @@ export default function AdminSettings() {
   const [pwSaving, setPwSaving]   = useState(false)
   const [pwMsg, setPwMsg]         = useState('')
   const [pwErr, setPwErr]         = useState('')
+
+  const [toolsSaving, setToolsSaving] = useState(false)
+  const [toolsMsg, setToolsMsg]       = useState('')
+  const [toolsErr, setToolsErr]       = useState('')
 
   const [notifSaving, setNotifSaving] = useState(false)
   const [notifMsg, setNotifMsg]       = useState('')
@@ -180,6 +177,21 @@ export default function AdminSettings() {
       setPwErr(err.response?.data?.message || 'Could not change password.')
     } finally {
       setPwSaving(false)
+    }
+  }
+
+  const handleSaveToolsTelegram = async (e) => {
+    e.preventDefault()
+    setToolsSaving(true)
+    setToolsMsg('')
+    setToolsErr('')
+    try {
+      await api.put('/config', { toolsTelegramLink: config.toolsTelegramLink || '' })
+      setToolsMsg('Saved.')
+    } catch (err) {
+      setToolsErr(err.response?.data?.message || 'Could not save this link.')
+    } finally {
+      setToolsSaving(false)
     }
   }
 
@@ -497,6 +509,48 @@ export default function AdminSettings() {
             onConfigUpdate={setConfig}
           />
         </div>
+      </div>
+
+      {/* ── Request Security Tools channel ──
+          This was previously just one row buried inside the generic
+          "Other Public Links" card below, under a heading that read
+          "Request Security Tools (Threats page)" — easy to miss, and not
+          obviously tied to the actual "Request Security Tools" modal by
+          name. Same underlying field (toolsTelegramLink), just given its
+          own clearly-labeled card here instead, matching how Threats/
+          Contact/Hire channels above are each their own section. */}
+      <div className="admin-card" style={{ marginBottom: '1.5rem' }}>
+        <div className="admin-card-header">
+          <h3><i className="bi bi-tools"></i> Request Security Tools</h3>
+        </div>
+        <form onSubmit={handleSaveToolsTelegram} className="admin-card-body">
+          <p className="admin-card-body-hint">
+            The Telegram link used in the "Request Security Tools" modal on the Threats page — both the
+            "Telegram Chat" option and the "Join Telegram Support Channel" card use this same link.
+          </p>
+          <div className="admin-detail-grid" style={{ padding: 0 }}>
+            <div className="admin-detail-field-full">
+              <label className="admin-detail-field-label" htmlFor="toolsTelegramLink">
+                Telegram — Tools Support
+              </label>
+              <input
+                id="toolsTelegramLink"
+                className="admin-search-input"
+                style={{ width: '100%' }}
+                placeholder="https://t.me/..."
+                value={config?.toolsTelegramLink || ''}
+                onChange={e => setConfig(prev => ({ ...prev, toolsTelegramLink: e.target.value }))}
+              />
+            </div>
+            <div className="admin-detail-field-full" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <button type="submit" className="admin-btn admin-btn-primary" disabled={toolsSaving}>
+                {toolsSaving ? 'Saving…' : 'Save'}
+              </button>
+              {toolsMsg && <span style={{ color: '#15803d', fontSize: '0.88rem' }}>{toolsMsg}</span>}
+              {toolsErr && <span style={{ color: '#dc2626', fontSize: '0.88rem' }}>{toolsErr}</span>}
+            </div>
+          </div>
+        </form>
       </div>
 
       {/* ── Public contact / social links, grouped by page ── */}
