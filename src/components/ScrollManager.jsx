@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 
 const PAGE_TITLES = {
-  '/':                       'WHTSIPA — Cybersecurity Intelligence & Scam Protection Platform',
+  '/':                       'WHTSIPA - Sophisticated Cybersecurity intelligence',
   '/threats':                'Cyber Threat Library — Browse All Threats | WHTSIPA',
   '/report':                 'Report a Cybercrime & Recover — WHTSIPA',
   '/recover':                'Incident Recovery Guide — WHTSIPA',
@@ -34,7 +34,7 @@ export default function ScrollManager() {
       const formatted = slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
       document.title = `${formatted} — Cyber Threat | WHTSIPA`
     } else {
-      document.title = PAGE_TITLES[location.pathname] || 'WHTSIPA — Cybersecurity Intelligence Platform'
+      document.title = PAGE_TITLES[location.pathname] || 'WHTSIPA - Sophisticated Cybersecurity intelligence'
     }
 
     // Scroll logic
