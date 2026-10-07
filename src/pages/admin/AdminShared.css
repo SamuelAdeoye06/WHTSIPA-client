@@ -24,6 +24,29 @@
 
 .admin-btn-sm { padding: 0.35rem 0.7rem; font-size: 0.78rem; }
 
+/* Icon-only action button (currently just the Users table's Delete
+   action) — square, fixed size, no label. Exists to reclaim the width a
+   full "Delete" text button costs in a dense table row; kept generic/
+   reusable rather than Users-specific in case another table wants the
+   same treatment later. */
+.admin-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  padding: 0;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: opacity 0.15s ease, background 0.15s ease;
+}
+.admin-icon-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.admin-icon-btn-danger { background: #dc2626; color: #fff; }
+.admin-icon-btn-danger:hover:not(:disabled) { background: #b91c1c; }
+
 /* ── Table ── */
 .admin-table-wrap { overflow-x: auto; }
 .admin-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
@@ -45,6 +68,20 @@
   vertical-align: middle;
 }
 .admin-table tr:last-child td { border-bottom: none; }
+
+/* ── Users table — desktop only (scoped to .admin-users-table so this
+   never touches any other admin table, and the mobile card view below
+   is a completely separate markup block, untouched by any of this) ──
+   The default 1.4rem horizontal cell padding, times 9 columns, was the
+   main reason this specific table (the widest in the admin panel) was
+   overflowing — tightened just here rather than lowering it globally,
+   which would affect every other admin table's spacing unnecessarily. */
+.admin-users-table th,
+.admin-users-table td {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+.admin-users-table .admin-users-actions { gap: 0.4rem; }
 .admin-table-row-clickable { cursor: pointer; }
 .admin-table-row-clickable:hover { background: #f8fafc; }
 .admin-table-empty { padding: 3rem 1.4rem; text-align: center; color: #9ca3af; }

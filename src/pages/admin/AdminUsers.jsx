@@ -123,10 +123,10 @@ export default function AdminUsers() {
                     const isSelf = currentAdmin && u._id === currentAdmin.id
                     return (
                       <tr key={u._id}>
-                        <td className="admin-table-truncate" style={{ maxWidth: 140 }} title={`${u.firstName} ${u.lastName}`}>{u.firstName} {u.lastName}</td>
-                        <td className="admin-table-truncate" style={{ maxWidth: 190 }} title={u.email}>{u.email}</td>
-                        <td className="admin-table-truncate" style={{ maxWidth: 140 }} title={u.phone}>{u.phone || '—'}</td>
-                        <td className="admin-table-truncate" style={{ maxWidth: 100 }} title={u.country}>{u.country}</td>
+                        <td className="admin-table-truncate" style={{ maxWidth: 125 }} title={`${u.firstName} ${u.lastName}`}>{u.firstName} {u.lastName}</td>
+                        <td className="admin-table-truncate" style={{ maxWidth: 175 }} title={u.email}>{u.email}</td>
+                        <td className="admin-table-truncate" style={{ maxWidth: 125 }} title={u.phone}>{u.phone || '—'}</td>
+                        <td className="admin-table-truncate" style={{ maxWidth: 90 }} title={u.country}>{u.country}</td>
                         <td style={{ textTransform: 'capitalize' }}>{u.role}</td>
                         <td>{u.isVerified ? <span className="admin-pill admin-pill-resolved">Verified</span> : <span className="admin-pill admin-pill-open">Unverified</span>}</td>
                         <td>
@@ -156,10 +156,12 @@ export default function AdminUsers() {
                                 </button>
                               )}
                               <button
-                                className="admin-btn admin-btn-danger admin-btn-sm"
+                                className="admin-icon-btn admin-icon-btn-danger"
                                 onClick={() => setConfirmTarget({ user: u, action: 'delete' })}
+                                title="Delete"
+                                aria-label="Delete"
                               >
-                                Delete
+                                <i className="bi bi-trash"></i>
                               </button>
                             </div>
                           )}

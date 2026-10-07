@@ -1301,7 +1301,7 @@ export default function Threats() {
             <h2 className="fw-bold glow-text mb-3">Think You've Been Targeted?</h2>
             <p className="text-muted-cyber mb-4 mx-auto" style={{ maxWidth: '50ch' }}>
               If you've experienced any of these threats for real, don't wait.
-              Report it now and let WHTSIP guide your recovery.
+              Report it now and let WHTSIPA guide your recovery.
             </p>
             <div className="d-flex justify-content-center gap-3 flex-wrap">
               <button className="btn btn-alert" onClick={() => { setModalThreat(''); setActiveModal('report') }}>

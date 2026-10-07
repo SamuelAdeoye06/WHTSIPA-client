@@ -234,7 +234,7 @@ export default function Home() {
               </h1>
               <p className="template-hero-copy">
                 Learn the warning signs, report cyber incidents, start recovery and track down
-                scammers with clear guidance from WHTSIP intelligence world.
+                scammers with clear guidance from WHTSIPA intelligence world.
               </p>
               <div className="d-flex gap-3 flex-wrap mt-4">
                 <Link className="btn btn-primary px-4" to="/threats" style={{ borderRadius: 8 }}>Explore Threats</Link>
@@ -328,7 +328,7 @@ export default function Home() {
                       <i className="bi bi-play-fill"></i>
                     </button>
                     <div className="cinematic-play-label">
-                      <span className="cinematic-play-title">WHTSIP &amp; The Officials</span>
+                      <span className="cinematic-play-title">WHTSIPA &amp; The Officials</span>
                       <span className="cinematic-play-sub">Tap to play · double-tap sides to skip · 2:57</span>
                     </div>
                   </div>
@@ -478,7 +478,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ════════ WHY WHTSIP ════════ */}
+      {/* ════════ WHY WHTSIPA ════════ */}
       <section className="section-pad-lg whywhtsip-section">
         <div className="container">
           <div className="text-center mb-5">
@@ -617,7 +617,7 @@ export default function Home() {
             <h2 className="fw-bold glow-text mb-3">Don't Wait Until It's Too Late</h2>
             <p className="text-muted-cyber mb-4 mx-auto" style={{ maxWidth: '52ch' }}>
               Whether you've spotted a scam, experienced a breach, or want to stay protected —
-              WHTSIP private security agency is here to guide you every step of the way.
+              WHTSIPA private security agency is here to guide you every step of the way.
             </p>
             <div className="d-flex justify-content-center flex-wrap gap-3">
               <Link className="btn btn-alert" to="/report">

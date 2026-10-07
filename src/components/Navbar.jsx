@@ -9,7 +9,7 @@ import './Navbar.css'
 
 /* ── Build a flat search index from threatData ── */
 const SEARCH_INDEX = [
-  { title: 'Home', desc: 'Cybersecurity intelligence platform — protect yourself online', path: '/' },
+  { title: 'Home', desc: 'Sophisticated Cybersecurity intelligence — protect yourself online', path: '/' },
   { title: 'Threats', desc: 'Browse all cyber threat categories and scenarios', path: '/threats' },
   { title: 'Report an Incident', desc: 'Submit a cybercrime or scam report', path: '/report' },
   { title: 'About WHTSIPA', desc: 'Learn who we are, our mission and government alignment', path: '/about' },

@@ -81,7 +81,7 @@ const RECOVERY_SCENARIOS = [
       'Enable MFA on all accounts and conduct a full security audit.',
       'Report the incident to law enforcement and relevant authorities.',
       'Document everything — screenshots, ransom notes, timelines.',
-      'Contact WHTSIPA immediately for trusted recovery assistance.',
+      'Contact WHTS immediately for trusted recovery assistance.',
       'Review and update your incident response plan.',
       'Monitor for secondary attacks or data leaks post-recovery.',
     ]
@@ -100,7 +100,7 @@ const RECOVERY_SCENARIOS = [
       'File taxes early if tax-related fraud is suspected.',
       'Place fraud alerts with credit reporting agencies.',
       'Maintain offline, encrypted backups of important documents.',
-      'Contact WHTSIPA for expert guidance tailored to your situation.',
+      'Contact WHTS for expert guidance tailored to your situation.',
       'Review accounts for suspicious activity for 12–24 months.',
     ]
   },
@@ -119,7 +119,7 @@ const RECOVERY_SCENARIOS = [
       'Restore data only from clean, offline backups.',
       'Reinstall the OS if the infection is severe.',
       'Notify affected parties about potential data exposure.',
-      'Contact WHTSIPA for advanced removal and system restoration support.',
+      'Contact WHTS for advanced removal and system restoration support.',
     ]
   },
   {
@@ -135,7 +135,7 @@ const RECOVERY_SCENARIOS = [
       'Monitor accounts for suspicious activity and enable recovery alerts.',
       'Use a VPN when accessing sensitive accounts remotely.',
       'Report the hack to our team and relevant platforms.',
-      'Contact WHTSIPA for professional reverse engineering and full recovery support.',
+      'Contact WHTS for professional reverse engineering and full recovery support.',
       'Grant only minimum required permissions to apps going forward.',
       'Verify all apps and services linked to your accounts.',
     ]
@@ -152,7 +152,7 @@ const RECOVERY_SCENARIOS = [
       'Enable privacy settings on all accounts and limit personal information visibility.',
       'Scan devices with trusted security tools and monitor for continued tracking.',
       'If physical safety is at risk, contact law enforcement immediately.',
-      'Contact WHTSIPA — our specialists are experienced in tracing and neutralizing these threats.',
+      'Contact WHTS — our specialists are experienced in tracing and neutralizing these threats.',
       'Act quickly — do not delay.',
     ]
   },
@@ -166,7 +166,7 @@ const RECOVERY_SCENARIOS = [
       'Preserve all evidence (emails, logs, IP addresses) without altering it.',
       'Change passwords and enable MFA on all business email accounts.',
       'Review and secure any linked accounts or vendor relationships.',
-      'File a BEC complaint and contact WHTSIPA for urgent case assistance.',
+      'File a BEC complaint and contact WHTS for urgent case assistance.',
       'Report to the FBI Internet Crime Complaint Center (IC3) and local authorities.',
       'Engage legal and cybersecurity professionals for full forensic investigation.',
       'Update email security policies and conduct employee training.',
@@ -185,7 +185,7 @@ const RECOVERY_SCENARIOS = [
       'Monitor credit reports and financial accounts for unusual activity.',
       'Avoid sending sensitive files to unknown or unverified contacts.',
       'Notify affected individuals or organizations if you are responsible for the breach.',
-      'Report to relevant authorities and WHTSIPA for coordinated support.',
+      'Report to relevant authorities and WHTS for coordinated support.',
       'Do not click suspicious links or download attachments from untrusted sources.',
     ]
   },
@@ -193,7 +193,7 @@ const RECOVERY_SCENARIOS = [
     id: 'wallet',
     emoji: '⛓️',
     title: 'Lost / Stolen Crypto Wallet',
-    immediate: 'Contact WHTSIPA immediately and provide all available wallet details for specialized recovery.',
+    immediate: 'Contact WHTS immediately and provide all available wallet details for specialized recovery.',
     steps: [
       'Check for unauthorized transactions and report to the wallet provider or exchange.',
       'Secure any remaining accessible wallets by enabling all available security features.',
@@ -811,6 +811,18 @@ export default function Report() {
     }
   })
 
+  // The email input is disabled and shows user.email once logged in (see
+  // the input below), but that's ONLY a display override — Formik's own
+  // values.email never actually got set to it, so it stayed '' and the
+  // field looked filled while the real data Formik/submission use was
+  // still empty. Writing it into real Formik state here, the same way
+  // Contact.jsx's existing (and correctly working) prefill effect does
+  // for its own form state, is the actual fix — not just overriding what
+  // renders on screen.
+  useEffect(() => {
+    if (user) personalFormik.setFieldValue('email', user.email)
+  }, [user])
+
   /* ── 2. Formik & Yup Validation: Public/Org Form ── */
   const publicFormik = useFormik({
     initialValues: {
@@ -894,6 +906,11 @@ export default function Report() {
       await handleFormSubmit(values)
     }
   })
+
+  // Same real-state fix as personalFormik above — see that comment.
+  useEffect(() => {
+    if (user) publicFormik.setFieldValue('email', user.email)
+  }, [user])
 
   const handleConfirmClearDraft = () => {
     if (reportType === 'personal') {
@@ -1130,7 +1147,7 @@ export default function Report() {
                 <div className="section-label mb-2">Support Our Mission</div>
                 <h2 className="fw-bold mb-3" style={{ color: '#0f172a' }}>Every Report Strengthens Our Mission</h2>
                 <p className="mb-4" style={{ color: '#4a5568' }}>
-                  Help strengthen WHTSIPA, ACSW, and WHTSIP by reporting cybersecurity incidents,
+                  Help strengthen WHTSIPA, ACSW, and WHTSIPA by reporting cybersecurity incidents,
                   fraud, suspicious activity, and impersonation attempts.
                 </p>
                 <div className="d-flex flex-column gap-3">
@@ -2125,7 +2142,7 @@ export default function Report() {
                   </div>
                   <div className="mt-4 d-flex gap-3 flex-wrap">
                     <a className="btn btn-alert" href="#contact">
-                      <i className="bi bi-headset me-2"></i>Contact WHTSIPA Now
+                      <i className="bi bi-headset me-2"></i>Contact WHTS Now
                     </a>
                     <a className="btn btn-outline-cyber" href="#report">
                       <i className="bi bi-send me-2"></i>Submit a Report

@@ -354,6 +354,17 @@ function BookCallModal({ onClose }) {
   })
   const [errors, setErrors] = useState({})
 
+  // The email input is disabled and shows user.email once logged in (see
+  // the input further down), but that was only a display override — the
+  // real form.email state never actually got set to it, so it stayed ''
+  // and the field looked filled while validate() below was still
+  // checking an empty string, always failing with "Email is required."
+  // This writes the real value into state, the same pattern Contact.jsx's
+  // existing (and correctly working) prefill effect already uses.
+  useEffect(() => {
+    if (user) setForm(p => ({ ...p, email: user.email }))
+  }, [user])
+
   // Live word count for the notes field
   const notesWordCount = form.notes.trim().split(/\s+/).filter(Boolean).length
 
@@ -740,7 +751,7 @@ export default function EssentialEight() {
       <section className="section-pad" style={{ background: '#f8fafc' }}>
         <div className="container">
           <div className="about-cta-banner p-4 p-md-5 text-center">
-            <div className="section-label mb-3">WHTSIPA Tools</div>
+            <div className="section-label mb-3">WHTS Tools</div>
             <h2 className="fw-bold mb-3" style={{ color: '#0f172a' }}>Get the Right Tools</h2>
             <p className="mb-4 mx-auto" style={{ maxWidth: '52ch', color: '#4a5568' }}>
               WHTSIPA provides tools aligned with every Essential Eight strategy —
