@@ -441,6 +441,7 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
     telegramHandle: TELEGRAM_USERNAME,
     email: SUPPORT_EMAIL,
     toolsTelegramLink: TG_CHANNEL_LINK,
+    toolsTelegramChannelLink: TG_CHANNEL_LINK,
     phone: '',
     // Recovery-mode ("Need personalised recovery support?") channels are
     // deliberately separate from the "Hire Our Team" worker above — they
@@ -459,6 +460,7 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
         telegramHandle: worker?.telegramHandle || prev.telegramHandle,
         email: worker?.email || prev.email,
         toolsTelegramLink: data?.toolsTelegramLink || prev.toolsTelegramLink,
+        toolsTelegramChannelLink: data?.toolsTelegramChannelLink || prev.toolsTelegramChannelLink,
         phone: worker?.phone || prev.phone,
         recoveryWhatsapp: data?.recoveryWhatsappNumber || prev.recoveryWhatsapp,
         recoveryTelegramHandle: data?.recoveryTelegramHandle || prev.recoveryTelegramHandle,
@@ -697,7 +699,7 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
             <div className="wm-request-footer-label">
               <i className="bi bi-send me-1"></i>Join Telegram Support Channel
             </div>
-            <a href={channels.toolsTelegramLink} target="_blank" rel="noopener noreferrer" className="wm-tg-support-link">
+            <a href={channels.toolsTelegramChannelLink} target="_blank" rel="noopener noreferrer" className="wm-tg-support-link">
               <i className="bi bi-telegram me-2"></i>
               <span>WHTSIPA Tools</span>
               <i className="bi bi-box-arrow-up-right ms-auto"></i>
