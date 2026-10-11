@@ -186,6 +186,7 @@ function ThreatsChatModal({ isOpen, onClose, navigate, user, isHumanAgent = fals
   const chatEndRef = useRef(null)
   const [ticketId] = useState(genTicketId)
   const ticketDbIdRef = useRef(null)
+  const chatStartSentRef = useRef(false)
 
   // Create/track a ticket for this session so it shows up in Previous
   // Sessions, same as the Threats/Tools live chat does.
@@ -227,6 +228,13 @@ function ThreatsChatModal({ isOpen, onClose, navigate, user, isHumanAgent = fals
   const EMAIL_LINK = 'mailto:wehelptrackscammersipaddress@mail.com'
 
   const selectOption = (opt) => {
+    // Signal that the visitor actually started chatting (first option
+    // click). The server's $ne guard makes this idempotent.
+    if (!chatStartSentRef.current && ticketDbIdRef.current) {
+      chatStartSentRef.current = true
+      api.patch(`/tickets/${ticketDbIdRef.current}/activity`, { chatStarted: true }).catch(() => { /* non-critical */ })
+    }
+
     setMessages(prev => [...prev, {
       sender: 'user',
       text:   opt.text,

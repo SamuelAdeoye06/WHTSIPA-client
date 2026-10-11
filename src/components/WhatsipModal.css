@@ -270,8 +270,13 @@
 /* .wm-select-menu — passed via StyledSelect's menuClassName prop. The menu
    is portaled onto document.body (see StyledSelect.jsx), so it's no longer
    a DOM descendant of .wm-field — this plain class is what actually
-   targets it now, regardless of where in the DOM it renders. */
-.wm-select-menu {
+   targets it now, regardless of where in the DOM it renders.
+   Chained with .styled-select-menu-portal to reach specificity (0,2,0) —
+   AdminShared.css sets a white background on .styled-select-menu-portal
+   at (0,1,0), and in production builds the CSS chunk order is
+   non-deterministic, so the higher specificity here ensures the dark
+   background always wins for WhatsipModal dropdowns. */
+.styled-select-menu-portal.wm-select-menu {
   background: #0d1a35;
   border: 1px solid rgba(120,214,255,0.25);
   box-shadow: 0 16px 48px rgba(0,0,0,0.5);

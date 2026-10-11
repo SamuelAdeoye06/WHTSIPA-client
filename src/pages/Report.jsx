@@ -503,6 +503,7 @@ function LiveChatModal({ isOpen, onClose, userName, user, setReportType, isHuman
   const chatEndRef = useRef(null)
   const [ticketId] = useState(genTicketId)
   const ticketDbIdRef = useRef(null)
+  const chatStartSentRef = useRef(false)
 
   // Create/track a ticket for this session so it shows up in Previous
   // Sessions, same as the Threats/Tools live chat does.
@@ -542,6 +543,13 @@ function LiveChatModal({ isOpen, onClose, userName, user, setReportType, isHuman
   if (!isOpen) return null
 
   const selectOption = (opt) => {
+    // Signal that the visitor actually started chatting (first option
+    // click). The server's $ne guard makes this idempotent.
+    if (!chatStartSentRef.current && ticketDbIdRef.current) {
+      chatStartSentRef.current = true
+      api.patch(`/tickets/${ticketDbIdRef.current}/activity`, { chatStarted: true }).catch(() => { /* non-critical */ })
+    }
+
     // 1. Add user message
     const userMsg = {
       sender: 'user',

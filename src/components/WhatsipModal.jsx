@@ -248,6 +248,7 @@ function ToolsLiveChat({ ticketId, threatTitle, onClose, onBack, user, userName,
   // string) so we can PATCH it later when a human agent actually joins —
   // the activity endpoint looks tickets up by _id, not by our ticketId.
   const ticketDbIdRef = useRef(null)
+  const chatStartSentRef = useRef(false)
 
   // Listen for real Tidio agent connection event
   useEffect(() => {
@@ -286,6 +287,13 @@ function ToolsLiveChat({ ticketId, threatTitle, onClose, onBack, user, userName,
   }, [messages, isTyping])
 
   const selectOption = (opt) => {
+    // Signal that the visitor actually started chatting (first option
+    // click). The server's $ne guard makes this idempotent.
+    if (!chatStartSentRef.current && ticketDbIdRef.current) {
+      chatStartSentRef.current = true
+      api.patch(`/tickets/${ticketDbIdRef.current}/activity`, { chatStarted: true }).catch(() => { /* non-critical */ })
+    }
+
     const userMsg = {
       sender: 'user',
       text: opt.text,
