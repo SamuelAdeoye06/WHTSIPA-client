@@ -80,6 +80,10 @@ export default function AdminSettings() {
   const [toolsMsg, setToolsMsg]       = useState('')
   const [toolsErr, setToolsErr]       = useState('')
 
+  const [ticketPopupSaving, setTicketPopupSaving] = useState(false)
+  const [ticketPopupMsg, setTicketPopupMsg]       = useState('')
+  const [ticketPopupErr, setTicketPopupErr]       = useState('')
+
   const [notifSaving, setNotifSaving] = useState(false)
   const [notifMsg, setNotifMsg]       = useState('')
   const [notifErr, setNotifErr]       = useState('')
@@ -195,6 +199,24 @@ export default function AdminSettings() {
       setToolsErr(err.response?.data?.message || 'Could not save these settings.')
     } finally {
       setToolsSaving(false)
+    }
+  }
+
+  const handleSaveTicketPopup = async (e) => {
+    e.preventDefault()
+    setTicketPopupSaving(true)
+    setTicketPopupMsg('')
+    setTicketPopupErr('')
+    try {
+      await api.put('/config', {
+        ticketPopupWhatsapp:       config.ticketPopupWhatsapp || '',
+        ticketPopupTelegramHandle: config.ticketPopupTelegramHandle || '',
+      })
+      setTicketPopupMsg('Saved.')
+    } catch (err) {
+      setTicketPopupErr(err.response?.data?.message || 'Could not save these settings.')
+    } finally {
+      setTicketPopupSaving(false)
     }
   }
 
@@ -565,6 +587,59 @@ export default function AdminSettings() {
               </button>
               {toolsMsg && <span style={{ color: '#15803d', fontSize: '0.88rem' }}>{toolsMsg}</span>}
               {toolsErr && <span style={{ color: '#dc2626', fontSize: '0.88rem' }}>{toolsErr}</span>}
+            </div>
+          </div>
+        </form>
+      </div>
+
+      {/* ── Ticket Created! Popup Channels ── */}
+      <div className="admin-card" style={{ marginBottom: '1.5rem' }}>
+        <div className="admin-card-header">
+          <h3><i className="bi bi-ticket-perforated"></i> Ticket Popup Channels</h3>
+        </div>
+        <form onSubmit={handleSaveTicketPopup} className="admin-card-body">
+          <p className="admin-card-body-hint">
+            The WhatsApp and Telegram contact channels shown on the "Ticket Created!" success popup when a visitor submits a Report, Hire, or Request ticket.
+          </p>
+          <div className="admin-detail-grid" style={{ padding: 0 }}>
+            <div className="admin-detail-field-full">
+              <label className="admin-detail-field-label" htmlFor="ticketPopupWhatsapp">
+                WhatsApp Number
+              </label>
+              <input
+                id="ticketPopupWhatsapp"
+                className="admin-search-input"
+                style={{ width: '100%' }}
+                placeholder="digits only with country code, e.g. 19293816441"
+                value={config?.ticketPopupWhatsapp || ''}
+                onChange={e => setConfig(prev => ({ ...prev, ticketPopupWhatsapp: e.target.value }))}
+              />
+              <small style={{ color: '#9ca3af', fontSize: '0.78rem' }}>
+                Powers the "Continue on WhatsApp" button on the ticket success popup.
+              </small>
+            </div>
+            <div className="admin-detail-field-full">
+              <label className="admin-detail-field-label" htmlFor="ticketPopupTelegramHandle">
+                Telegram Handle
+              </label>
+              <input
+                id="ticketPopupTelegramHandle"
+                className="admin-search-input"
+                style={{ width: '100%' }}
+                placeholder="username or link, e.g. WHTSIPA_DigitalTools"
+                value={config?.ticketPopupTelegramHandle || ''}
+                onChange={e => setConfig(prev => ({ ...prev, ticketPopupTelegramHandle: e.target.value }))}
+              />
+              <small style={{ color: '#9ca3af', fontSize: '0.78rem' }}>
+                Powers the "Continue on Telegram" button on the ticket success popup. Accepts username or link.
+              </small>
+            </div>
+            <div className="admin-detail-field-full" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <button type="submit" className="admin-btn admin-btn-primary" disabled={ticketPopupSaving}>
+                {ticketPopupSaving ? 'Saving…' : 'Save'}
+              </button>
+              {ticketPopupMsg && <span style={{ color: '#15803d', fontSize: '0.88rem' }}>{ticketPopupMsg}</span>}
+              {ticketPopupErr && <span style={{ color: '#dc2626', fontSize: '0.88rem' }}>{ticketPopupErr}</span>}
             </div>
           </div>
         </form>

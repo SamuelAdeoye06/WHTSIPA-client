@@ -459,6 +459,10 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
     // silently changes what shows on the Recovery Steps screen.
     recoveryWhatsapp: WHATSAPP_NUMBER,
     recoveryTelegramHandle: TELEGRAM_USERNAME,
+    // Dedicated contact channels for the "Ticket Created!" success popup,
+    // configurable in Settings → Ticket Popup Channels.
+    ticketPopupWhatsapp: WHATSAPP_NUMBER,
+    ticketPopupTelegramHandle: TELEGRAM_USERNAME,
   })
 
   useEffect(() => {
@@ -473,6 +477,8 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
         phone: worker?.phone || prev.phone,
         recoveryWhatsapp: data?.recoveryWhatsappNumber || prev.recoveryWhatsapp,
         recoveryTelegramHandle: data?.recoveryTelegramHandle || prev.recoveryTelegramHandle,
+        ticketPopupWhatsapp: data?.ticketPopupWhatsapp || prev.ticketPopupWhatsapp,
+        ticketPopupTelegramHandle: data?.ticketPopupTelegramHandle || prev.ticketPopupTelegramHandle,
       }))
     }).catch(() => { /* keep defaults */ })
   }, [])
@@ -533,6 +539,17 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
   // Recovery Steps Support), not the Hire Our Team worker above.
   const recoveryWaLink = `https://wa.me/${channels.recoveryWhatsapp}`
   const recoveryTgLink = `https://t.me/${channels.recoveryTelegramHandle}`
+
+  // Dedicated channels for the "Ticket Created!" success popup (see Settings → Ticket Popup Channels)
+  const popupWaNumber = (channels.ticketPopupWhatsapp || channels.whatsapp || '').replace(/\D/g, '')
+  const popupTgRaw = channels.ticketPopupTelegramHandle || channels.telegramHandle || ''
+  const popupTgLink = popupTgRaw.startsWith('http')
+    ? popupTgRaw
+    : `https://t.me/${popupTgRaw.replace(/^@/, '')}`
+  const popupWaMessage = encodeURIComponent(
+    `Hello WHTSIPA Support Team,\n\nTicket ID: ${ticketId}\n${threatTitle ? `Threat/Case: ${threatTitle}\n` : ''}I submitted a ticket and would like to continue here.\n\n— ${user?.email || 'Client'}`
+  )
+  const popupWaLink = `https://wa.me/${popupWaNumber}?text=${popupWaMessage}`
 
   /* Auth gate */
   if (!user && mode !== 'recovery') {
@@ -815,8 +832,8 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
                 Our specialist will assist you shortly. Keep your Ticket ID for reference.
               </p>
               <div className="d-flex gap-2 flex-wrap justify-content-center">
-                <a href={waLink} target="_blank" rel="noreferrer" className="wm-channel-btn wm-wa"><i className="bi bi-whatsapp"></i>Continue on WhatsApp</a>
-                <a href={tgLink} target="_blank" rel="noreferrer" className="wm-channel-btn wm-tg"><i className="bi bi-telegram"></i>Continue on Telegram</a>
+                <a href={popupWaLink} target="_blank" rel="noreferrer" className="wm-channel-btn wm-wa"><i className="bi bi-whatsapp"></i>Continue on WhatsApp</a>
+                <a href={popupTgLink} target="_blank" rel="noreferrer" className="wm-channel-btn wm-tg"><i className="bi bi-telegram"></i>Continue on Telegram</a>
               </div>
               <button className="btn btn-outline-cyber mt-3 w-100" onClick={onClose}>Close</button>
             </div>
