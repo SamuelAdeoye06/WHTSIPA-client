@@ -200,7 +200,8 @@ function ThreatsChatModal({ isOpen, onClose, navigate, user, isHumanAgent = fals
       goals: 'User initiated live chatbot conversation from the Threats page.',
       name: user?.firstName || user?.name || 'Anonymous Client',
       email: user?.email || 'chat-client@whtsipa.com',
-      contactMethod: 'Live Chat'
+      contactMethod: 'Live Chat',
+      source: 'threats-livechat'
     })
       .then(({ data }) => { ticketDbIdRef.current = data._id })
       .catch(err => console.error('Error pre-registering ticket session:', err))

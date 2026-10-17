@@ -613,18 +613,6 @@
   pointer-events: none;
 }
 
-.combined-video-watermark {
-  position: absolute;
-  bottom: 0.75rem;
-  right: 0.85rem;
-  font-size: 0.68rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.22);
-  letter-spacing: 0.04em;
-  pointer-events: none;
-  user-select: none;
-}
-
 /* Play overlay */
 .combined-video-overlay {
   position: absolute;

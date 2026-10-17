@@ -272,7 +272,8 @@ function ToolsLiveChat({ ticketId, threatTitle, onClose, onBack, user, userName,
           goals: `User initiated live chatbot conversation. Ref: ${threatTitle || 'General'}`,
           name: user?.firstName || user?.name || userName || 'Anonymous Client',
           email: user?.email || 'chat-client@whtsipa.com',
-          contactMethod: 'Live Chat'
+          contactMethod: 'Live Chat',
+          source: 'threats-tools-chat'
         })
         ticketDbIdRef.current = data._id
       } catch (err) {
@@ -790,7 +791,8 @@ export default function WhatsipModal({ mode, onClose, threatTitle = '' }) {
             ? `${form.phoneDialCode}${form.phoneDigits}`
             : form.phone,
           contactMethod: form.contactMethod,
-          evidenceFiles: evidenceUrls
+          evidenceFiles: evidenceUrls,
+          source: isReport ? 'threats-report-form' : isHire ? 'threats-hire-form' : 'threats-request-form'
         })
         setStep('success')
       } catch (err) {

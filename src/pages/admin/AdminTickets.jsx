@@ -83,7 +83,14 @@ export default function AdminTickets() {
                     <tr key={t._id} className="admin-table-row-clickable" onClick={() => navigate(`/admin/tickets/${t._id}`)}>
                       <td>{t.ticketId}</td>
                       <td>{t.name}</td>
-                      <td style={{ textTransform: 'capitalize' }}>{t.type}</td>
+                      <td>
+                        <span style={{ textTransform: 'capitalize' }}>{t.type}</span>
+                        {t.source && (
+                          <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '0.15rem' }}>
+                            {t.source}
+                          </div>
+                        )}
+                      </td>
                       <td>{new Date(t.createdAt).toLocaleDateString()}</td>
                       <td><StatusPill status={t.status} /></td>
                     </tr>
@@ -110,6 +117,11 @@ export default function AdminTickets() {
                     {t.type && (
                       <div style={{ marginTop: '0.2rem', textTransform: 'capitalize', color: '#64748b', fontSize: '0.78rem' }}>
                         Category: {t.type} ticket
+                      </div>
+                    )}
+                    {t.source && (
+                      <div style={{ marginTop: '0.2rem', color: '#64748b', fontSize: '0.78rem' }}>
+                        Source: {t.source}
                       </div>
                     )}
                   </div>

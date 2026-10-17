@@ -305,7 +305,6 @@ export default function Home() {
                 poster={heroImage}
               />
               <div className="cinematic-gradient" aria-hidden="true" />
-              <div className="cinematic-watermark" aria-hidden="true">whts-client.vercel.app</div>
 
               {/* Double-tap skip feedback */}
               {skipHint === 'backward' && (

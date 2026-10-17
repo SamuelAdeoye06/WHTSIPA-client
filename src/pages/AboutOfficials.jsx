@@ -538,7 +538,6 @@ function CombinedVideo() {
               crossOrigin="anonymous"
             />
             <div className="combined-video-gradient" />
-            <div className="combined-video-watermark">whts-client.vercel.app</div>
 
             {skipHint === 'backward' && (
               <div className="skip-hint skip-hint-left"><i className="bi bi-skip-backward-fill"></i><span>-10s</span></div>

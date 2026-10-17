@@ -280,7 +280,8 @@ function ContactLiveChat({ isOpen, onClose, userName, user, navigate, isHumanAge
       goals: 'User initiated live chatbot conversation from the Contact page.',
       name: user?.firstName || user?.name || userName || 'Anonymous Client',
       email: user?.email || 'chat-client@whtsipa.com',
-      contactMethod: 'Live Chat'
+      contactMethod: 'Live Chat',
+      source: 'contact-livechat'
     })
       .then(({ data }) => { ticketDbIdRef.current = data._id })
       .catch(err => console.error('Error pre-registering ticket session:', err))
