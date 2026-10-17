@@ -69,47 +69,66 @@
 }
 .admin-table tr:last-child td { border-bottom: none; }
 
-/* ── Users table — desktop only (scoped to .admin-users-table so this
-   never touches any other admin table, and the mobile card view below
-   is a completely separate markup block, untouched by any of this) ──
-   The default 1.4rem horizontal cell padding, times 9 columns, was the
-   main reason this specific table (the widest in the admin panel) was
-   overflowing — tightened just here rather than lowering it globally,
-   which would affect every other admin table's spacing unnecessarily. */
+/* ── Users table — desktop only ──
+   Compact metadata columns take minimal width so Name, Email, and Phone
+   can expand and show their full content without ellipsis or overflow-x. */
+.admin-users-table {
+  width: 100%;
+}
 .admin-users-table th,
 .admin-users-table td {
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
+  padding: 0.75rem 0.65rem;
+  vertical-align: middle;
 }
-.admin-users-table .admin-users-actions { gap: 0.4rem; }
+.admin-users-table th:first-child,
+.admin-users-table td:first-child {
+  padding-left: 1.2rem;
+}
+.admin-users-table th:last-child,
+.admin-users-table td:last-child {
+  padding-right: 1.2rem;
+}
+
+/* Compact columns: fit contents tightly */
+.admin-users-table .cell-compact {
+  width: 1%;
+  white-space: nowrap;
+}
+
+/* Data cells: render full text naturally without ellipsis clipping */
+.admin-user-cell-name {
+  font-weight: 500;
+  color: #0f172a;
+  white-space: normal;
+  line-height: 1.35;
+}
+.admin-user-cell-email {
+  color: #475569;
+  font-size: 0.84rem;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.35;
+}
+.admin-user-cell-phone {
+  white-space: nowrap;
+  font-size: 0.84rem;
+  color: #334155;
+}
+
+.admin-users-table .admin-users-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: nowrap;
+}
 .admin-table-row-clickable { cursor: pointer; }
 .admin-table-row-clickable:hover { background: #f8fafc; }
 .admin-table-empty { padding: 3rem 1.4rem; text-align: center; color: #9ca3af; }
 
-/* Reusable cell truncation — long unbroken strings (emails especially) don't
-   wrap, so without this a single long value can force the whole table wider
-   than its container and trigger horizontal scroll. max-width is set inline
-   per-cell since the right width varies by column. */
+/* Reusable cell truncation (kept for reference or single-line needs) */
 .admin-table-truncate {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-/* ── Users table: tighter columns + compact actions so 8 columns fit
-   without horizontal scroll on typical desktop widths ── */
-.admin-users-table th,
-.admin-users-table td {
-  padding: 0.7rem 0.9rem;
-}
-.admin-users-table th:last-child,
-.admin-users-table td:last-child {
-  padding-right: 1.4rem;
-}
-.admin-users-actions {
-  display: flex;
-  gap: 0.4rem;
-  flex-wrap: nowrap;
 }
 
 /* ── Worker list editor (Threats/Contact page channels) ── */

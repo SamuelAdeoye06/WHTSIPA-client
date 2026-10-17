@@ -110,12 +110,12 @@ export default function AdminUsers() {
                     <th>Name</th>
                     <th>Email</th>
                     <th>Phone</th>
-                    <th>Country</th>
-                    <th>Role</th>
-                    <th>Verified</th>
-                    <th>Login Status</th>
-                    <th>Joined</th>
-                    <th>Actions</th>
+                    <th className="cell-compact">Country</th>
+                    <th className="cell-compact">Role</th>
+                    <th className="cell-compact">Verified</th>
+                    <th className="cell-compact">Login Status</th>
+                    <th className="cell-compact">Joined</th>
+                    <th className="cell-compact">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -123,19 +123,19 @@ export default function AdminUsers() {
                     const isSelf = currentAdmin && u._id === currentAdmin.id
                     return (
                       <tr key={u._id}>
-                        <td className="admin-table-truncate" style={{ maxWidth: 125 }} title={`${u.firstName} ${u.lastName}`}>{u.firstName} {u.lastName}</td>
-                        <td className="admin-table-truncate" style={{ maxWidth: 175 }} title={u.email}>{u.email}</td>
-                        <td className="admin-table-truncate" style={{ maxWidth: 125 }} title={u.phone}>{u.phone || '—'}</td>
-                        <td className="admin-table-truncate" style={{ maxWidth: 90 }} title={u.country}>{u.country}</td>
-                        <td style={{ textTransform: 'capitalize' }}>{u.role}</td>
-                        <td>{u.isVerified ? <span className="admin-pill admin-pill-resolved">Verified</span> : <span className="admin-pill admin-pill-open">Unverified</span>}</td>
-                        <td>
+                        <td className="admin-user-cell-name">{u.firstName} {u.lastName}</td>
+                        <td className="admin-user-cell-email">{u.email}</td>
+                        <td className="admin-user-cell-phone">{u.phone || '—'}</td>
+                        <td className="cell-compact">{u.country || '—'}</td>
+                        <td className="cell-compact" style={{ textTransform: 'capitalize' }}>{u.role}</td>
+                        <td className="cell-compact">{u.isVerified ? <span className="admin-pill admin-pill-resolved">Verified</span> : <span className="admin-pill admin-pill-open">Unverified</span>}</td>
+                        <td className="cell-compact">
                           {u.isRestricted
                             ? <span className="admin-pill admin-pill-open">Restricted</span>
                             : <span className="admin-pill admin-pill-resolved">Active</span>}
                         </td>
-                        <td>{new Date(u.createdAt).toLocaleDateString()}</td>
-                        <td>
+                        <td className="cell-compact">{new Date(u.createdAt).toLocaleDateString()}</td>
+                        <td className="cell-compact">
                           {isSelf ? (
                             <span style={{ color: '#9ca3af', fontSize: '0.8rem' }}>—</span>
                           ) : (
